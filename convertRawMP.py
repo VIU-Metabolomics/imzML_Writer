@@ -88,8 +88,8 @@ def convertRAWMP(path_to_folder, orig_format='raw', file_format = 'mzML', core_n
     if core_number > 1:
         result_path = os.path.join(path_to_folder,'Output mzML Files')
         converted_files_path = os.path.join(path_to_folder,f'Initial RAW files')
-        os.mkdir(result_path)
-        os.mkdir(converted_files_path)
+        os.makedirs(result_path)
+        os.makedirs(converted_files_path)
         #print(f'Results will be available in {result_path}. Start conversion....\n')
         
     

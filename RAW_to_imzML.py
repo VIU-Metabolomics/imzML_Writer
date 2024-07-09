@@ -5,11 +5,10 @@ import pyimzml.ImzMLWriter as imzmlw
 import time
 from move_files import move_files
 from recalibrate_mz import recalibrate
-import convertRawMP
+
 
 tic = time.time()
-
-convertRawMP.convertRAWMP("./DataFiles")
+os.system('python3 convertRawMP.py')
 
 LOCK_MASS = 538.3873 #What peak to look for, ideally present in every scan
 TOLERANCE = 20 #Specified in ppm
