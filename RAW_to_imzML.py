@@ -8,7 +8,7 @@ from recalibrate_mz import recalibrate
 
 
 tic = time.time()
-#os.system('python3 convertRawMP.py')
+os.system('python3 convertRawMP.py')
 
 LOCK_MASS = 538.3873 #What peak to look for, ideally present in every scan
 TOLERANCE = 20 #Specified in ppm
