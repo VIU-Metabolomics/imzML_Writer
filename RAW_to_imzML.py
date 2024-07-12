@@ -8,7 +8,7 @@ from recalibrate_mz import recalibrate
 
 
 tic = time.time()
-os.system('python3 convertRawMP.py')
+#os.system('python3 convertRawMP.py')
 
 LOCK_MASS = 538.3873 #What peak to look for, ideally present in every scan
 TOLERANCE = 20 #Specified in ppm
@@ -23,12 +23,18 @@ scan_filts=[]
 file_iter=-1
 spectrum_counts=[]
 mzml_files=[]
+spec_counts=[]
 for file in files:
     if ".mzML" in file:
-        mzml_files.append(file)
-        tmp = pymzml.run.Reader(PATH+file)
-
         file_iter+=1
+        tmp = pymzml.run.Reader(PATH+file)
+        spec_counts.append(tmp.get_spectrum_count())
+        if np.mean(spec_counts)*0.85 > tmp.get_spectrum_count():
+            break
+        
+        
+        mzml_files.append(file)
+
         if file_iter==0:
             for spectrum in tmp:
                 if spectrum["filter string"] not in scan_filts:
@@ -39,6 +45,9 @@ for file in files:
             tmp_spectrum_counts[spectrum["filter string"]] += 1
         
         spectrum_counts.append(tmp_spectrum_counts)
+
+tmp.close()
+del spectrum
 
 #Find conserved portion of name for output filename
 str_array = [letter for letter in mzml_files[0]]
@@ -66,8 +75,10 @@ for filt in scan_filts:
 max_times = []
 for idx in contender_idx:
     tmp = pymzml.run.Reader(PATH+mzml_files[idx])
-    last_spectrum = tmp.__getitem__(tmp.get_spectrum_count())
-    max_times.append(last_spectrum["scan time"])
+    last_spectrum_idx = tmp.get_spectrum_count()
+    for spectrum in tmp:
+        scan_time = spectrum["scan time"]
+    max_times.append(scan_time)
 
 time_targets={}
 iter = -1
