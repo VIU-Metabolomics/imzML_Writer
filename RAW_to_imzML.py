@@ -10,7 +10,6 @@ from make_mzML import convert_RAW_to_mzML
 
 tic = time.time()
 convert_RAW_to_mzML()
-#os.system('python3 convertRawMP.py')
 
 LOCK_MASS = 538.3873 #What peak to look for, ideally present in every scan
 TOLERANCE = 20 #Specified in ppm
