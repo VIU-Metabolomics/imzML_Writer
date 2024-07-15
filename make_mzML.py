@@ -1,6 +1,8 @@
-##docker run -e WINEDEBUG=-all -v -q '/Users/josephmonaghan/Documents/nanoDESI_raw_to_imzml/DataFiles chambm/pwiz-skyline-i-agree-to-the-vendor-licenses wine msconvert /data/*.raw --mzML --64 --zlib=off --filter "peakPicking true 1-"'
-    #command = 'docker run -e WINEDEBUG=-all -v '+path_to_folder+'/:/data chambm/pwiz-skyline-i-agree-to-the-vendor-licenses  /data/*.'+orig_format+' --'+file_format+' --64  --zlib=off --filter "peakPicking true 1-"'
+#TODO Figure out how to make parallel computer work in a way that's actually faster
 
+# Code was inspired by another use of the docker image at "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses" 
+# available at https://github.com/JensSettelmeier/raw_to_mzXML_and_mzML/tree/main by JensSettelmeier.
+# The version written here is slower/worse, but uses the python docker SDK for readability and to suppress command line output.
 
 import docker
 import os
@@ -15,10 +17,6 @@ def convert_RAW_to_mzML():
     client.images.pull(DOCKER_IMAGE)
     path=os.getcwd()
     working_directory = path + "/DataFiles"
-
-
-
-
 
     vol = {working_directory: {'bind': "/"+DOCKER_IMAGE+"/data", 'mode': 'rw'}}
 
@@ -41,10 +39,6 @@ def convert_RAW_to_mzML():
             shutil.move("./DataFiles/"+file,"./DataFiles/Output mzML Files/"+file)
         elif ".raw" in file:
             shutil.move("./DataFiles/"+file,"./DataFiles/Initial RAW files/"+file)
-
-
-
-
 
     toc = time.time()
     print(f"Time elapsed: {round(toc - tic,1)} s for RAW to mzML conversion")
