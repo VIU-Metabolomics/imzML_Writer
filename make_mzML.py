@@ -21,6 +21,7 @@ def convert_RAW_to_mzML():
     vol = {working_directory: {'bind': "/"+DOCKER_IMAGE+"/data", 'mode': 'rw'}}
 
     comm = 'wine msconvert /'+DOCKER_IMAGE+'/data/*.raw --zlib=off --mzML --64 --outdir "/'+DOCKER_IMAGE+'/data" --filter "peakPicking true 1-"'
+    #comm = 'wine msconvert /'+DOCKER_IMAGE+'/data/*.raw --zlib=off --mzML --64 --outdir "/'+DOCKER_IMAGE+'/data"'
     env_vars = {"WINEDEBUG": "-all"}
 
     client.containers.run(
