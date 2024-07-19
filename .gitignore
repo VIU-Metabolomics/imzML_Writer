@@ -1,1 +1,5 @@
 /DataFiles/
+/__pycache__
+/launch.json
+/prof.dat
+
