@@ -6,6 +6,8 @@ import time
 from move_files import move_files
 from recalibrate_mz import recalibrate
 from make_mzML import convert_RAW_to_mzML
+from annotate import annotate_imzML
+from Progress_Bar import printProgressBar
 
 
 tic = time.time()
@@ -96,6 +98,7 @@ for filt in scan_filts:
     output_files[filt]=(OUTPUT_NAME+"_" + filt)
 
 #Build image grid, write directly to an imzML
+
 for y_row in range(y_pixels):
     active_file = pymzml.run.Reader(PATH + mzml_files[y_row])
     for filt in scan_filts:
@@ -115,14 +118,36 @@ for y_row in range(y_pixels):
 
             [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
             image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
+    printProgressBar(y_row,y_pixels-1,prefix="Writing imzML")
+
+update_files = os.listdir()
+update_files.sort()
 
 for filt in scan_filts:
     image_files[filt].close()
 
+iter = 0
+for filt in scan_filts:
+    path_to_mzML = "./DataFiles/Output mzML Files/"
+    first_mzML = path_to_mzML+mzml_files[0]
+
+    #Find the target file
+    iter+=1
+    for file in update_files:
+        if ".imzML" in file:
+            partial_filter_string = file.split(OUTPUT_NAME+"_")[1].split(".imzML")[0]
+            if partial_filter_string in filt:
+                target_file = file
+    final_time_point = time_targets[filt][-1]
+
+    annotate_imzML(target_file,first_mzML,final_time_point,filt)
+    printProgressBar(iter, len(scan_filts),prefix="Annotate")
+
+
 move_files(OUTPUT_NAME)
-          
+
 toc = time.time()
-print(f"Time elapsed: {round(toc - tic,1)} s")
+print(f"Overall time: {round(toc - tic,1)}s")
 
 
 

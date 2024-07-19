@@ -10,6 +10,8 @@ def annotate_imzML(annotate_file,SRC_mzML,scan_time=0.001,filter_string="none gi
     scan_time = how long it took to scan across the tissue (default = 0.001)
     filter_string = what scan filter is actually captured  (default = "none given")
     """
+
+    result_file = annotate_file
     #Read in imaging settings from image_parameters.xlsx spreadsheet
     wb = openpyxl.load_workbook("Image_Parameters.xlsx")
     ws = wb.active
