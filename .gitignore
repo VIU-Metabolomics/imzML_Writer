@@ -2,4 +2,6 @@
 /__pycache__
 /launch.json
 /prof.dat
+/Job_Queue/
+/Processed_Images/
 
