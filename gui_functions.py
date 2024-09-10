@@ -7,7 +7,6 @@ import pyimzml.ImzMLWriter as imzmlw
 import time
 from move_files import move_files
 from recalibrate_mz import recalibrate
-from Progress_Bar import printProgressBar
 from bs4 import BeautifulSoup
 
 def RAW_to_mzML(path,sl):

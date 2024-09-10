@@ -50,7 +50,6 @@ def get_os():
     else:
         slashes= "'\'"
 
-    slashes = "/"
     return slashes
 
 def full_convert():
