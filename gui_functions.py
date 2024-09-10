@@ -16,11 +16,8 @@ def RAW_to_mzML(path,sl):
     client.images.pull(DOCKER_IMAGE)
     
     working_directory = path
-
-    #vol = {working_directory: {'bind': "/"+DOCKER_IMAGE+"/data", 'mode': 'rw'}}
     vol = {working_directory: {'bind': f"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
 
-    #comm = 'wine msconvert /'+DOCKER_IMAGE+'/data/*.raw --zlib=off --mzML --64 --outdir "/'+DOCKER_IMAGE+'/data" --filter "peakPicking true 1-" --simAsSpectra --srmAsSpectra'
     comm = f"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.raw --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
     env_vars = {"WINEDEBUG": "-all"}
 
