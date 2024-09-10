@@ -17,7 +17,6 @@ def convert_RAW_to_mzML():
     client = docker.from_env()
     client.images.pull(DOCKER_IMAGE)
     
-    path=os.getcwd()
     working_directory = path + "/DataFiles"
 
     vol = {working_directory: {'bind': "/"+DOCKER_IMAGE+"/data", 'mode': 'rw'}}
