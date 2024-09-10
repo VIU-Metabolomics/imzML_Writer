@@ -111,13 +111,12 @@ for y_row in range(y_pixels):
 
         pvs_ppm_off = 0
         for x_row in range(max_x_pixels[filt]):
-            align_time = time_targets[filt][x_row]
-            time_diffs = abs(tmp_times - align_time)
-            match_idx = np.where(time_diffs == min(time_diffs))[0][0]
-            match_spectra = spec_list[match_idx]
-
-            [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
-            image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
+            try:
+                match_spectra = spec_list[x_row]
+                [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
+                image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
+            except:
+                pass
     printProgressBar(y_row,y_pixels-1,prefix="Writing imzML")
 
 update_files = os.listdir()
