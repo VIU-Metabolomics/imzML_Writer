@@ -54,7 +54,7 @@ def get_os():
 
 def full_convert():
     #RAW to mzML conversion, then call mzML to imzML function
-    RAW_to_mzML(path=CD_entry.get())
+    RAW_to_mzML(path=CD_entry.get(),sl=get_os())
     follow_raw_progress()
 
 def follow_raw_progress():
