@@ -1,6 +1,7 @@
 import docker
 import shutil
 import os
+import sys
 import pymzml
 import numpy as np
 import pyimzml.ImzMLWriter as imzmlw
@@ -13,10 +14,22 @@ def RAW_to_mzML(path,sl):
     client = docker.from_env()
     client.images.pull(DOCKER_IMAGE)
     
+    operating_system = sys.platform
     working_directory = path
+    # if not operating_system=='darwin' or not operating_system=='linux':
+    #     sl="'\'"
+    #     working_directory = working_directory.replace("/","\\")
+    # working_directory = working_directory.replace("/","\\")
+    # print(working_directory)
     vol = {working_directory: {'bind': fr"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
 
     comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.raw --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+
+    if not operating_system=='darwin' or not operating_system=='linux':
+        pass
+        #comm.replace("/",r"\")
+    
+
     env_vars = {"WINEDEBUG": "-all"}
 
     client.containers.run(
