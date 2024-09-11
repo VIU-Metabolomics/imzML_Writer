@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: pyimzML
+Version: 1.5.4
+Summary: Parser for conversion of imzML 1.1.0 files
+Home-page: https://github.com/alexandrovteam/pyimzML
+Author: Alexandrov Team, EMBL
+Author-email: theodore.alexandrov@embl.de
+License: Apache 2.0
+Keywords: bioinformatics imaging mass spectrometry parser imzML
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Requires-Dist: numpy
+Requires-Dist: wheezy.template
+
+
+Parser for conversion of imzML 1.1.0 files. 
+See specification here: https://ms-imaging.org/wp-content/uploads/2009/08/specifications_imzML1.1.0_RC1.pdf. 
+Outputs data as python lists, dicts or numpy array.
+
+

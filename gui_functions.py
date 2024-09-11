@@ -4,7 +4,6 @@ import os
 import pymzml
 import numpy as np
 import pyimzml.ImzMLWriter as imzmlw
-import time
 from move_files import move_files
 from recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup
@@ -15,9 +14,9 @@ def RAW_to_mzML(path,sl):
     client.images.pull(DOCKER_IMAGE)
     
     working_directory = path
-    vol = {working_directory: {'bind': f"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
+    vol = {working_directory: {'bind': fr"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
 
-    comm = f"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.raw --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+    comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.raw --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
     env_vars = {"WINEDEBUG": "-all"}
 
     client.containers.run(
@@ -31,15 +30,15 @@ def RAW_to_mzML(path,sl):
         )
 
 def clean_raw_files(path,sl):
-    mzML_folder = f"{path}{sl}Output mzML Files"
-    RAW_folder = f"{path}{sl}Initial RAW files"
+    mzML_folder = fr"{path}{sl}Output mzML Files"
+    RAW_folder = fr"{path}{sl}Initial RAW files"
     os.mkdir(mzML_folder)
     os.mkdir(RAW_folder)
     for file in os.listdir(path):
         if ".mzML" in file:
-            shutil.move(path+sl+file,mzML_folder+sl+file)
+            shutil.move(fr"{path}{sl}{file}",fr"{mzML_folder}{sl}{file}")
         elif ".raw" in file:
-            shutil.move(path+sl+file,RAW_folder+sl+file)
+            shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
 
 def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
     files = os.listdir(PATH)
@@ -55,7 +54,7 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
     for file in files:
         if ".mzML" in file:
             file_iter+=1
-            tmp = pymzml.run.Reader(PATH+file)
+            tmp = pymzml.run.Reader(fr"{PATH}{file}")
             spec_counts.append(tmp.get_spectrum_count())
             if np.mean(spec_counts)*0.85 > tmp.get_spectrum_count():
                 break
@@ -102,8 +101,7 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
     #Retrieve max times for time-alignment on longest spectra, build ideal time array
     max_times = []
     for idx in contender_idx:
-        tmp = pymzml.run.Reader(PATH+mzml_files[idx])
-        last_spectrum_idx = tmp.get_spectrum_count()
+        tmp = pymzml.run.Reader(fr"{PATH}{mzml_files[idx]}")
         for spectrum in tmp:
             scan_time = spectrum["scan time"]
         max_times.append(scan_time)
@@ -119,8 +117,8 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
     image_files = {}
     output_files ={}
     for filt in scan_filts:
-        image_files[filt] = imzmlw.ImzMLWriter(output_filename=OUTPUT_NAME+"_" + filt)
-        output_files[filt]=(OUTPUT_NAME+"_" + filt)
+        image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt}")
+        output_files[filt]=(fr"{OUTPUT_NAME}_{filt}")
 
     #Build image grid, write directly to an imzML
 
@@ -134,7 +132,6 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
                     tmp_times.append(spectrum["scan time"])
                     spec_list.append(spectrum)
 
-            pvs_ppm_off = 0
             for x_row in range(max_x_pixels[filt]):
                 align_time = time_targets[filt][x_row]
                 time_diffs = abs(tmp_times - align_time)

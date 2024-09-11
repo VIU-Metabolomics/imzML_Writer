@@ -45,12 +45,12 @@ def get_file_types(dir):
     return file_type
 
 def get_os():
-    if platform == "linux" or platform == "darwin":
-        slashes = "/"
-    else:
-        slashes= "'\'"
+    # if platform == "linux" or platform == "darwin":
+    #     slashes = "/"
+    # else:
+    #     slashes= "'\'"
 
-    return slashes
+    return "/"
 
 def full_convert():
     #RAW to mzML conversion, then call mzML to imzML function
@@ -78,7 +78,7 @@ def follow_raw_progress():
         RAW_label.config(fg=GREEN)
 
         slashes = get_os()
-        new_path = CD_entry.get()+slashes+"Output mzML Files"
+        new_path = fr"{CD_entry.get()}{slashes}Output mzML Files"
         CD_entry.delete(0,tk.END)
         CD_entry.insert(0,new_path)
 
@@ -95,7 +95,7 @@ def follow_raw_progress():
 def mzML_to_imzML():
     ##Run main conversion script from mzML to imzML, stop at annotation stage
     sl = get_os()
-    path_name=CD_entry.get()+sl
+    path_name=fr"{CD_entry.get()}{sl}"
     thread = threading.Thread(target=lambda:mzML_to_imzML_convert(PATH=path_name,progress_target=write_imzML_progress))
     thread.daemon=True
     thread.start()
@@ -111,7 +111,7 @@ def check_imzML_completion(thread):
 
         full_path = CD_entry.get()
         slash = get_os()
-        new_path = full_path.split(slash+"Output mzML Files")[0]
+        new_path = full_path.split(fr"{slash}Output mzML Files")[0]
         CD_entry.delete(0,tk.END)
         CD_entry.insert(0,new_path)
 
@@ -126,7 +126,7 @@ def write_metadata(path_in="direct"):
     if path_in == "direct":
         path_to_models = filedialog.askdirectory(initialdir=os.getcwd())
     else:
-        path_to_models = CD_entry.get()+slashes+"Output mzML Files"
+        path_to_models = fr"{CD_entry.get()}{slashes}Output mzML Files"
     
     thread = threading.Thread(target=lambda:imzML_metadata_process(path_to_models,slashes,x_speed=int(speed_entry.get()),y_step=int(Y_step_entry.get()),tgt_progress=Annotate_progress))
     thread.daemon=True

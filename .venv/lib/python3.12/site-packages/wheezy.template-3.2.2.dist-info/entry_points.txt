@@ -1,0 +1,2 @@
+[console_scripts]
+wheezy.template = wheezy.template.console:main

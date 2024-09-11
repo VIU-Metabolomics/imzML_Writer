@@ -16,6 +16,7 @@ def convert_RAW_to_mzML():
     DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
     client = docker.from_env()
     client.images.pull(DOCKER_IMAGE)
+    path = os.getcwd()
     
     working_directory = path + "/DataFiles"
 
