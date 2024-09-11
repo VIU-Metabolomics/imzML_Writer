@@ -218,7 +218,7 @@ Annotate_progress.grid(row=7,column=1,columnspan=5)
 
 
 #Listbox for files in target folder
-file_list = tk.Listbox(window,bg=BEIGE,fg="black",height=10,highlightcolor=TEAL,width=35)
+file_list = tk.Listbox(window,bg=BEIGE,fg="black",height=10,highlightcolor=TEAL,width=35,justify='center')
 file_list.grid(row=0,column=4,rowspan=2,columnspan=3)
 
 ##Processing buttons
