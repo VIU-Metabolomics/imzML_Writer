@@ -254,13 +254,13 @@ def annotate_imzML(annotate_file,SRC_mzML,scan_time=0.001,filter_string="none gi
                 y_pixels = tag.get("value")
 
     #Calculate pixel sizes and overall dimensions from size of pixel grid, scan speed, step sizes
-    x_pix_size = int(x_speed * scan_time * 60 / float(x_pixels))
+    x_pix_size = float(x_speed * scan_time * 60 / float(x_pixels))
     max_x = int(x_pix_size * float(x_pixels))
     y_pix_size = y_step
     max_y = int(y_pix_size * float(y_pixels))
 
     accessions = ["IMS:1000046", "IMS:1000047", "IMS:1000044", "IMS:1000045"]
-    names = ["pixel size x", "pixel size y", "max dimension x", "max dimension y"]
+    names = ["pixel size (x)", "pixel size y", "max dimension x", "max dimension y"]
     values = [x_pix_size, y_pix_size, max_x, max_y]
 
     #Actual insertion of data - need to write string into a beautiful soup object with NO FORMATTING to append it

@@ -28,6 +28,7 @@ def get_path():
 
 def populate_list(dir):
     files = os.listdir(dir)
+    files.sort()
     ticker = 0
     for file in files:
         if not file.startswith("."):

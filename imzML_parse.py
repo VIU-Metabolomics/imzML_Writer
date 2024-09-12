@@ -1,6 +1,7 @@
 import pyimzml.ImzMLParser as imzmlp
 import matplotlib.pyplot as plt
 
+
 TARGET_MZ=104.1069 #Choline
 #TARGET_MZ = 363.3082 #MG(18:1)
 
@@ -9,9 +10,7 @@ TOLERANCE=2 #ppm
 window=TARGET_MZ*TOLERANCE/1e6
 
 file_python = imzmlp.ImzMLParser(filename=python_conversion,parse_lib='lxml')
-img_python = imzmlp.getionimage(file_python,TARGET_MZ,TOLERANCE)
+img_python = imzmlp.getionimage(file_python,TARGET_MZ,window)
 
 plt.imshow(img_python)
 plt.show()
-
-
