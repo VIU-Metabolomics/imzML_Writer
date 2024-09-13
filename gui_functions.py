@@ -5,7 +5,6 @@ import sys
 import pymzml
 import numpy as np
 import pyimzml.ImzMLWriter as imzmlw
-from move_files import move_files
 from recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup
 
@@ -160,7 +159,7 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
     for filt in scan_filts:
         image_files[filt].close()
 
-def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress):
+def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
     global OUTPUT_NAME, time_targets
     update_files = os.listdir()
     update_files.sort()
@@ -202,7 +201,19 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress):
                
 
 
-    move_files(OUTPUT_NAME)
+    move_files(OUTPUT_NAME,path)
+
+def move_files(probe_txt,path):
+    files = os.listdir()
+    try:
+        new_directory = f"{path}/{probe_txt}"
+        os.mkdir(new_directory)
+    except:
+        pass
+    
+    for file in files:
+        if probe_txt in file:
+            shutil.move(file,f"{path}/{probe_txt}/{file}")
 
 def annotate_imzML(annotate_file,SRC_mzML,scan_time=0.001,filter_string="none given",x_speed=1,y_step=1):
     """Takes pyimzml output imzML files and annotates them using some user input (imaging_parameters.xlsx)

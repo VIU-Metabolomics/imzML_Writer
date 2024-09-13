@@ -28,6 +28,7 @@ def get_path():
         FILE_TYPE = get_file_types(directory)
 
 def populate_list(dir):
+    file_list.delete(0,tk.END)
     files = os.listdir(dir)
     files.sort()
     ticker = 0
@@ -83,6 +84,7 @@ def follow_raw_progress():
         new_path = fr"{CD_entry.get()}{slashes}Output mzML Files"
         CD_entry.delete(0,tk.END)
         CD_entry.insert(0,new_path)
+        populate_list(CD_entry.get())
 
         mzML_to_imzML()
 
@@ -113,6 +115,7 @@ def check_imzML_completion(thread):
         new_path = full_path.split(fr"{slash}Output mzML Files")[0]
         CD_entry.delete(0,tk.END)
         CD_entry.insert(0,new_path)
+        populate_list(os.getcwd())
 
         write_metadata(path_in="indirect")
 
@@ -123,7 +126,7 @@ def write_metadata(path_in="direct"):
     else:
         path_to_models = fr"{CD_entry.get()}{slashes}Output mzML Files"
     
-    thread = threading.Thread(target=lambda:imzML_metadata_process(path_to_models,slashes,x_speed=int(speed_entry.get()),y_step=int(Y_step_entry.get()),tgt_progress=Annotate_progress))
+    thread = threading.Thread(target=lambda:imzML_metadata_process(path_to_models,slashes,x_speed=int(speed_entry.get()),y_step=int(Y_step_entry.get()),tgt_progress=Annotate_progress,path=CD_entry.get()))
     thread.daemon=True
     thread.start()
 
@@ -134,9 +137,25 @@ def check_metadata_completion(thread):
         window.after(2000,check_metadata_completion,thread)
     else:
         Annotate_recalibrate_label.config(fg=GREEN)
+        model_file_list = os.listdir(f"{CD_entry.get()}/Output mzML Files")
+        str_array = [letter for letter in model_file_list[0]]
+        OUTPUT_NAME = "".join(str_array)
+        while OUTPUT_NAME not in model_file_list[-1]:
+            str_array.pop(-1)
+            OUTPUT_NAME = "".join(str_array)
+
+        new_path = f"{CD_entry.get()}/{OUTPUT_NAME}"
+        CD_entry.delete(0,tk.END)
+        CD_entry.insert(0,new_path)
+        populate_list(CD_entry.get())
+            
+        
 
 def launch_scout():
     tgt_file = file_list.selection_get()
+    if tgt_file.split(".")[-1]=="ibd":
+        file_start = tgt_file.split("ibd")[0]
+        tgt_file = file_start+"imzML"
     path = CD_entry.get()
     file_path = f"{path}/{tgt_file}"
     scout.main(_tgt_file=file_path)

@@ -84,7 +84,7 @@ def main(_tgt_file = ""):
         ion_image = np.where(ion_image > up_cutoff,up_cutoff,ion_image)
         ion_image = np.where(ion_image < low_cutoff,low_cutoff,ion_image)
 
-        fig = Figure(figsize= (1.25*aspect_ratio,1.25),dpi=300,facecolor=TEAL,layout='tight')
+        fig = Figure(dpi=100,facecolor=TEAL,layout='tight')
         
         plot1 = fig.add_subplot()
         img=plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=up_cutoff)
@@ -119,7 +119,7 @@ def main(_tgt_file = ""):
             file_format = file.split(".")[-1]
             fig.savefig(fname=file,
                         transparent=True,
-                        dpi=300,
+                        #dpi=300,
                         format=file_format,
                         bbox_inches="tight",
                         pad_inches=0)
