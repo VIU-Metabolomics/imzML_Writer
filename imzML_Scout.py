@@ -37,12 +37,12 @@ def main(_tgt_file = ""):
         target_mz = float(mz_entry.get())
         tolerance = float(tolerance_entry.get())
         filename = file_entry.get()
-        window=target_mz*tolerance/1e6
+        mz_window=target_mz*tolerance/1e6
 
         with warnings.catch_warnings(action="ignore"):
             coordinate_map = []
             imzML_object = imzmlp.ImzMLParser(filename=filename,parse_lib='lxml')
-        ion_image = imzmlp.getionimage(imzML_object,target_mz,window)
+        ion_image = imzmlp.getionimage(imzML_object,target_mz,mz_window)
         [aspect_ratio, x_pix, y_pix, max_x_dimension] = get_aspect_ratio(imzML_object)
 
         #Normalize ion image (or don't) as specified in GUI
@@ -92,23 +92,23 @@ def main(_tgt_file = ""):
         #fig.colorbar(img,location="top",fraction=0.07)
 
         try:
-            canvas.destroy()
+            canvas_ionimage.destroy()
             title_label.destroy()
             export_button.destroy()
         except:
             pass
 
-        canvas = FigureCanvasTkAgg(fig)
-        canvas.draw()
-        toolbar = NavigationToolbar2Tk(canvas, pack_toolbar=False)
+        canvas_ionimage = FigureCanvasTkAgg(fig,master=window_scout)
+        canvas_ionimage.draw()
+        toolbar = NavigationToolbar2Tk(canvas_ionimage, pack_toolbar=False)
         toolbar.update()
-        canvas.get_tk_widget().grid(row=5,column=0,columnspan=3)
+        canvas_ionimage.get_tk_widget().grid(row=5,column=0,columnspan=3)
 
         title_string = f"{int(round(x_pix,0))} µm x {int(round(y_pix,1))} µm pixels; m/z {target_mz} @ {tolerance} ppm"
-        title_label = tk.Label(text=title_string,bg=TEAL,font=FONT)
+        title_label = tk.Label(window_scout,text=title_string,bg=TEAL,font=FONT)
         title_label.grid(row=6,column=0,columnspan=3)
 
-        export_button=tk.Button(text="Export Image",bg=TEAL,highlightbackground=TEAL,command=lambda:export_image(fig))
+        export_button=tk.Button(window_scout,text="Export Image",bg=TEAL,highlightbackground=TEAL,command=lambda:export_image(fig))
         export_button.grid(row=7,column=0,columnspan=3)
 
         fig.canvas.callbacks.connect('button_press_event',report_coordinates)
@@ -167,7 +167,7 @@ def main(_tgt_file = ""):
         except:
             pass
 
-        canvas_mass_spectrum = FigureCanvasTkAgg(fig_spectrum)
+        canvas_mass_spectrum = FigureCanvasTkAgg(fig_spectrum,master=window_scout)
         canvas_mass_spectrum.draw()
         toolbar = NavigationToolbar2Tk(canvas_mass_spectrum, pack_toolbar=False)
         toolbar.update()
@@ -187,18 +187,17 @@ def main(_tgt_file = ""):
             plot_ion_image()
 
 
-    window = tk.Tk()
-    window.title("IMZML Explorer")
-    # window.geometry("900x500")
-    window.config(padx=5,pady=5,bg=TEAL)
+    window_scout = tk.Tk()
+    window_scout.title("IMZML Scout")
+    window_scout.config(padx=5,pady=5,bg=TEAL)
     style = ttk.Style()
     style.theme_use('clam')
 
     ##Target image:
-    file_var = tk.StringVar()
+    file_var = tk.StringVar(window_scout)
     file_var.set(_tgt_file)
-    file_button=tk.Button(text="Browse for file",bg=TEAL,highlightbackground=TEAL, command=browse_for_file)
-    file_entry = tk.Entry(textvariable=file_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
+    file_button=tk.Button(window_scout,text="Browse for file",bg=TEAL,highlightbackground=TEAL, command=browse_for_file)
+    file_entry = tk.Entry(window_scout,textvariable=file_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
     file_var.trace_add('write',plot_ion_image)
 
     file_button.grid(row=1,column=0)
@@ -206,10 +205,10 @@ def main(_tgt_file = ""):
 
 
     ##mz entry
-    mz_var = tk.StringVar()
+    mz_var = tk.StringVar(window_scout)
     mz_var.set("104.1069")
-    mz_label=tk.Label(text="Target m/z:",bg=TEAL,font=FONT)
-    mz_entry = tk.Entry(textvariable=mz_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
+    mz_label=tk.Label(window_scout,text="Target m/z:",bg=TEAL,font=FONT)
+    mz_entry = tk.Entry(window_scout,textvariable=mz_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
     #mz_var.trace_add('write',plot_ion_image)
     mz_entry.bind("<Return>",plot_ion_image)
     mz_entry.bind("<FocusOut>",plot_ion_image)
@@ -218,10 +217,10 @@ def main(_tgt_file = ""):
     mz_entry.grid(row=2,column=1)
 
     ##Tolerance entry
-    tol_var = tk.StringVar()
+    tol_var = tk.StringVar(window_scout)
     tol_var.set("10")
-    tolerance_label=tk.Label(text="Tolerance (ppm):",bg=TEAL,font=FONT)
-    tolerance_entry = tk.Entry(textvariable=tol_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
+    tolerance_label=tk.Label(window_scout,text="Tolerance (ppm):",bg=TEAL,font=FONT)
+    tolerance_entry = tk.Entry(window_scout,textvariable=tol_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
     #tol_var.trace_add('write',plot_ion_image)
     tolerance_entry.bind("<Return>",plot_ion_image)
     tolerance_entry.bind("<FocusOut>",plot_ion_image)
@@ -230,21 +229,21 @@ def main(_tgt_file = ""):
     tolerance_entry.grid(row=3,column=1)
 
     ##Normalization buttons
-    normalize_custom_entry=tk.Entry(highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
+    normalize_custom_entry=tk.Entry(window_scout,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
 
-    normalization_method = tk.StringVar()
-    no_normalization = tk.Radiobutton(bg=TEAL,command=check_normalization,fg="white",text="No Normalization",variable=normalization_method,value="none")
+    normalization_method = tk.StringVar(window_scout)
+    no_normalization = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",text="No Normalization",variable=normalization_method,value="none")
     no_normalization.grid(row=1,column=4)
     no_normalization.select()
-    custom_method = tk.Radiobutton(bg=TEAL,command=check_normalization,fg="white",text="Custom Normalize",variable=normalization_method,value="custom")
+    custom_method = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",text="Custom Normalize",variable=normalization_method,value="custom")
     custom_method.grid(row=2,column=4)
-    tic_method = tk.Radiobutton(bg=TEAL,command=check_normalization,fg="white",text="TIC Normalize",variable=normalization_method,value="TIC")
+    tic_method = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",text="TIC Normalize",variable=normalization_method,value="TIC")
     tic_method.grid(row=3,column=4)
 
     ##Slider
-    v_top = tk.DoubleVar(value=0.9)
-    v_bottom = tk.DoubleVar(value=0.05)
-    v_slider = RangeSliderV(window,[v_bottom,v_top],padY=12,bgColor=TEAL,valueSide="RIGHT",font_color='#ffffff',font_family="Helvetica",line_s_color=BEIGE,digit_precision='.2f',step_size=0.01)
+    v_top = tk.DoubleVar(window_scout,value=0.9)
+    v_bottom = tk.DoubleVar(window_scout,value=0.05)
+    v_slider = RangeSliderV(window_scout,[v_bottom,v_top],padY=12,bgColor=TEAL,valueSide="RIGHT",font_color='#ffffff',font_family="Helvetica",line_s_color=BEIGE,digit_precision='.2f',step_size=0.01)
     v_slider.grid(row=4,column=4,rowspan=4)
     v_top.trace_add('write',update_ion_image)
     v_bottom.trace_add('write',update_ion_image)
@@ -256,7 +255,7 @@ def main(_tgt_file = ""):
         
         on_startup=False
 
-    window.mainloop()
+    window_scout.mainloop()
 
 if __name__ == "__main__":
     try:

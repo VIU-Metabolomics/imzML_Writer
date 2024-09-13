@@ -4,6 +4,7 @@ from sys import platform
 import os
 from gui_functions import *
 import threading
+import imzML_Scout as scout
 
 
 
@@ -92,7 +93,6 @@ def follow_raw_progress():
     
     #clean_raw_files(path=CD_entry.get(),sl=slashes)
     
-
 def mzML_to_imzML():
     ##Run main conversion script from mzML to imzML, stop at annotation stage
     sl = get_os()
@@ -102,8 +102,6 @@ def mzML_to_imzML():
     thread.start()
     check_imzML_completion(thread)
     
-    
-
 def check_imzML_completion(thread):
     if thread.is_alive():
         window.after(2000,check_imzML_completion,thread)
@@ -117,10 +115,6 @@ def check_imzML_completion(thread):
         CD_entry.insert(0,new_path)
 
         write_metadata(path_in="indirect")
-
-
-
-
 
 def write_metadata(path_in="direct"):
     slashes = get_os()
@@ -141,14 +135,18 @@ def check_metadata_completion(thread):
     else:
         Annotate_recalibrate_label.config(fg=GREEN)
 
-
+def launch_scout():
+    tgt_file = file_list.selection_get()
+    path = CD_entry.get()
+    file_path = f"{path}/{tgt_file}"
+    scout.main(_tgt_file=file_path)
     
     
 
 
 window = tk.Tk()
 window.title("IMZML WRITER")
-window.geometry("750x410")
+# window.geometry("750x410")
 window.config(padx=5,pady=5,bg=TEAL)
 style = ttk.Style()
 style.theme_use('clam')
@@ -231,5 +229,9 @@ mzML_process.grid(row=2,column=5)
 
 imzML_metadata = tk.Button(text="Write imzML metadata",bg=TEAL,highlightbackground=TEAL,command=write_metadata)
 imzML_metadata.grid(row=3,column=4,columnspan=3)
+
+##Visualize .imzML
+visualize = tk.Button(text="View imzML",bg=TEAL,highlightbackground=TEAL,command=launch_scout)
+visualize.grid(row=4,column=4,columnspan=3)
 
 window.mainloop()
