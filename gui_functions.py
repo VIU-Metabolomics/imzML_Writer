@@ -1,4 +1,5 @@
 import docker
+import subprocess
 import shutil
 import os
 import sys
@@ -8,38 +9,47 @@ import pyimzml.ImzMLWriter as imzmlw
 from recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup
 
+def _viaPWIZ(path):
+    current_wd = os.getcwd()
+    os.chdir(path)
+
+    ##check pwiz availability:
+    try:
+        check = subprocess.run("msconvert",capture_output=True)
+    except:
+        raise Exception("msConvert not available, check installation and verify path is specified correctly")
+
+    command = fr"msconvert * --zlib=off --mzML --64 --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+
+    subprocess.run(["msconvert", fr"{path}\*.raw", "--zlib=off", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL)
+    os.chdir(current_wd)
+
+
 def RAW_to_mzML(path,sl):
-    DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
-    client = docker.from_env()
-    client.images.pull(DOCKER_IMAGE)
-    
-    operating_system = sys.platform
-    working_directory = path
-    # if not operating_system=='darwin' or not operating_system=='linux':
-    #     sl="'\'"
-    #     working_directory = working_directory.replace("/","\\")
-    # working_directory = working_directory.replace("/","\\")
-    # print(working_directory)
-    vol = {working_directory: {'bind': fr"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
+    if "win" in sys.platform:
+        _viaPWIZ(path)
+    else:
+        DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
+        client = docker.from_env()
+        client.images.pull(DOCKER_IMAGE)
 
-    comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.raw --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+        working_directory = path
 
-    if not operating_system=='darwin' or not operating_system=='linux':
-        pass
-        #comm.replace("/",r"\")
-    
+        vol = {working_directory: {'bind': fr"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
 
-    env_vars = {"WINEDEBUG": "-all"}
+        comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.raw --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
 
-    client.containers.run(
-        image=DOCKER_IMAGE,
-        environment=env_vars,
-        volumes = vol,
-        command=comm,
-        working_dir=working_directory,
-        auto_remove=True,
-        detach=True
-        )
+        env_vars = {"WINEDEBUG": "-all"}
+
+        client.containers.run(
+            image=DOCKER_IMAGE,
+            environment=env_vars,
+            volumes = vol,
+            command=comm,
+            working_dir=working_directory,
+            auto_remove=True,
+            detach=True
+            )
 
 def clean_raw_files(path,sl):
     mzML_folder = fr"{path}{sl}Output mzML Files"
