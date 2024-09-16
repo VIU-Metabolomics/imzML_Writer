@@ -58,7 +58,7 @@ def clean_raw_files(path,sl):
         elif ".raw" in file:
             shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
 
-def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
+def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE=20):
     files = os.listdir(PATH)
     files.sort()
 
@@ -150,13 +150,16 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd()):
                     tmp_times.append(spectrum["scan time"])
                     spec_list.append(spectrum)
 
+            pvs_ppm_off = 0
             for x_row in range(max_x_pixels[filt]):
                 align_time = time_targets[filt][x_row]
                 time_diffs = abs(tmp_times - align_time)
                 match_idx = np.where(time_diffs == min(time_diffs))[0][0]
                 match_spectra = spec_list[match_idx]
 
-                image_files[filt].addSpectrum(match_spectra.mz,match_spectra.i,(x_row,y_row))
+                [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
+
+                image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
         progress_target.config(value=int(y_row*100/(y_pixels-1)))
 
     update_files = os.listdir()

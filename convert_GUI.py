@@ -99,7 +99,7 @@ def mzML_to_imzML():
     ##Run main conversion script from mzML to imzML, stop at annotation stage
     sl = get_os()
     path_name=fr"{CD_entry.get()}{sl}"
-    thread = threading.Thread(target=lambda:mzML_to_imzML_convert(PATH=path_name,progress_target=write_imzML_progress))
+    thread = threading.Thread(target=lambda:mzML_to_imzML_convert(PATH=path_name,progress_target=write_imzML_progress,LOCK_MASS=lock_mass_entry.get()))
     thread.daemon=True
     thread.start()
     check_imzML_completion(thread)
