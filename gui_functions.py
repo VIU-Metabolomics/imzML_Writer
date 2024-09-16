@@ -10,19 +10,12 @@ from recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup
 
 def _viaPWIZ(path):
-    current_wd = os.getcwd()
-    os.chdir(path)
-
     ##check pwiz availability:
     try:
         check = subprocess.run("msconvert",capture_output=True)
     except:
         raise Exception("msConvert not available, check installation and verify path is specified correctly")
-
-    command = fr"msconvert * --zlib=off --mzML --64 --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
-
     subprocess.run(["msconvert", fr"{path}\*.raw", "--zlib=off", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL)
-    os.chdir(current_wd)
 
 
 def RAW_to_mzML(path,sl):
