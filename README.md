@@ -1,5 +1,3 @@
-# nanoDESI_raw_to_imzml
-
 ##MAC Install instructions:
 1. Download and install the latest version of python (https://www.python.org/downloads/)
 2. Download and Install VS Code (https://code.visualstudio.com/download)
