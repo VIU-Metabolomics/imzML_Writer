@@ -114,7 +114,7 @@ def main(_tgt_file = ""):
         fig.canvas.callbacks.connect('button_press_event',report_coordinates)
         
     def export_image(fig):
-        file = filedialog.asksaveasfilename(initialdir=os.getcwd())
+        file = filedialog.asksaveasfilename(initialdir=os.getcwd(),filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")])
         if file:
             file_format = file.split(".")[-1]
             fig.savefig(fname=file,
@@ -158,7 +158,7 @@ def main(_tgt_file = ""):
         fig_spectrum = Figure(figsize=(4,4),dpi=100,facecolor=TEAL,layout='tight')
 
         plot2 = fig_spectrum.add_subplot()
-        plot2.plot(mz,intensities)
+        plot2.vlines(x=mz,ymin=0,ymax=intensities)
         plot2.set_xlabel("m/z")
         plot2.set_ylabel("Intensity")
 

@@ -11,11 +11,14 @@ from bs4 import BeautifulSoup
 
 def _viaPWIZ(path):
     ##check pwiz availability:
+    current_dir = os.getcwd()
+    os.chdir(path)
     try:
         check = subprocess.run("msconvert",capture_output=True)
     except:
         raise Exception("msConvert not available, check installation and verify path is specified correctly")
-    subprocess.run(["msconvert", fr"{path}\*.raw", "--zlib=off", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL)
+    subprocess.run(["msconvert", fr"{path}\*.raw", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL)
+    os.chdir(current_dir)
 
 
 def RAW_to_mzML(path,sl):
