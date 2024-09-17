@@ -22,7 +22,7 @@ def _viaPWIZ(path):
 
 
 def RAW_to_mzML(path,sl):
-    if "win" in sys.platform:
+    if "win" in sys.platform and sys.platform != "darwin":
         _viaPWIZ(path)
     else:
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
@@ -59,6 +59,8 @@ def clean_raw_files(path,sl):
             shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
 
 def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE=20):
+    LOCK_MASS = float(LOCK_MASS)
+    TOLERANCE = float(TOLERANCE)
     files = os.listdir(PATH)
     files.sort()
 
