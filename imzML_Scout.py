@@ -1,7 +1,7 @@
 import pyimzml.ImzMLParser as imzmlp
 import matplotlib.pyplot as plt
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from RangeSlider.RangeSlider import RangeSliderV
 import os
 import sys
@@ -10,6 +10,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 from matplotlib.backend_tools import ToolBase, ToolToggleBase 
 import warnings
 import numpy as np
+import pandas as pd
 
 def main(_tgt_file = ""):
     ##Colors and FONTS
@@ -59,7 +60,8 @@ def main(_tgt_file = ""):
         
         raw_ion_image = ion_image
 
-        update_ion_image()
+        fig = update_ion_image()
+        return fig
 
     def update_ion_image(*_):
         global raw_ion_image,aspect_ratio,x_pix,y_pix
@@ -95,6 +97,7 @@ def main(_tgt_file = ""):
             canvas_ionimage.destroy()
             title_label.destroy()
             export_button.destroy()
+            b_export.destroy()
         except:
             pass
 
@@ -106,12 +109,16 @@ def main(_tgt_file = ""):
 
         title_string = f"{int(round(x_pix,0))} µm x {int(round(y_pix,1))} µm pixels; m/z {target_mz} @ {tolerance} ppm"
         title_label = tk.Label(window_scout,text=title_string,bg=TEAL,font=FONT)
-        title_label.grid(row=6,column=0,columnspan=3)
+        title_label.grid(row=6,column=0,columnspan=4)
 
         export_button=tk.Button(window_scout,text="Export Image",bg=TEAL,highlightbackground=TEAL,command=lambda:export_image(fig))
-        export_button.grid(row=7,column=0,columnspan=3)
+        export_button.grid(row=7,column=2,columnspan=1)
+
+        b_export = tk.Button(window_scout,text="Bulk Export",bg=TEAL,highlightbackground=TEAL,command=bulk_export)
+        b_export.grid(row=7,column=0,columnspan=1)
 
         fig.canvas.callbacks.connect('button_press_event',report_coordinates)
+        return fig
         
     def export_image(fig):
         file = filedialog.asksaveasfilename(initialdir=os.getcwd(),filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")])
@@ -186,6 +193,41 @@ def main(_tgt_file = ""):
             mz_entry.insert(0,round(new_mz,4))
             plot_ion_image()
 
+    def bulk_export():
+        target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
+        target_list = pd.read_excel(target_list_file)
+
+        for iter,row in target_list.iterrows():
+            mz_entry.delete(0,tk.END)
+            mz_entry.insert(0,row.values[1])
+            fig = plot_ion_image()
+
+            folder_name = os.path.join(os.path.dirname(file_entry.get()),"ion_images")
+            img_name_base = f"{row.values[0]}-{str(row.values[1]).split(".")[0]}"
+            if iter == 0:
+                if os.path.exists(folder_name):
+                    warn = messagebox.showwarning(title="Folder already exists!",message="You already have an ion image folder here, please rename, move, or delete it")
+                    break
+                os.mkdir(folder_name)
+                file = filedialog.asksaveasfilename(initialdir=folder_name,filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")],initialfile=img_name_base)
+                used_extension = file.split(".")[-1]
+            else:
+                file = os.path.join(folder_name,f"{img_name_base}.{used_extension}")
+            
+            fig.savefig(fname=file,
+                        transparent=True,
+                        #dpi=300,
+                        format=used_extension,
+                        bbox_inches="tight",
+                        pad_inches=0)
+
+
+            
+
+
+
+
+
 
     window_scout = tk.Tk()
     window_scout.title("IMZML Scout")
@@ -247,6 +289,7 @@ def main(_tgt_file = ""):
     v_slider.grid(row=4,column=4,rowspan=4)
     v_top.trace_add('write',update_ion_image)
     v_bottom.trace_add('write',update_ion_image)
+
 
     on_startup = True
     if on_startup:

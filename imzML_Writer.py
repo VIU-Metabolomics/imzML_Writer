@@ -1,12 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
-from sys import platform
 import os
 from gui_functions import *
 import threading
 import imzML_Scout as scout
-
-
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
