@@ -64,7 +64,7 @@ def main(_tgt_file = ""):
         return fig
 
     def update_ion_image(*_):
-        global raw_ion_image,aspect_ratio,x_pix,y_pix
+        global raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,export_button,b_export
 
         low_thres = v_bottom.get()
         up_thres=v_top.get()
@@ -86,12 +86,16 @@ def main(_tgt_file = ""):
         ion_image = np.where(ion_image > up_cutoff,up_cutoff,ion_image)
         ion_image = np.where(ion_image < low_cutoff,low_cutoff,ion_image)
 
+        if NL_state.get():
+            color_NL = norm_value.get()
+        else:
+            color_NL= up_cutoff
+
         fig = Figure(dpi=100,facecolor=TEAL,layout='tight')
         
         plot1 = fig.add_subplot()
-        img=plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=up_cutoff)
+        img=plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=color_NL,cmap=cmap_selected.get())
         plot1.axis('off')
-        #fig.colorbar(img,location="top",fraction=0.07)
 
         try:
             canvas_ionimage.destroy()
@@ -187,8 +191,16 @@ def main(_tgt_file = ""):
         new_mz = event.xdata
 
         if new_mz != None:
-            match_idx = (np.abs(mz - new_mz)).argmin()
-            new_mz = mz[match_idx]
+            low_pass = new_mz - 0.4
+            high_pass = new_mz + 0.4
+            matches_idx = [idx for idx, value in enumerate(mz) if value>low_pass and value<high_pass]
+            # match_idx = (np.abs(mz - new_mz)).argmin()
+            # new_mz = mz[match_idx]
+            filt_mz = mz[matches_idx]
+            filt_int = intensities[matches_idx]
+            max_idx = [idx for idx,val in enumerate(filt_int) if val==max(filt_int)]
+            new_mz = filt_mz[max_idx]
+            new_mz= new_mz.item()
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,round(new_mz,4))
             plot_ion_image()
@@ -222,8 +234,34 @@ def main(_tgt_file = ""):
                         pad_inches=0)
 
 
-            
+    def custom_NL():
+        ##0 = no custom, 1 = custom NL
+        global NL_entry, norm_value, raw_ion_image, NL_store
 
+        custom_NL_desired = NL_state.get()
+        if not custom_NL_desired:
+            try:
+                NL_entry.destroy()
+                update_NL_button.destroy()
+            except:
+                pass
+            update_ion_image()
+        elif custom_NL_desired:
+            norm_value = tk.StringVar(window_scout)
+            if norm_value.get()=="":    
+                norm_value.set(np.percentile(raw_ion_image,v_top.get()*100))
+            
+            NL_entry = tk.Entry(window_scout,textvariable=norm_value,highlightbackground=TEAL,bg=TEAL,background=BEIGE,fg="black",justify='center')
+            NL_entry.grid(row=4,column=1)
+            update_NL_button = tk.Button(window_scout,text="Get this NL",bg=TEAL,highlightbackground=TEAL,command=update_NL)
+            update_NL_button.grid(row=4,column=2)
+            NL_entry.bind("<Return>",update_ion_image)
+            NL_entry.bind("<FocusOut>",update_ion_image)
+        
+        
+    def update_NL():
+        norm_value.set(np.percentile(raw_ion_image,v_top.get()*100))
+        update_ion_image()
 
 
 
@@ -290,6 +328,18 @@ def main(_tgt_file = ""):
     v_top.trace_add('write',update_ion_image)
     v_bottom.trace_add('write',update_ion_image)
 
+    ##Custom normalization limit
+    NL_state = tk.BooleanVar(window_scout)
+    NL_checkbox = tk.Checkbutton(text="Custom normalization limit?",bg=TEAL,font=FONT,variable=NL_state,command=custom_NL)
+    NL_checkbox.grid(row=4,column=0)
+
+    ##Colormap set
+    colormap_options = ["viridis","plasma","cividis","hot","jet"]
+    cmap_selected = tk.StringVar(window_scout)
+    cmap_selected.set(colormap_options[0])
+    cmap_selector = tk.OptionMenu(window_scout,cmap_selected,*colormap_options)
+    cmap_selector.grid(row=1,column=2)
+    cmap_selected.trace_add('write',update_ion_image)
 
     on_startup = True
     if on_startup:
