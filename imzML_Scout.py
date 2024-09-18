@@ -330,7 +330,7 @@ def main(_tgt_file = ""):
 
     ##Custom normalization limit
     NL_state = tk.BooleanVar(window_scout)
-    NL_checkbox = tk.Checkbutton(text="Custom normalization limit?",bg=TEAL,font=FONT,variable=NL_state,command=custom_NL)
+    NL_checkbox = tk.Checkbutton(window_scout,text="Custom normalization limit?",bg=TEAL,font=FONT,variable=NL_state,command=custom_NL)
     NL_checkbox.grid(row=4,column=0)
 
     ##Colormap set

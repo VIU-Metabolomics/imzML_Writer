@@ -1,9 +1,14 @@
+##Standalone notes - Runs ok with no gui_functions
+##Compile with: 
+# pyinstaller --noconfirm --windowed --add-data=/Users/josephmonaghan/Documents/nanoDESI_raw_to_imzml/Images/Logo-01.png:./Images imzML_Writer.py
+
 import tkinter as tk
 from tkinter import ttk, filedialog
 import os
 from gui_functions import *
 import threading
 import imzML_Scout as scout
+import sys
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
@@ -117,6 +122,7 @@ def check_imzML_completion(thread):
         write_metadata(path_in="indirect")
 
 def write_metadata(path_in="direct"):
+    global path_to_models
     slashes = get_os()
     if path_in == "direct":
         path_to_models = filedialog.askdirectory(initialdir=os.getcwd())
@@ -130,11 +136,12 @@ def write_metadata(path_in="direct"):
     check_metadata_completion(thread)
 
 def check_metadata_completion(thread):
+    global path_to_models
     if thread.is_alive():
         window.after(2000,check_metadata_completion,thread)
     else:
         Annotate_recalibrate_label.config(fg=GREEN)
-        model_file_list = os.listdir(f"{CD_entry.get()}/Output mzML Files")
+        model_file_list = os.listdir(path_to_models)
         str_array = [letter for letter in model_file_list[0]]
         OUTPUT_NAME = "".join(str_array)
         while OUTPUT_NAME not in model_file_list[-1]:
@@ -157,8 +164,14 @@ def launch_scout():
     file_path = f"{path}/{tgt_file}"
     scout.main(_tgt_file=file_path)
     
-    
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 window = tk.Tk()
 window.title("IMZML WRITER")
@@ -170,10 +183,20 @@ style.theme_use('clam')
 
 
 ##Logo
-canvas = tk.Canvas(width = 313,height=205,bg=TEAL,highlightthickness=0)
-img = tk.PhotoImage(file="./Images/Logo-01.png")
-canvas.create_image(313/2, 205/2,image=img)
-canvas.grid(column=0,row=0,columnspan=2)
+try:
+    canvas = tk.Canvas(width = 313,height=205,bg=TEAL,highlightthickness=0)
+    img = tk.PhotoImage(file="./Images/Logo-01.png")
+    canvas.create_image(313/2, 205/2,image=img)
+    canvas.grid(column=0,row=0,columnspan=2)
+except:
+    try:
+        canvas = tk.Canvas(width = 313,height=205,bg=TEAL,highlightthickness=0)
+        img = tk.PhotoImage(file=resource_path("./Images/Logo-01.png"))
+        canvas.create_image(313/2, 205/2,image=img)
+        canvas.grid(column=0,row=0,columnspan=2)
+    except:
+        pass
+
 
 
 ##Scan-speed entry
@@ -224,7 +247,7 @@ write_imzML_progress.grid(row=6,column=1,columnspan=5)
 
 
 ##Annotate / m/z recalibration progress bar:
-Annotate_recalibrate_label = tk.Label(text="Metadata/Recalibrate:",bg=TEAL,font=FONT)
+Annotate_recalibrate_label = tk.Label(text="Metadata:",bg=TEAL,font=FONT)
 Annotate_recalibrate_label.grid(row=7,column=0)
 
 Annotate_progress=ttk.Progressbar(length=525,style="success.Striped.Horizontal.TProgressbar")

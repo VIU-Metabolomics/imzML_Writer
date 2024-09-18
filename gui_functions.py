@@ -14,10 +14,21 @@ def _viaPWIZ(path):
     current_dir = os.getcwd()
     os.chdir(path)
     try:
-        check = subprocess.run("msconvert",capture_output=True)
+        check = subprocess.run("msconvert",capture_output=True,
+                            shell=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,
+                            stdin=subprocess.PIPE,
+                            cwd=os.getcwd(),
+                            env=os.environ)
     except:
         raise Exception("msConvert not available, check installation and verify path is specified correctly")
-    subprocess.run(["msconvert", fr"{path}\*.raw", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL)
+    subprocess.run(["msconvert", fr"{path}\*.raw", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+                   shell=True,
+                    stderr=subprocess.STDOUT,
+                    stdin=subprocess.PIPE,
+                    cwd=os.getcwd(),
+                    env=os.environ)
     os.chdir(current_dir)
 
 
@@ -46,6 +57,7 @@ def RAW_to_mzML(path,sl):
             auto_remove=True,
             detach=True
             )
+        
 
 def clean_raw_files(path,sl):
     mzML_folder = fr"{path}{sl}Output mzML Files"
