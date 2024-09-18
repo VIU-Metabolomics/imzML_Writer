@@ -5,4 +5,6 @@
 /Job_Queue/
 /Processed_Images/
 /.venv
+/build
+/dist
 
