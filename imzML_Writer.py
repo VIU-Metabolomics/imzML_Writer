@@ -29,6 +29,16 @@ def get_path():
         populate_list(directory)
         FILE_TYPE = get_file_types(directory)
 
+        if FILE_TYPE != "mzML":
+            mzML_process.grid_remove()
+            imzML_metadata.grid_remove()
+        elif FILE_TYPE == "mzML":
+            full_process.grid_remove()
+            imzML_metadata.grid_remove()
+        elif FILE_TYPE == "imzML":
+            full_process.grid_remove()
+            mzML_process.grid_remove()
+
 def populate_list(dir):
     file_list.delete(0,tk.END)
     files = os.listdir(dir)
@@ -138,6 +148,8 @@ def check_metadata_completion(thread):
     else:
         Annotate_recalibrate_label.config(fg=GREEN)
         model_file_list = os.listdir(path_to_models)
+        model_file_list.sort()
+
         str_array = [letter for letter in model_file_list[0]]
         OUTPUT_NAME = "".join(str_array)
         while OUTPUT_NAME not in model_file_list[-1]:

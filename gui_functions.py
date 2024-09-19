@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 
 def _viaPWIZ(path):
     ##check pwiz availability:
+    file_type = get_file_type(path)
     current_dir = os.getcwd()
     os.chdir(path)
     try:
@@ -23,7 +24,7 @@ def _viaPWIZ(path):
                             env=os.environ)
     except:
         raise Exception("msConvert not available, check installation and verify path is specified correctly")
-    subprocess.run(["msconvert", fr"{path}\*.raw", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+    subprocess.run(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                    shell=True,
                     stderr=subprocess.STDOUT,
                     stdin=subprocess.PIPE,
@@ -74,7 +75,7 @@ def clean_raw_files(path,sl,file_type):
     for file in os.listdir(path):
         if ".mzML" in file:
             shutil.move(fr"{path}{sl}{file}",fr"{mzML_folder}{sl}{file}")
-        elif file_type in file:
+        elif file_type in file and file != "Initial RAW files":
             shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
 
 def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE=20):
@@ -179,8 +180,10 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE
                 match_spectra = spec_list[match_idx]
 
                 [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
+                if len(recalibrated_mz) != 0:
+                    image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
 
-                image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
+                
         progress_target.config(value=int(y_row*100/(y_pixels-1)))
 
     update_files = os.listdir()
@@ -196,6 +199,7 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
 
     scan_filts=[]
     model_file_list = os.listdir(model_files)
+    model_file_list.sort()
 
     ##Extract scan filter list
     while model_file_list[0].startswith("."):
@@ -224,7 +228,7 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
         iter+=1
         for file in update_files:
             if ".imzML" in file:
-                partial_filter_string = file.split(OUTPUT_NAME+"_")[1].split(".imzML")[0]
+                partial_filter_string = file.split(OUTPUT_NAME+"_")[-1].split(".imzML")[0]
                 if partial_filter_string == "None":
                     target_file = file
                 elif partial_filter_string in filt:
