@@ -105,8 +105,13 @@ def follow_raw_progress(raw_filetype):
     
 def mzML_to_imzML():
     ##Run main conversion script from mzML to imzML, stop at annotation stage
+    cur_path = CD_entry.get()
+    if os.path.basename(cur_path) != "Output mzML Files":
+        clean_raw_files(cur_path,get_os(),"     ")
+        cur_path = os.path.join(cur_path,"Output mzML Files")
+    
     sl = get_os()
-    path_name=fr"{CD_entry.get()}{sl}"
+    path_name=fr"{cur_path}{sl}"
     thread = threading.Thread(target=lambda:mzML_to_imzML_convert(PATH=path_name,progress_target=write_imzML_progress,LOCK_MASS=lock_mass_entry.get()))
     thread.daemon=True
     thread.start()
