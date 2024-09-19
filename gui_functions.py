@@ -31,6 +31,12 @@ def _viaPWIZ(path):
                     env=os.environ)
     os.chdir(current_dir)
 
+def get_file_type(path):
+    files = os.listdir(path)
+    while files[0].startswith("."):
+        files.pop(0)
+
+    return files[0].split(".")[-1]
 
 def RAW_to_mzML(path,sl):
     if "win" in sys.platform and sys.platform != "darwin":
@@ -41,13 +47,14 @@ def RAW_to_mzML(path,sl):
         client.images.pull(DOCKER_IMAGE)
 
         working_directory = path
+        file_type = get_file_type(path)
 
         vol = {working_directory: {'bind': fr"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
 
-        comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.raw --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+        comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.{file_type} --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
 
         env_vars = {"WINEDEBUG": "-all"}
-
+        
         client.containers.run(
             image=DOCKER_IMAGE,
             environment=env_vars,
@@ -59,7 +66,7 @@ def RAW_to_mzML(path,sl):
             )
         
 
-def clean_raw_files(path,sl):
+def clean_raw_files(path,sl,file_type):
     mzML_folder = fr"{path}{sl}Output mzML Files"
     RAW_folder = fr"{path}{sl}Initial RAW files"
     os.mkdir(mzML_folder)
@@ -67,7 +74,7 @@ def clean_raw_files(path,sl):
     for file in os.listdir(path):
         if ".mzML" in file:
             shutil.move(fr"{path}{sl}{file}",fr"{mzML_folder}{sl}{file}")
-        elif ".raw" in file:
+        elif file_type in file:
             shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
 
 def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE=20):
@@ -191,7 +198,10 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
     model_file_list = os.listdir(model_files)
 
     ##Extract scan filter list
-    tmp = pymzml.run.Reader(model_files+sl+model_file_list[0])
+    while model_file_list[0].startswith("."):
+        model_file_list.pop(0)
+
+    tmp = pymzml.run.Reader(os.path.join(model_files,model_file_list[0]))
     for spectrum in tmp:
         if spectrum["filter string"] not in scan_filts:
             scan_filts.append(spectrum["filter string"])
@@ -215,7 +225,9 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
         for file in update_files:
             if ".imzML" in file:
                 partial_filter_string = file.split(OUTPUT_NAME+"_")[1].split(".imzML")[0]
-                if partial_filter_string in filt:
+                if partial_filter_string == "None":
+                    target_file = file
+                elif partial_filter_string in filt:
                     target_file = file
 
         annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step)
@@ -248,6 +260,8 @@ def annotate_imzML(annotate_file,SRC_mzML,scan_time=0.001,filter_string="none gi
     """
 
     result_file = annotate_file
+    if filter_string == None:
+        filter_string = "None"
 
     #Retrieve data from source mzml
     with open(SRC_mzML) as file:

@@ -22,7 +22,7 @@ exe = EXE(
     [('v', None, 'OPTION')],
     exclude_binaries=True,
     name='imzML_Writer',
-    debug=True,
+    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,

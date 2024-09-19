@@ -59,27 +59,29 @@ def get_os():
 
 def full_convert():
     #RAW to mzML conversion, then call mzML to imzML function
+    file_type = get_file_type(CD_entry.get())
     RAW_to_mzML(path=CD_entry.get(),sl=get_os())
-    follow_raw_progress()
+    follow_raw_progress(file_type)
 
-def follow_raw_progress():
+def follow_raw_progress(raw_filetype):
     files = os.listdir(CD_entry.get())
     num_raw_files = 0
     num_mzML_files = 0
-    for file in files:
-        if ".raw" in file:
-            num_raw_files+=1
-        elif ".mzML" in file:
-            num_mzML_files+=1
 
+    for file in files:
+        if file.startswith(".")==False:
+            if f".{raw_filetype}" in file:
+                num_raw_files+=1
+            elif "mzML" in file:
+                num_mzML_files+=1
     progress = int(num_mzML_files * 100 / num_raw_files)
     RAW_progress.config(value=progress)
 
     if progress < 100:
-        window.after(3000,follow_raw_progress)
+        window.after(3000,lambda:follow_raw_progress(raw_filetype))
     elif progress >= 100:
         slashes = get_os()
-        clean_raw_files(path=CD_entry.get(),sl=slashes)
+        clean_raw_files(path=CD_entry.get(),sl=slashes,file_type=raw_filetype)
         RAW_label.config(fg=GREEN)
 
         slashes = get_os()
@@ -90,12 +92,6 @@ def follow_raw_progress():
 
         mzML_to_imzML()
 
-
-    
-    
-
-    
-    #clean_raw_files(path=CD_entry.get(),sl=slashes)
     
 def mzML_to_imzML():
     ##Run main conversion script from mzML to imzML, stop at annotation stage
