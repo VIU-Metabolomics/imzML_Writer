@@ -188,7 +188,6 @@ def resource_path(relative_path):
 
 window = tk.Tk()
 window.title("IMZML WRITER")
-# window.geometry("750x410")
 window.config(padx=5,pady=5,bg=TEAL)
 style = ttk.Style()
 style.theme_use('clam')

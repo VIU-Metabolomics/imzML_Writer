@@ -55,7 +55,7 @@ def main(_tgt_file = ""):
             norm_grid = imzmlp.getionimage(imzML_object,mz_value=norm_mz,tol=norm_window)
             ion_image = np.divide(ion_image,norm_grid,out=np.zeros_like(ion_image),where=norm_grid!=0)
         elif norm_method == "tic":
-            norm_grid = imzmlp.getionimage(imzML_object,mz_value=200,tolerance=9999)
+            norm_grid = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
             ion_image = np.divide(ion_image,norm_grid,out=np.zeros_like(ion_image),where=norm_grid!=0)
         
         raw_ion_image = ion_image
@@ -64,7 +64,7 @@ def main(_tgt_file = ""):
         return fig
 
     def update_ion_image(*_):
-        global raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,export_button,b_export
+        global raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,export_button,b_export,include_TIC_var,fig
 
         low_thres = v_bottom.get()
         up_thres=v_top.get()
@@ -94,14 +94,16 @@ def main(_tgt_file = ""):
         fig = Figure(dpi=100,facecolor=TEAL,layout='tight')
         
         plot1 = fig.add_subplot()
-        img=plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=color_NL,cmap=cmap_selected.get())
+        plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=color_NL,cmap=cmap_selected.get())
         plot1.axis('off')
 
         try:
             canvas_ionimage.destroy()
             title_label.destroy()
-            export_button.destroy()
-            b_export.destroy()
+            # export_button.destroy()
+            # b_export.destroy()
+            # csv_export.destroy()
+            # b_csv_export.destroy()
         except:
             pass
 
@@ -111,19 +113,54 @@ def main(_tgt_file = ""):
         toolbar.update()
         canvas_ionimage.get_tk_widget().grid(row=5,column=0,columnspan=3)
 
+        title_string=[]
         title_string = f"{int(round(x_pix,0))} µm x {int(round(y_pix,1))} µm pixels; m/z {target_mz} @ {tolerance} ppm"
         title_label = tk.Label(window_scout,text=title_string,bg=TEAL,font=FONT)
         title_label.grid(row=6,column=0,columnspan=4)
 
-        export_button=tk.Button(window_scout,text="Export Image",bg=TEAL,highlightbackground=TEAL,command=lambda:export_image(fig))
-        export_button.grid(row=7,column=2,columnspan=1)
-
-        b_export = tk.Button(window_scout,text="Bulk Export",bg=TEAL,highlightbackground=TEAL,command=bulk_export)
-        b_export.grid(row=7,column=0,columnspan=1)
-
         fig.canvas.callbacks.connect('button_press_event',report_coordinates)
         return fig
-        
+
+    def export_csv():
+        global raw_ion_image
+        dataframe = pd.DataFrame(raw_ion_image)
+        path = os.path.dirname(file_entry.get()) 
+        file_name = filedialog.asksaveasfilename(initialdir=path,filetypes=[("CSV file",".csv")])
+        dataframe.to_csv(path_or_buf=file_name,header=False,index=False)
+
+    def bulk_export_csv():
+        global raw_ion_image
+        target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
+        target_list = pd.read_excel(target_list_file)
+
+        for iter,row in target_list.iterrows():
+            mz_entry.delete(0,tk.END)
+            mz_entry.insert(0,row.values[1])
+            plot_ion_image()
+
+            folder_name = os.path.join(os.path.dirname(file_entry.get()),"ion_images")
+            img_name_base = f"{row.values[0]}-{str(row.values[1]).split(".")[0]}"
+            if iter == 0:
+                if os.path.exists(folder_name):
+                    messagebox.showwarning(title="Folder already exists!",message="You already have an ion image folder here, please rename, move, or delete it")
+                    break
+                os.mkdir(folder_name)
+                file = filedialog.asksaveasfilename(initialdir=folder_name,filetypes=[("CSV", ".csv")],initialfile=img_name_base)
+                used_extension = file.split(".")[-1]
+            else:
+                file = os.path.join(folder_name,f"{img_name_base}.{used_extension}")
+            
+            dataframe = pd.DataFrame(raw_ion_image)
+            dataframe.to_csv(path_or_buf=file,header=False,index=False)
+
+        if include_TIC_var.get():
+            view_tic_check.invoke()
+            file = os.path.join(folder_name,f"TIC_Image.{used_extension}")
+            dataframe = pd.DataFrame(raw_ion_image)
+            dataframe.to_csv(path_or_buf=file,header=False,index=False)
+
+
+
     def export_image(fig):
         file = filedialog.asksaveasfilename(initialdir=os.getcwd(),filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")])
         if file:
@@ -206,19 +243,20 @@ def main(_tgt_file = ""):
             plot_ion_image()
 
     def bulk_export():
+        global fig
         target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
         target_list = pd.read_excel(target_list_file)
 
         for iter,row in target_list.iterrows():
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,row.values[1])
-            fig = plot_ion_image()
+            plot_ion_image()
 
             folder_name = os.path.join(os.path.dirname(file_entry.get()),"ion_images")
             img_name_base = f"{row.values[0]}-{str(row.values[1]).split(".")[0]}"
             if iter == 0:
                 if os.path.exists(folder_name):
-                    warn = messagebox.showwarning(title="Folder already exists!",message="You already have an ion image folder here, please rename, move, or delete it")
+                    messagebox.showwarning(title="Folder already exists!",message="You already have an ion image folder here, please rename, move, or delete it")
                     break
                 os.mkdir(folder_name)
                 file = filedialog.asksaveasfilename(initialdir=folder_name,filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")],initialfile=img_name_base)
@@ -233,10 +271,31 @@ def main(_tgt_file = ""):
                         bbox_inches="tight",
                         pad_inches=0)
 
+        if include_TIC_var.get():
+            view_tic_check.invoke()
+            file = os.path.join(folder_name,f"TIC_Image.{used_extension}")
+            fig.savefig(fname=file,
+                transparent=True,
+                #dpi=300,
+                format=used_extension,
+                bbox_inches="tight",
+                pad_inches=0)
+
+
+    def view_tic():
+        if view_tic_option.get():
+            draw_tic_image()
+        else:
+            plot_ion_image()        
+
+    def draw_tic_image():
+        global raw_ion_image
+        raw_ion_image = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
+        update_ion_image()
 
     def custom_NL():
         ##0 = no custom, 1 = custom NL
-        global NL_entry, norm_value, raw_ion_image, NL_store
+        global NL_entry, norm_value, raw_ion_image
 
         custom_NL_desired = NL_state.get()
         if not custom_NL_desired:
@@ -340,6 +399,26 @@ def main(_tgt_file = ""):
     cmap_selector = tk.OptionMenu(window_scout,cmap_selected,*colormap_options)
     cmap_selector.grid(row=1,column=2)
     cmap_selected.trace_add('write',update_ion_image)
+
+    ##View TIC image
+    view_tic_option = tk.BooleanVar(window_scout)
+    view_tic_check = tk.Checkbutton(text="View TIC?",bg=TEAL,font=FONT,var=view_tic_option,command=view_tic)
+    view_tic_check.grid(row=2,column=2)
+
+    ##Export buttons
+    export_button=tk.Button(window_scout,text="Export Image",bg=TEAL,highlightbackground=TEAL,command=lambda:export_image(fig))
+    export_button.grid(row=7,column=2)
+
+    b_export = tk.Button(window_scout,text="Bulk Export",bg=TEAL,highlightbackground=TEAL,command=bulk_export)
+    b_export.grid(row=7,column=0)
+
+    csv_export = tk.Button(window_scout,text="csv Export",bg=TEAL,highlightbackground=TEAL,command=export_csv)
+    csv_export.grid(row=8,column=2)
+    b_csv_export = tk.Button(window_scout,text="Bulk csv export",bg=TEAL,highlightbackground=TEAL,command=bulk_export_csv)
+    b_csv_export.grid(row=8,column=0)
+    include_TIC_var = tk.BooleanVar(window_scout)
+    include_tic = tk.Checkbutton(text="Include TIC?",bg=TEAL,font=FONT,var=include_TIC_var)
+    include_tic.grid(row=9,column=0)
 
     on_startup = True
     if on_startup:
