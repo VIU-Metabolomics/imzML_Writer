@@ -183,8 +183,10 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE
                 if len(recalibrated_mz) != 0:
                     image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
 
-                
-        progress_target.config(value=int(y_row*100/(y_pixels-1)))
+        progress = int(y_row*100/(y_pixels-1)) 
+        if progress > 0:   
+            progress_target.stop() 
+            progress_target.config(mode="determinate",value=int(y_row*100/(y_pixels-1)))
 
     update_files = os.listdir()
     update_files.sort()
@@ -235,8 +237,11 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
                     target_file = file
 
         annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step)
-        #printProgressBar(iter, len(scan_filts),prefix="Annotate")
-        tgt_progress.config(value=int(iter*100/len(scan_filts)))
+
+        progress = int(iter*100/len(scan_filts))
+        if progress > 0:
+            tgt_progress.stop()
+            tgt_progress.config(mode="determinate",value=progress)
                
 
 

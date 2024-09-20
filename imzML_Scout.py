@@ -41,20 +41,28 @@ def main(_tgt_file = ""):
         mz_window=target_mz*tolerance/1e6
 
         with warnings.catch_warnings(action="ignore"):
-            coordinate_map = []
-            imzML_object = imzmlp.ImzMLParser(filename=filename,parse_lib='lxml')
-        ion_image = imzmlp.getionimage(imzML_object,target_mz,mz_window)
+            # coordinate_map = []
+            if "imzML_object" in globals():
+                if imzML_object.filename != filename:
+                    imzML_object = imzmlp.ImzMLParser(filename=filename,parse_lib='lxml')
+            else:
+                imzML_object = imzmlp.ImzMLParser(filename=filename,parse_lib='lxml')
+
+        if view_tic_option.get():
+            ion_image = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
+        else:
+            ion_image = imzmlp.getionimage(imzML_object,target_mz,mz_window)
+        
         [aspect_ratio, x_pix, y_pix, max_x_dimension] = get_aspect_ratio(imzML_object)
 
         #Normalize ion image (or don't) as specified in GUI
         norm_method = normalization_method.get()
-
         if norm_method == "custom":
             norm_mz = float(normalize_custom_entry.get())
             norm_window = norm_mz * tolerance / 1e6
             norm_grid = imzmlp.getionimage(imzML_object,mz_value=norm_mz,tol=norm_window)
             ion_image = np.divide(ion_image,norm_grid,out=np.zeros_like(ion_image),where=norm_grid!=0)
-        elif norm_method == "tic":
+        elif norm_method == "TIC":
             norm_grid = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
             ion_image = np.divide(ion_image,norm_grid,out=np.zeros_like(ion_image),where=norm_grid!=0)
         
@@ -228,18 +236,21 @@ def main(_tgt_file = ""):
         new_mz = event.xdata
 
         if new_mz != None:
-            low_pass = new_mz - 0.4
-            high_pass = new_mz + 0.4
-            matches_idx = [idx for idx, value in enumerate(mz) if value>low_pass and value<high_pass]
-            # match_idx = (np.abs(mz - new_mz)).argmin()
-            # new_mz = mz[match_idx]
-            filt_mz = mz[matches_idx]
-            filt_int = intensities[matches_idx]
-            max_idx = [idx for idx,val in enumerate(filt_int) if val==max(filt_int)]
-            new_mz = filt_mz[max_idx]
-            new_mz= new_mz.item()
+            iter = 1
+            new_target = []
+            while len(new_target) == 0:
+                low_pass = new_mz - (0.4*iter)
+                high_pass = new_mz + (0.4*iter)
+                iter += 1
+
+                matches_idx = [idx for idx, value in enumerate(mz) if value>low_pass and value<high_pass]
+                filt_mz = mz[matches_idx]
+                filt_int = intensities[matches_idx]
+                max_idx = [idx for idx,val in enumerate(filt_int) if val==max(filt_int)]
+                new_target = filt_mz[max_idx]
+            new_target= new_target.item()
             mz_entry.delete(0,tk.END)
-            mz_entry.insert(0,round(new_mz,4))
+            mz_entry.insert(0,round(new_target,4))
             plot_ion_image()
 
     def bulk_export():
@@ -289,9 +300,10 @@ def main(_tgt_file = ""):
             plot_ion_image()        
 
     def draw_tic_image():
-        global raw_ion_image
-        raw_ion_image = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
-        update_ion_image()
+        plot_ion_image()
+        # global raw_ion_image
+        # raw_ion_image = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
+        # update_ion_image()
 
     def custom_NL():
         ##0 = no custom, 1 = custom NL

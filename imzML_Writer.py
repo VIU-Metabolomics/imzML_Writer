@@ -71,6 +71,8 @@ def full_convert():
     #RAW to mzML conversion, then call mzML to imzML function
     file_type = get_file_type(CD_entry.get())
     RAW_to_mzML(path=CD_entry.get(),sl=get_os())
+    RAW_progress.config(mode="indeterminate")
+    RAW_progress.start()
     follow_raw_progress(file_type)
 
 def follow_raw_progress(raw_filetype):
@@ -85,7 +87,10 @@ def follow_raw_progress(raw_filetype):
             elif "mzML" in file:
                 num_mzML_files+=1
     progress = int(num_mzML_files * 100 / num_raw_files)
-    RAW_progress.config(value=progress)
+    if progress > 0:
+        RAW_progress.stop()
+        RAW_progress.config(mode="determinate",value=progress)
+        # RAW_progress.config(value=progress)
 
     if progress < 100:
         window.after(3000,lambda:follow_raw_progress(raw_filetype))
@@ -106,6 +111,8 @@ def follow_raw_progress(raw_filetype):
 def mzML_to_imzML():
     ##Run main conversion script from mzML to imzML, stop at annotation stage
     cur_path = CD_entry.get()
+    write_imzML_progress.config(mode="indeterminate")
+    write_imzML_progress.start()
     if os.path.basename(cur_path) != "Output mzML Files":
         clean_raw_files(cur_path,get_os(),"     ")
         cur_path = os.path.join(cur_path,"Output mzML Files")
@@ -134,6 +141,8 @@ def check_imzML_completion(thread):
 
 def write_metadata(path_in="direct"):
     global path_to_models
+    Annotate_progress.config(mode="indeterminate")
+    Annotate_progress.start()
     slashes = get_os()
     if path_in == "direct":
         path_to_models = filedialog.askdirectory(initialdir=os.getcwd())
