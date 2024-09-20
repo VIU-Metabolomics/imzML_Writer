@@ -11,7 +11,7 @@ import imzML_Scout as scout
 import sys
 import time
 
-timing_mode = True
+timing_mode = False
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
@@ -22,6 +22,8 @@ FONT = ("HELVETICA", 18, 'bold')
 
 ##UI Functions
 def get_path():
+    """No arguments, prompts the user via dialog box for the directory containing the data to be processed.
+    Will call populate_list() method to show files in the UI listbox"""
     global FILE_TYPE
     directory = filedialog.askdirectory(initialdir=os.getcwd())
 
@@ -42,7 +44,9 @@ def get_path():
             full_process.grid_remove()
             mzML_process.grid_remove()
 
-def populate_list(dir):
+def populate_list(dir:str):
+    """takes an argument dir and populates the UI listbox based on its contents
+    dir: pathname for active directory as a string"""
     file_list.delete(0,tk.END)
     files = os.listdir(dir)
     files.sort()
@@ -52,7 +56,10 @@ def populate_list(dir):
             file_list.insert(ticker,file)
             ticker+=1
 
-def get_file_types(dir):
+def get_file_types(dir) -> str:
+    """dir: pathname for active directory
+    returns file_type as a str
+    [taken as first non-hidden (i.e. doesn't start with ".") file in the directory]"""
     files = os.listdir(dir) 
     for file in files:
         split_file = file.split(".")
@@ -62,15 +69,12 @@ def get_file_types(dir):
     file_type_label.grid(row=1,column=3,columnspan=3)
     return file_type
 
-def get_os():
-    # if platform == "linux" or platform == "darwin":
-    #     slashes = "/"
-    # else:
-    #     slashes= "'\'"
-
+def get_os() -> str:
+    """Legacy code - returns "/" """
     return "/"
 
 def full_convert():
+    """Initiates file conversion from vendor format in the current directory"""
     if timing_mode:
         global tic
         tic = time.time()
