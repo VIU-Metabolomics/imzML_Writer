@@ -278,7 +278,10 @@ def annotate_imzML(annotate_file,SRC_mzML,scan_time=0.001,filter_string="none gi
     data = BeautifulSoup(data,'xml')
 
     #Grab instrument model from the source mzML
-    instrument_model = data.referenceableParamGroup.cvParam.get("name")
+    try:
+        instrument_model = data.referenceableParamGroup.cvParam.get("name")
+    except:
+        instrument_model = "Could not find"
 
 
     #Open un-annotated imzML

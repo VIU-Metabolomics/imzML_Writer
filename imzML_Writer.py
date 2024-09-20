@@ -9,6 +9,9 @@ from gui_functions import *
 import threading
 import imzML_Scout as scout
 import sys
+import time
+
+timing_mode = True
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
@@ -68,6 +71,9 @@ def get_os():
     return "/"
 
 def full_convert():
+    if timing_mode:
+        global tic
+        tic = time.time()
     #RAW to mzML conversion, then call mzML to imzML function
     file_type = get_file_type(CD_entry.get())
     RAW_to_mzML(path=CD_entry.get(),sl=get_os())
@@ -76,6 +82,7 @@ def full_convert():
     follow_raw_progress(file_type)
 
 def follow_raw_progress(raw_filetype):
+    global tic
     files = os.listdir(CD_entry.get())
     num_raw_files = 0
     num_mzML_files = 0
@@ -95,6 +102,10 @@ def follow_raw_progress(raw_filetype):
     if progress < 100:
         window.after(3000,lambda:follow_raw_progress(raw_filetype))
     elif progress >= 100:
+        if timing_mode:
+            global tic
+            toc = time.time()
+            print(f"RAW to mzML: {round(toc - tic,1)}s")
         slashes = get_os()
         clean_raw_files(path=CD_entry.get(),sl=slashes,file_type=raw_filetype)
         RAW_label.config(fg=GREEN)
@@ -128,6 +139,10 @@ def check_imzML_completion(thread):
     if thread.is_alive():
         window.after(2000,check_imzML_completion,thread)
     else:
+        if timing_mode:
+            global tic
+            toc = time.time()
+            print(f"mzML to imzML: {round(toc - tic,1)}s")
         write_imzML_Label.config(fg=GREEN)
 
         full_path = CD_entry.get()
@@ -160,6 +175,10 @@ def check_metadata_completion(thread):
     if thread.is_alive():
         window.after(2000,check_metadata_completion,thread)
     else:
+        if timing_mode:
+            global tic
+            toc = time.time()
+            print(f"imzML metadata: {round(toc - tic,1)}s")
         Annotate_recalibrate_label.config(fg=GREEN)
         model_file_list = os.listdir(path_to_models)
         model_file_list.sort()

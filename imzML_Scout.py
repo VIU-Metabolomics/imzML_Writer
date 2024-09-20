@@ -414,7 +414,7 @@ def main(_tgt_file = ""):
 
     ##View TIC image
     view_tic_option = tk.BooleanVar(window_scout)
-    view_tic_check = tk.Checkbutton(text="View TIC?",bg=TEAL,font=FONT,var=view_tic_option,command=view_tic)
+    view_tic_check = tk.Checkbutton(window_scout,text="View TIC?",bg=TEAL,font=FONT,var=view_tic_option,command=view_tic)
     view_tic_check.grid(row=2,column=2)
 
     ##Export buttons
@@ -429,7 +429,7 @@ def main(_tgt_file = ""):
     b_csv_export = tk.Button(window_scout,text="Bulk csv export",bg=TEAL,highlightbackground=TEAL,command=bulk_export_csv)
     b_csv_export.grid(row=8,column=0)
     include_TIC_var = tk.BooleanVar(window_scout)
-    include_tic = tk.Checkbutton(text="Include TIC?",bg=TEAL,font=FONT,var=include_TIC_var)
+    include_tic = tk.Checkbutton(window_scout,text="Include TIC?",bg=TEAL,font=FONT,var=include_TIC_var)
     include_tic.grid(row=9,column=0)
 
     on_startup = True
