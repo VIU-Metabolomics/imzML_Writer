@@ -9,7 +9,7 @@ import pyimzml.ImzMLWriter as imzmlw
 from recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup
 
-def _viaPWIZ(path):
+def _viaPWIZ(path,write_mode):
     ##check pwiz availability:
     file_type = get_file_type(path)
     current_dir = os.getcwd()
@@ -24,12 +24,23 @@ def _viaPWIZ(path):
                             env=os.environ)
     except:
         raise Exception("msConvert not available, check installation and verify path is specified correctly")
-    subprocess.run(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
-                   shell=True,
-                    stderr=subprocess.STDOUT,
-                    stdin=subprocess.PIPE,
-                    cwd=os.getcwd(),
-                    env=os.environ)
+    if write_mode=="Centroid":
+        subprocess.run(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+                    shell=True,
+                        stderr=subprocess.STDOUT,
+                        stdin=subprocess.PIPE,
+                        cwd=os.getcwd(),
+                        env=os.environ)
+    elif write_mode=="Profile":
+                subprocess.run(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+                    shell=True,
+                        stderr=subprocess.STDOUT,
+                        stdin=subprocess.PIPE,
+                        cwd=os.getcwd(),
+                        env=os.environ)
+    else:
+        raise("Invalid data write mode!")
+    
     os.chdir(current_dir)
 
 def get_file_type(path):
@@ -39,9 +50,9 @@ def get_file_type(path):
 
     return files[0].split(".")[-1]
 
-def RAW_to_mzML(path,sl):
+def RAW_to_mzML(path,sl,write_mode):
     if "win" in sys.platform and sys.platform != "darwin":
-        _viaPWIZ(path)
+        _viaPWIZ(path,write_mode)
     else:
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
         client = docker.from_env()
@@ -52,7 +63,13 @@ def RAW_to_mzML(path,sl):
 
         vol = {working_directory: {'bind': fr"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
 
-        comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.{file_type} --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+        if write_mode=="Centroid":
+            comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.{file_type} --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+        elif write_mode=="Profile":
+            comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.{file_type} --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --simAsSpectra --srmAsSpectra"
+        else:
+            raise("Invalid data write mode!")
+            
 
         env_vars = {"WINEDEBUG": "-all"}
         

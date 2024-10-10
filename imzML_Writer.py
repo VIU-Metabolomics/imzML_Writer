@@ -11,7 +11,7 @@ import imzML_Scout as scout
 import sys
 import time
 
-timing_mode = False
+timing_mode = True
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
@@ -80,7 +80,7 @@ def full_convert():
         tic = time.time()
     #RAW to mzML conversion, then call mzML to imzML function
     file_type = get_file_type(CD_entry.get())
-    RAW_to_mzML(path=CD_entry.get(),sl=get_os())
+    RAW_to_mzML(path=CD_entry.get(),sl=get_os(),write_mode=write_option_var.get())
     RAW_progress.config(mode="indeterminate")
     RAW_progress.start()
     follow_raw_progress(file_type)
@@ -315,6 +315,13 @@ imzML_metadata.grid(row=3,column=4,columnspan=3)
 
 ##Visualize .imzML
 visualize = tk.Button(text="View imzML",bg=TEAL,highlightbackground=TEAL,command=launch_scout)
-visualize.grid(row=4,column=4,columnspan=3)
+visualize.grid(row=4,column=5,columnspan=2)
+
+##Centroid or Profile?
+data_writing_options = ["Centroid", "Profile"]
+write_option_var = tk.StringVar(window)
+write_option_var.set(data_writing_options[0])
+write_options_dropdown=tk.OptionMenu(window,write_option_var,*data_writing_options)
+write_options_dropdown.grid(row=4,column=4)
 
 window.mainloop()
