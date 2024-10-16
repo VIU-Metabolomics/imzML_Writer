@@ -11,6 +11,7 @@ from matplotlib.backend_tools import ToolBase, ToolToggleBase
 import warnings
 import numpy as np
 import pandas as pd
+from analyte_list_cleanup import *
 
 def main(_tgt_file = ""):
     ##Colors and FONTS
@@ -18,6 +19,7 @@ def main(_tgt_file = ""):
     BEIGE = "#dbc076"
     GREEN = "#22d10f"
     FONT = ("HELVETICA", 18, 'bold')
+
 
     def browse_for_file():
         path_to_file = filedialog.askopenfilename(initialdir=os.getcwd())
@@ -72,7 +74,7 @@ def main(_tgt_file = ""):
         return fig
 
     def update_ion_image(*_):
-        global raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,export_button,b_export,include_TIC_var,fig
+        global FIRST_IMG,raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,fig
 
         low_thres = v_bottom.get()
         up_thres=v_top.get()
@@ -104,16 +106,12 @@ def main(_tgt_file = ""):
         plot1 = fig.add_subplot()
         plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=color_NL,cmap=cmap_selected.get())
         plot1.axis('off')
+        
 
-        try:
-            canvas_ionimage.destroy()
+        if not first_img.get():
+            canvas_ionimage.get_tk_widget().destroy()
             title_label.destroy()
-            # export_button.destroy()
-            # b_export.destroy()
-            # csv_export.destroy()
-            # b_csv_export.destroy()
-        except:
-            pass
+
 
         canvas_ionimage = FigureCanvasTkAgg(fig,master=window_scout)
         canvas_ionimage.draw()
@@ -121,12 +119,16 @@ def main(_tgt_file = ""):
         toolbar.update()
         canvas_ionimage.get_tk_widget().grid(row=5,column=0,columnspan=3)
 
+
+
         title_string=[]
         title_string = f"{int(round(x_pix,0))} µm x {int(round(y_pix,1))} µm pixels; m/z {target_mz} @ {tolerance} ppm"
         title_label = tk.Label(window_scout,text=title_string,bg=TEAL,font=FONT)
         title_label.grid(row=6,column=0,columnspan=4)
 
         fig.canvas.callbacks.connect('button_press_event',report_coordinates)
+        first_img.set(False)
+        
         return fig
 
     def export_csv():
@@ -140,6 +142,7 @@ def main(_tgt_file = ""):
         global raw_ion_image
         target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
         target_list = pd.read_excel(target_list_file)
+        target_list=cleanup_table(target_list,target_list_file)
 
         for iter,row in target_list.iterrows():
             mz_entry.delete(0,tk.END)
@@ -257,6 +260,7 @@ def main(_tgt_file = ""):
         global fig
         target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
         target_list = pd.read_excel(target_list_file)
+        target_list=cleanup_table(target_list,target_list_file)
 
         for iter,row in target_list.iterrows():
             mz_entry.delete(0,tk.END)
@@ -432,7 +436,10 @@ def main(_tgt_file = ""):
     include_tic = tk.Checkbutton(window_scout,text="Include TIC?",bg=TEAL,font=FONT,var=include_TIC_var)
     include_tic.grid(row=9,column=0)
 
+    first_img = tk.BooleanVar()
+    first_img.set(True)
     on_startup = True
+
     if on_startup:
         if _tgt_file != "":
             plot_ion_image()

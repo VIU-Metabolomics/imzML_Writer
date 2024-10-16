@@ -7,4 +7,5 @@
 /.venv
 /build
 /dist
+/sandbox.py
 

@@ -11,7 +11,7 @@ import imzML_Scout as scout
 import sys
 import time
 
-timing_mode = True
+timing_mode = False
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
