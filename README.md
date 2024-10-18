@@ -29,7 +29,7 @@ Note: This should return an info page on msConvert
 7. Install the requisite packages by running the command:
 pip install -r requirements.txt
 8. Launch imzML_Writer by typing the command:
-python convert_GUI.py
+python imzML_Writer.py
 
 
 

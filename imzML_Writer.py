@@ -120,7 +120,7 @@ def follow_raw_progress(raw_filetype):
         CD_entry.insert(0,new_path)
         populate_list(CD_entry.get())
 
-        mzML_to_imzML()
+        window.after(5000,mzML_to_imzML())
 
     
 def mzML_to_imzML():
