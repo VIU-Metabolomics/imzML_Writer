@@ -30,3 +30,9 @@ Note: This should return an info page on msConvert
 pip install -r requirements.txt
 8. Launch imzML_Writer by typing the command:
 python convert_GUI.py
+
+
+
+##Customizing colormaps:
+You can change the available colormaps by editing/creating a "Scout_Config.xlsx" file in the working directory (where imzML_Scout.py is located). A default sheet is available in the Github repo. You can edit which colormaps are available by adding/removing colormap names in the spreadsheet. Additional colormaps can be found here in the matplotlib documentation:
+https://matplotlib.org/stable/users/explain/colors/colormaps.html

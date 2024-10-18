@@ -409,7 +409,13 @@ def main(_tgt_file = ""):
     NL_checkbox.grid(row=4,column=0)
 
     ##Colormap set
-    colormap_options = ["viridis","plasma","cividis","hot","jet"]
+    try:
+        cmap_config = pd.read_excel("Scout_Config.xlsx")
+        colormap_options=cmap_config["Cmap_Options"].to_list()
+    except:
+        print("Failed to find/read colormap options file, loading defaults")
+        colormap_options = ["viridis","plasma","cividis","hot","jet"]
+    
     cmap_selected = tk.StringVar(window_scout)
     cmap_selected.set(colormap_options[0])
     cmap_selector = tk.OptionMenu(window_scout,cmap_selected,*colormap_options)
