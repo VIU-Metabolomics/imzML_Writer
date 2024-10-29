@@ -9,19 +9,20 @@ import pyimzml.ImzMLWriter as imzmlw
 from recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup
 
+
+
 def _viaPWIZ(path,write_mode):
     ##check pwiz availability:
     file_type = get_file_type(path)
     current_dir = os.getcwd()
     os.chdir(path)
     try:
-        check = subprocess.run("msconvert",capture_output=True,
-                            shell=True,
+        subprocess.run("msconvert", shell=True,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT,
                             stdin=subprocess.PIPE,
                             cwd=os.getcwd(),
-                            env=os.environ)
+                            env=os.environ) 
     except:
         raise Exception("msConvert not available, check installation and verify path is specified correctly")
     if write_mode=="Centroid":
@@ -174,7 +175,7 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE
     image_files = {}
     output_files ={}
     for filt in scan_filts:
-        image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt}")
+        image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}")
         output_files[filt]=(fr"{OUTPUT_NAME}_{filt}")
 
     #Build image grid, write directly to an imzML
@@ -350,14 +351,6 @@ def annotate_imzML(annotate_file,SRC_mzML,scan_time=0.001,filter_string="none gi
     #Write the new file
     with open(result_file,'w') as file:
         file.write(str(data_need_annotation.prettify()))
-
-
-
-
-
-
-
-
 
 
 
