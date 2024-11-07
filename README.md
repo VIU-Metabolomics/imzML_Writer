@@ -11,7 +11,7 @@ Note: This will take ~5 - 10 mins to install, you can follow the progress in the
 pip3 install -r requirements.txt
 Note: If this fails, try replacing pip3 with pip (Apple silicon chips need pip3/python3, older intel chips use pip/python)
 8. Launch imzML_Writer by typing the command:
-python3 convert_GUI.py
+python3 imzML_Writer.py
 
 
 ##PC Install instructions
