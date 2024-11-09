@@ -7,4 +7,4 @@ pyimzML==1.5.4
 pymzml==2.5.10
 RangeSlider==2023.7.2
 lxml==5.3.0
-pandas
+pandas==2.2.3
