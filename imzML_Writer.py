@@ -53,8 +53,14 @@ def populate_list(dir:str):
     ticker = 0
     for file in files:
         if not file.startswith(".") and not file.endswith(".ibd"):
-            file_list.insert(ticker,file)
-            ticker+=1
+            if file.endswith(".imzML"):
+                search_txt = file.split(".imzML")[0] + ".ibd"
+                if search_txt in files:
+                    file_list.insert(ticker,file)
+                ticker+=1
+            else:                
+                file_list.insert(ticker,file)
+                ticker+=1
 
 def get_file_types(dir) -> str:
     """dir: pathname for active directory
