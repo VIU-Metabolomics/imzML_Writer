@@ -22,7 +22,7 @@ def main(_tgt_file = ""):
 
 
     def browse_for_file():
-        path_to_file = filedialog.askopenfilename(initialdir=os.getcwd())
+        path_to_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("imzML Files","*.imzML")])
         file_entry.delete(0,tk.END)
         file_entry.insert(0,path_to_file)
 
@@ -36,7 +36,7 @@ def main(_tgt_file = ""):
         return y_pix_size/x_pix_size, x_pix_size, y_pix_size, max_x_dimension
 
     def plot_ion_image(*_):
-        global raw_ion_image, aspect_ratio,x_pix,y_pix, coordinate_map, imzML_object, max_x_dimension
+        global raw_ion_image, aspect_ratio,x_pix,y_pix, imzML_object, max_x_dimension
         target_mz = float(mz_entry.get())
         tolerance = float(tolerance_entry.get())
         filename = file_entry.get()
@@ -74,7 +74,7 @@ def main(_tgt_file = ""):
         return fig
 
     def update_ion_image(*_):
-        global FIRST_IMG,raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,fig
+        global raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,fig,ion_image, plot1, last_selected_patch, last_selected_pixel, red_highlight_patch, color_NL
 
         low_thres = v_bottom.get()
         up_thres=v_top.get()
@@ -83,18 +83,11 @@ def main(_tgt_file = ""):
 
         ion_image = raw_ion_image
 
-        ##Absolute threshold method
-        # ion_image_max = np.max(ion_image)
-        # low_cutoff = ion_image_max * low_thres
-        # up_cutoff = ion_image_max * up_thres
-
         ##Percentile method (preferred)
         low_cutoff = np.percentile(ion_image,low_thres*100)
         up_cutoff = np.percentile(ion_image,up_thres*100)
 
-
         ion_image = np.where(ion_image > up_cutoff,up_cutoff,ion_image)
-        # ion_image = np.where(ion_image < low_cutoff,low_cutoff,ion_image)
         ion_image = np.where(ion_image < low_cutoff,0,ion_image)
 
         if NL_state.get():
@@ -107,30 +100,94 @@ def main(_tgt_file = ""):
         plot1 = fig.add_subplot()
         plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=color_NL,cmap=cmap_selected.get())
         plot1.axis('off')
-        
 
         if not first_img.get():
             canvas_ionimage.get_tk_widget().destroy()
             title_label.destroy()
-
+        else:
+            last_selected_pixel = None
+            last_selected_patch = None
+            red_highlight_patch = None
 
         canvas_ionimage = FigureCanvasTkAgg(fig,master=window_scout)
+        if last_selected_patch != None:
+            draw_last_selected_patch()
         canvas_ionimage.draw()
         toolbar = NavigationToolbar2Tk(canvas_ionimage, pack_toolbar=False)
         toolbar.update()
         canvas_ionimage.get_tk_widget().grid(row=5,column=0,columnspan=3)
-
-
 
         title_string=[]
         title_string = f"{int(round(x_pix,0))} µm x {int(round(y_pix,1))} µm pixels; m/z {target_mz} @ {tolerance} ppm"
         title_label = tk.Label(window_scout,text=title_string,bg=TEAL,font=FONT)
         title_label.grid(row=6,column=0,columnspan=4)
 
+        fig.canvas.mpl_connect("motion_notify_event",image_move)
         fig.canvas.callbacks.connect('button_press_event',report_coordinates)
         first_img.set(False)
         
         return fig
+
+    def draw_last_selected_patch():
+        global last_selected_patch, last_selected_pixel
+        lx, ly = last_selected_pixel
+
+        # Prepare the green overlay for the selected pixel
+        selected_overlay = np.zeros((ion_image.shape[0], ion_image.shape[1], 4))  # New overlay
+
+        # Size for the selected pixel's highlight area
+        selected_size = 0  # Set size for the square around the selected pixel
+        
+        selected_min_y = int(max(0, ly - selected_size))
+        selected_max_y = int(min(ion_image.shape[0], ly + selected_size + 1))
+        selected_min_x = int(max(0, lx - 5))
+        selected_max_x = int(min(ion_image.shape[1], lx + selected_size + 5))
+
+
+        # Set the green color with some opacity for the selection overlay
+        selected_overlay[selected_min_y:selected_max_y, selected_min_x:selected_max_x] = [1, 0, 0, 0.8]  # Green with 80% opacity
+
+        last_selected_patch = plot1.imshow(selected_overlay, aspect=aspect_ratio, interpolation="none")
+
+    def image_move(event):
+        """Handle mouse movement over the image."""
+        global ion_image, plot1, last_selected_patch, red_highlight_patch,canvas_ionimage, color_NL  # Track selected and red patches
+
+        if event.xdata is not None and event.ydata is not None:
+            # Get the pixel index
+            x_index = int(event.xdata)
+            y_index = int(event.ydata)
+
+            # Create a copy of the original image to modify for hover
+            highlight_image = np.zeros((ion_image.shape[0], ion_image.shape[1], 4))  # RGBA image for highlight
+
+            # Size of the area around the pixel to highlight for hover
+            size = 0  # Size of the highlighted pixel (can increase if needed)
+
+            # Define bounds for the highlight area
+            min_y = max(0, y_index - size)
+            max_y = min(ion_image.shape[0], y_index + size + 1)
+            min_x = max(0, x_index - 5)
+            max_x = min(ion_image.shape[1], x_index + 5)
+
+            # Set the red color with varying opacity for the hover overlay
+            highlight_image[min_y:max_y, min_x:max_x] = [0, 1, 0, 0.8]  # Red with 80% opacity        
+            
+            # Draw the ion image first
+            plot1.imshow(ion_image, aspect=aspect_ratio, interpolation="none", vmin=np.min(ion_image), vmax=color_NL, cmap=cmap_selected.get())
+
+            # Overlay the red highlight
+            if red_highlight_patch is not None:
+                red_highlight_patch.remove()  # Remove previous red highlight if it exists
+                
+            red_highlight_patch = plot1.imshow(highlight_image, aspect=aspect_ratio, interpolation="none")  # Store new red highlight
+
+            # If we have a last selected pixel, keep it drawn
+            if last_selected_pixel:
+                draw_last_selected_patch()
+
+            # Refresh the canvas to show updates
+            canvas_ionimage.draw()
 
     def export_csv():
         global raw_ion_image
@@ -140,7 +197,7 @@ def main(_tgt_file = ""):
         dataframe.to_csv(path_or_buf=file_name,header=False,index=False)
 
     def bulk_export_csv():
-        global raw_ion_image
+        global red_highlight_patch, last_selected_patch, raw_ion_image
         target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
         target_list = pd.read_excel(target_list_file)
         target_list=cleanup_table(target_list,target_list_file)
@@ -149,6 +206,11 @@ def main(_tgt_file = ""):
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,row.values[1])
             plot_ion_image()
+            if red_highlight_patch != None:
+                red_highlight_patch.remove()
+        
+            if last_selected_patch !=None:
+                last_selected_patch.remove()
 
             folder_name = os.path.join(os.path.dirname(file_entry.get()),"ion_images")
             img_name_base = f"{row.values[0]}-{str(row.values[1]).split(".")[0]}"
@@ -171,9 +233,21 @@ def main(_tgt_file = ""):
             dataframe = pd.DataFrame(raw_ion_image)
             dataframe.to_csv(path_or_buf=file,header=False,index=False)
 
+    def find_scan_idx(event):
+            scans_per_line = int(max_x_dimension / x_pix)
+            line_scan_num = int(round(event.ydata,0))+1
+            scan_along_line = int(round(event.xdata,0))+1
+            return line_scan_num*scans_per_line + scan_along_line
 
 
     def export_image(fig):
+        global red_highlight_patch, last_selected_patch
+        if red_highlight_patch != None:
+            red_highlight_patch.remove()
+        
+        if last_selected_patch !=None:
+            last_selected_patch.remove()
+        
         file = filedialog.asksaveasfilename(initialdir=os.getcwd(),filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")])
         if file:
             file_format = file.split(".")[-1]
@@ -199,26 +273,49 @@ def main(_tgt_file = ""):
             plot_ion_image()
         except:
             pass
-
+        
     def report_coordinates(event):
-        global coordinate_map, max_x_dimension, x_pix
+        global scan_idx, last_selected_pixel, color_NL
         if event.xdata != None:
-            scans_per_line = int(max_x_dimension / x_pix)
-            line_scan_num = int(round(event.ydata,0))+1
-            scan_along_line = int(round(event.xdata,0))+1
-            scan_idx = line_scan_num*scans_per_line + scan_along_line
+            scan_idx = find_scan_idx(event)
+            last_selected_pixel = (event.xdata, event.ydata)
+            update_plot_for_selected_pixel(int(event.xdata), int(event.ydata))
             plot_mass_spectrum(scan_idx)
         
+    def update_plot_for_selected_pixel(x_index, y_index):
+        """Update the plot with the new selected pixel and draw the previous selection in green."""
+        global ion_image, plot1, canvas_ionimage, last_selected_pixel, last_selected_patch
+
+        # Draw your ion image first
+        plot1.imshow(ion_image, aspect=aspect_ratio, interpolation="none", vmin=np.min(ion_image), vmax=color_NL, cmap=cmap_selected.get())
+        
+        # Remove the old green highlight if it exists
+        if last_selected_patch is not None:
+            last_selected_patch.remove()
+
+        # If we have a previous pixel, mark it in green
+        if last_selected_pixel:
+            draw_last_selected_patch()
+
+        # Refresh the canvas to show updates
+        canvas_ionimage.draw()
 
 
-    def plot_mass_spectrum(scan_idx):
-        global imzML_object, mz, intensities
+    def plot_mass_spectrum(scan_idx,*args):
+        global imzML_object, mz, intensities, MS_vline, plot2, canvas_mass_spectrum
         [mz, intensities] = imzML_object.getspectrum(scan_idx)
 
-        fig_spectrum = Figure(figsize=(4,4),dpi=100,facecolor=TEAL,layout='tight')
+        fig_spectrum = Figure(figsize=(4,4),dpi=100,facecolor=TEAL)
 
         plot2 = fig_spectrum.add_subplot()
         plot2.vlines(x=mz,ymin=0,ymax=intensities)
+        plot2.set_ylim(0,plot2.get_ylim()[1])
+        if not first_MS.get():
+            plot2.set_xlim(float(start_var.get()),float(end_var.get()))
+            in_bounds = [idx for idx, value in enumerate(mz) if float(start_var.get()) < value < float(end_var.get())]
+            new_ylim = np.max(intensities[in_bounds]) *1.3
+            plot2.set_ylim(0,new_ylim)
+            
         plot2.set_xlabel("m/z")
         plot2.set_ylabel("Intensity")
 
@@ -228,34 +325,116 @@ def main(_tgt_file = ""):
             pass
 
         canvas_mass_spectrum = FigureCanvasTkAgg(fig_spectrum,master=window_scout)
-        canvas_mass_spectrum.draw()
-        toolbar = NavigationToolbar2Tk(canvas_mass_spectrum, pack_toolbar=False)
-        toolbar.update()
-        canvas_mass_spectrum.get_tk_widget().grid(row=5,column=6,columnspan=3)
-        toolbar.grid(row=6,column=6,columnspan=3)
+        canvas_mass_spectrum.get_tk_widget().grid(row=5,column=6,columnspan=4)
 
+        if first_MS.get():
+            MS_vline = None
+            start_mz = tk.Label(window_scout,text="Start m/z",bg=TEAL,font=FONT)
+            end_mz = tk.Label(window_scout, text = "End m/z",bg=TEAL,font=FONT)
+            start_mz.grid(row=6,column=6)
+            end_mz.grid(row=6,column=8)
+            start_var.set(f"{plot2.get_xlim()[0]:.1f}")
+            start_mz_entry = tk.Entry(window_scout,textvariable=start_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center',width=10)
+            end_var.set(f"{plot2.get_xlim()[1]:.1f}")
+            end_mz_entry = tk.Entry(window_scout,textvariable=end_var,highlightbackground=TEAL,background=BEIGE,fg='black',justify='center',width=10)
+            start_mz_entry.grid(row=6,column=7)
+            end_mz_entry.grid(row=6,column=9)
+            start_mz_entry.bind("<Return>",lambda event:plot_mass_spectrum(scan_idx=scan_idx))
+            start_mz_entry.bind("<FocusOut>",lambda event:plot_mass_spectrum(scan_idx=scan_idx))
+            end_mz_entry.bind("<Return>",lambda event:plot_mass_spectrum(scan_idx=scan_idx))
+            end_mz_entry.bind("<FocusOut>",lambda event:plot_mass_spectrum(scan_idx=scan_idx))
+
+        current_mz = mz_entry.get()
+        current_mz = float(current_mz)
+        xlim = plot2.get_xlim()
+        percentage = (current_mz - xlim[0]) / (xlim[1] - xlim[0])
+        if percentage > 0.75:
+            ha = 'right'  # align label to the right if near the end
+            label_x_pos = current_mz - 0.5  # adjust label position to the left
+        else:
+            ha = 'left'   # align label to the left otherwise
+            label_x_pos = current_mz + 0.5  #
+        y_position = 4/5 * plot2.get_ylim()[1]
+        plot2.axvline(x=current_mz,color='red',linestyle='--')
+        plot2.text(label_x_pos, y_position, f"{current_mz:.4f}", color='red', fontsize=10, ha=ha, va='center')
+        canvas_mass_spectrum.draw()
+
+        fig_spectrum.canvas.mpl_connect("motion_notify_event",on_MS_move)
         fig_spectrum.canvas.callbacks.connect("button_press_event",change_target_mz)
+        first_MS.set(False)
+    
+    def on_MS_move(event):
+        new_mz = event.xdata
+        if new_mz is not None:
+            new_target = find_target_mz(new_mz)
+
+            global MS_vline, plot2, canvas_mass_spectrum, MS_label
+            if MS_vline is not None:
+                MS_vline.remove()
+
+            if 'MS_label' in globals() and MS_label is not None:
+                MS_label.remove()
+
+            # Get the current limits of the x-axis
+            xlim = plot2.get_xlim()
+            
+            # Calculate the percentage along the x-axis
+            percentage = (new_target - xlim[0]) / (xlim[1] - xlim[0])
+            
+            # Set the y position of the label
+            y_position = 2 / 3 * plot2.get_ylim()[1]
+
+            # Determine label position
+            if percentage > 0.75:
+                ha = 'right'  # align label to the right if near the end
+                label_x_pos = new_target - 0.5  # adjust label position to the left
+            else:
+                ha = 'left'   # align label to the left otherwise
+                label_x_pos = new_target + 0.5  # adjust label position to the right
+
+            MS_vline = plot2.axvline(x=new_target, color='black', linestyle='--')
+            
+            # Create the label with adjusted properties
+            MS_label = plot2.text(label_x_pos, y_position, f"{new_target:.4f}",
+                                color='black', fontsize=10, ha=ha, va='center')
+
+            canvas_mass_spectrum.draw()
+
+    def find_target_mz(new_mz):
+        """Finds the target m/z value based on surrounding m/z values."""
+        if new_mz is None:
+            return None  # Handle case for None input
+
+        iter = 1
+        new_target = []
+        
+        # Loop until a target value is found
+        while len(new_target) == 0:
+            low_pass = new_mz - (0.05 * iter)
+            high_pass = new_mz + (0.05 * iter)
+            iter += 1
+
+            # Find indices of values within the low and high pass range
+            matches_idx = [idx for idx, value in enumerate(mz) if low_pass < value < high_pass]
+            filt_mz = mz[matches_idx]
+            filt_int = intensities[matches_idx]
+            
+            # Get index of the maximum intensity value
+            if len(filt_int) > 0:
+                max_idx = [idx for idx, val in enumerate(filt_int) if val == max(filt_int)]
+                new_target = filt_mz[max_idx]
+
+        return new_target.item()  # Return the found target m/z value
 
     def change_target_mz(event):
+        global scan_idx
         new_mz = event.xdata
-
         if new_mz != None:
-            iter = 1
-            new_target = []
-            while len(new_target) == 0:
-                low_pass = new_mz - (0.4*iter)
-                high_pass = new_mz + (0.4*iter)
-                iter += 1
-
-                matches_idx = [idx for idx, value in enumerate(mz) if value>low_pass and value<high_pass]
-                filt_mz = mz[matches_idx]
-                filt_int = intensities[matches_idx]
-                max_idx = [idx for idx,val in enumerate(filt_int) if val==max(filt_int)]
-                new_target = filt_mz[max_idx]
-            new_target= new_target.item()
+            new_target = find_target_mz(new_mz)
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,round(new_target,4))
             plot_ion_image()
+            plot_mass_spectrum(scan_idx)
 
     def bulk_export():
         global fig
@@ -443,8 +622,15 @@ def main(_tgt_file = ""):
     include_tic = tk.Checkbutton(window_scout,text="Include TIC?",bg=TEAL,font=FONT,var=include_TIC_var)
     include_tic.grid(row=9,column=0)
 
-    first_img = tk.BooleanVar()
+
+    start_var = tk.StringVar(window_scout)
+    start_var.set(None)
+    end_var = tk.StringVar(window_scout)
+    end_var.set(None)
+    first_img = tk.BooleanVar(window_scout)
     first_img.set(True)
+    first_MS = tk.BooleanVar(window_scout)
+    first_MS.set(True)
     on_startup = True
 
     if on_startup:

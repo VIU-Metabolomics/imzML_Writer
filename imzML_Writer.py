@@ -52,7 +52,7 @@ def populate_list(dir:str):
     files.sort()
     ticker = 0
     for file in files:
-        if not file.startswith("."):
+        if not file.startswith(".") and not file.endswith(".ibd"):
             file_list.insert(ticker,file)
             ticker+=1
 
