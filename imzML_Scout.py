@@ -94,7 +94,8 @@ def main(_tgt_file = ""):
 
 
         ion_image = np.where(ion_image > up_cutoff,up_cutoff,ion_image)
-        ion_image = np.where(ion_image < low_cutoff,low_cutoff,ion_image)
+        # ion_image = np.where(ion_image < low_cutoff,low_cutoff,ion_image)
+        ion_image = np.where(ion_image < low_cutoff,0,ion_image)
 
         if NL_state.get():
             color_NL = norm_value.get()
