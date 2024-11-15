@@ -96,6 +96,7 @@ def follow_raw_progress(raw_filetype):
     files = os.listdir(CD_entry.get())
     num_raw_files = 0
     num_mzML_files = 0
+    mzML_files = []
 
     for file in files:
         if file.startswith(".")==False:
@@ -103,15 +104,30 @@ def follow_raw_progress(raw_filetype):
                 num_raw_files+=1
             elif "mzML" in file:
                 num_mzML_files+=1
+                mzML_files.append(file)
     progress = int(num_mzML_files * 100 / num_raw_files)
+    
+    sizes = []
+    for file in mzML_files:
+        file_size = os.path.getsize(f"{CD_entry.get()}/{file}")
+        sizes.append(file_size)
+    if len(sizes) > 0:
+        if np.min(sizes) < np.mean(sizes)*0.75:
+            last_one_ready = False
+        else:
+            last_one_ready = True
+            
+
     if progress > 0:
         RAW_progress.stop()
         RAW_progress.config(mode="determinate",value=progress)
-        # RAW_progress.config(value=progress)
 
-    if progress < 100:
+
+    if progress < 100 or not last_one_ready:
         window.after(3000,lambda:follow_raw_progress(raw_filetype))
-    elif progress >= 100:
+    elif progress >= 100 and last_one_ready:
+
+        
         if timing_mode:
             global tic
             toc = time.time()

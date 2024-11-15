@@ -134,14 +134,12 @@ def main(_tgt_file = ""):
 
         # Prepare the green overlay for the selected pixel
         selected_overlay = np.zeros((ion_image.shape[0], ion_image.shape[1], 4))  # New overlay
-
-        # Size for the selected pixel's highlight area
-        selected_size = 0  # Set size for the square around the selected pixel
         
-        selected_min_y = int(max(0, ly - selected_size))
-        selected_max_y = int(min(ion_image.shape[0], ly + selected_size + 1))
-        selected_min_x = int(max(0, lx - 5))
-        selected_max_x = int(min(ion_image.shape[1], lx + selected_size + 5))
+        num_lines, pixels_per_line = ion_image.shape
+        selected_min_y = int(max(0, ly))
+        selected_max_y = int(min(num_lines, ly + 1))
+        selected_min_x = int(max(0, lx - pixels_per_line*0.008))
+        selected_max_x = int(min(pixels_per_line, lx + 1))
 
 
         # Set the green color with some opacity for the selection overlay
@@ -161,17 +159,18 @@ def main(_tgt_file = ""):
             # Create a copy of the original image to modify for hover
             highlight_image = np.zeros((ion_image.shape[0], ion_image.shape[1], 4))  # RGBA image for highlight
 
-            # Size of the area around the pixel to highlight for hover
-            size = 0  # Size of the highlighted pixel (can increase if needed)
-
             # Define bounds for the highlight area
-            min_y = max(0, y_index - size)
-            max_y = min(ion_image.shape[0], y_index + size + 1)
-            min_x = max(0, x_index - 5)
-            max_x = min(ion_image.shape[1], x_index + 5)
+            num_lines, pixels_per_line = ion_image.shape
+            # min_y = int(max(0, y_index - num_lines*0.01))
+            # max_y = int(min(ion_image.shape[0], y_index + num_lines*0.01))
 
-            # Set the red color with varying opacity for the hover overlay
-            highlight_image[min_y:max_y, min_x:max_x] = [0, 1, 0, 0.8]  # Red with 80% opacity        
+            min_y = int(max(0, y_index))
+            max_y = int(min(ion_image.shape[0], y_index+1))
+            min_x = int(max(0, x_index - pixels_per_line*0.008))
+            max_x = int(min(ion_image.shape[1], x_index + 1))
+
+            # Set the green color with varying opacity for the hover overlay
+            highlight_image[min_y:max_y, min_x:max_x] = [0, 1, 0, 0.8]  # Green with 80% opacity        
             
             # Draw the ion image first
             plot1.imshow(ion_image, aspect=aspect_ratio, interpolation="none", vmin=np.min(ion_image), vmax=color_NL, cmap=cmap_selected.get())
@@ -279,11 +278,11 @@ def main(_tgt_file = ""):
         if event.xdata != None:
             scan_idx = find_scan_idx(event)
             last_selected_pixel = (event.xdata, event.ydata)
-            update_plot_for_selected_pixel(int(event.xdata), int(event.ydata))
+            update_plot_for_selected_pixel()
             plot_mass_spectrum(scan_idx)
         
-    def update_plot_for_selected_pixel(x_index, y_index):
-        """Update the plot with the new selected pixel and draw the previous selection in green."""
+    def update_plot_for_selected_pixel():
+        """Update the plot with the new selected pixel and draw the previous selection in red."""
         global ion_image, plot1, canvas_ionimage, last_selected_pixel, last_selected_patch
 
         # Draw your ion image first
@@ -293,7 +292,7 @@ def main(_tgt_file = ""):
         if last_selected_patch is not None:
             last_selected_patch.remove()
 
-        # If we have a previous pixel, mark it in green
+        # If we have a previous pixel, mark it in red
         if last_selected_pixel:
             draw_last_selected_patch()
 
@@ -301,7 +300,7 @@ def main(_tgt_file = ""):
         canvas_ionimage.draw()
 
 
-    def plot_mass_spectrum(scan_idx,*args):
+    def plot_mass_spectrum(scan_idx):
         global imzML_object, mz, intensities, MS_vline, plot2, canvas_mass_spectrum
         [mz, intensities] = imzML_object.getspectrum(scan_idx)
 
@@ -410,8 +409,8 @@ def main(_tgt_file = ""):
         
         # Loop until a target value is found
         while len(new_target) == 0:
-            low_pass = new_mz - (0.05 * iter)
-            high_pass = new_mz + (0.05 * iter)
+            low_pass = new_mz - (0.005 * iter)
+            high_pass = new_mz + (0.005 * iter)
             iter += 1
 
             # Find indices of values within the low and high pass range

@@ -26,14 +26,14 @@ def _viaPWIZ(path,write_mode):
     except:
         raise Exception("msConvert not available, check installation and verify path is specified correctly")
     if write_mode=="Centroid":
-        subprocess.run(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+        subprocess.Popen(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                     shell=True,
                         stderr=subprocess.STDOUT,
                         stdin=subprocess.PIPE,
                         cwd=os.getcwd(),
                         env=os.environ)
     elif write_mode=="Profile":
-                subprocess.run(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+                subprocess.Popen(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                     shell=True,
                         stderr=subprocess.STDOUT,
                         stdin=subprocess.PIPE,
