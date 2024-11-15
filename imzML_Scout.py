@@ -146,7 +146,7 @@ def main(_tgt_file = ""):
         selected_overlay[selected_min_y:selected_max_y, selected_min_x:selected_max_x] = [1, 0, 0, 0.8]  # Green with 80% opacity
 
         last_selected_patch = plot1.imshow(selected_overlay, aspect=aspect_ratio, interpolation="none")
-
+        
     def image_move(event):
         """Handle mouse movement over the image."""
         global ion_image, plot1, last_selected_patch, red_highlight_patch,canvas_ionimage, color_NL  # Track selected and red patches
