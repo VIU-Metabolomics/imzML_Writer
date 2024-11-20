@@ -38,4 +38,14 @@
 You can change the available colormaps by editing/creating a "Scout_Config.xlsx" file in the working directory (where imzML_Scout.py is located). A default sheet is available in the Github repo. You can edit which colormaps are available by adding/removing colormap names in the spreadsheet. Additional colormaps can be found here in the matplotlib documentation:
 https://matplotlib.org/stable/users/explain/colors/colormaps.html
 
+##Troubleshooting:
+
+Nothing's working! Why?!?!
+
+1. Start with a clean installation and try the test files to ensure all packages/msConvert/Docker are installed correctly
+2. Verify that no 'hanging' imzML files are in the working directory where imzML_Writer is installed, these can result from failed file conversions and will cause errors if you try to process a new dataset without removing them
+
+Everything turned green, but I don't have any imzML files and the progress bars look wacky?
+-This can occur for non-thermo files that specify the filter string in a new and exciting way I hadn't found yet. If comfortable, please share a test file and I'll add it to the library so it will convert correctly
+
 Please direct any questions, concerns, or feature requests to me at Joseph.Monaghan@viu.ca

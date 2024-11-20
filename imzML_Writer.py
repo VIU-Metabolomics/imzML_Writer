@@ -91,13 +91,19 @@ def full_convert():
     RAW_progress.start()
     follow_raw_progress(file_type)
 
-def follow_raw_progress(raw_filetype):
+def follow_raw_progress(raw_filetype:str):
+    """Monitors progress of raw file conversion to mzML by comparing the number of raw vendor files to mzML files in the working directory
+    Input:
+    raw_filetype: string specifying the file extension of the raw files"""
     global tic
+
+    #Retrieve list of files in working directory
     files = os.listdir(CD_entry.get())
     num_raw_files = 0
     num_mzML_files = 0
     mzML_files = []
 
+    ##Iterate through each file, counting each type
     for file in files:
         if file.startswith(".")==False:
             if f".{raw_filetype}" in file:
@@ -105,8 +111,12 @@ def follow_raw_progress(raw_filetype):
             elif "mzML" in file:
                 num_mzML_files+=1
                 mzML_files.append(file)
+    
+    #Calculate progress based on number of each
     progress = int(num_mzML_files * 100 / num_raw_files)
     
+    #Check that the mzML files are all roughly the same size (smallest at least >75% the size of the mean) to ensure
+    #last file actually finished
     sizes = []
     for file in mzML_files:
         file_size = os.path.getsize(f"{CD_entry.get()}/{file}")
@@ -117,14 +127,15 @@ def follow_raw_progress(raw_filetype):
         else:
             last_one_ready = True
             
-
+    #Update progress bar to show how many mzML files are finished compared to total
     if progress > 0:
         RAW_progress.stop()
         RAW_progress.config(mode="determinate",value=progress)
 
-
+    #If not finished, start this function over again after waiting 3 seconds for more progress to be made
     if progress < 100 or not last_one_ready:
         window.after(3000,lambda:follow_raw_progress(raw_filetype))
+    #If finished, move on to the next stage in the process
     elif progress >= 100 and last_one_ready:
 
         
@@ -133,44 +144,57 @@ def follow_raw_progress(raw_filetype):
             toc = time.time()
             print(f"RAW to mzML: {round(toc - tic,1)}s")
         slashes = get_os()
+        #Clean up file structure by placing mzML and raw files in separate folders
         clean_raw_files(path=CD_entry.get(),sl=slashes,file_type=raw_filetype)
+        #Make it obvious the process is complete by changing the label to green
         RAW_label.config(fg=GREEN)
 
         slashes = get_os()
+        ##Change the directory to the new mzML folder
         new_path = fr"{CD_entry.get()}{slashes}Output mzML Files"
         CD_entry.delete(0,tk.END)
         CD_entry.insert(0,new_path)
         populate_list(CD_entry.get())
 
-        window.after(5000,mzML_to_imzML())
+        ##Initiate the next step in the pipeline
+        window.after(500,mzML_to_imzML())
 
     
 def mzML_to_imzML():
-    ##Run main conversion script from mzML to imzML, stop at annotation stage
+    """Run main conversion script from mzML to imzML, stop at annotation stage"""
     cur_path = CD_entry.get()
+
+    ##Start the progress bar whirling to indicate to user that things are working
     write_imzML_progress.config(mode="indeterminate")
     write_imzML_progress.start()
     if os.path.basename(cur_path) != "Output mzML Files":
         clean_raw_files(cur_path,get_os(),"     ")
         cur_path = os.path.join(cur_path,"Output mzML Files")
     
+
     sl = get_os()
     path_name=fr"{cur_path}{sl}"
+    ##Start thread to convert the process
     thread = threading.Thread(target=lambda:mzML_to_imzML_convert(PATH=path_name,progress_target=write_imzML_progress,LOCK_MASS=lock_mass_entry.get()))
     thread.daemon=True
     thread.start()
+
+    ##Start monitoring process to see if imzML files have been successfully written
     check_imzML_completion(thread)
     
 def check_imzML_completion(thread):
+    """monitors imzML conversion process by checking if the thread is still alive"""
     if thread.is_alive():
-        window.after(2000,check_imzML_completion,thread)
-    else:
+        window.after(2000,check_imzML_completion,thread) #If thread is still going, check back again in 2 seconds
+    else: #Otherwise, move on to the next step
         if timing_mode:
             global tic
             toc = time.time()
             print(f"mzML to imzML: {round(toc - tic,1)}s")
+        #Update progress bar label to green to make it obvious things have completed
         write_imzML_Label.config(fg=GREEN)
 
+        ##Update folder to directory where the intermediate imzML files are saved (directory w/ the python code)
         full_path = CD_entry.get()
         slash = get_os()
         new_path = full_path.split(fr"{slash}Output mzML Files")[0]
@@ -178,33 +202,43 @@ def check_imzML_completion(thread):
         CD_entry.insert(0,new_path)
         populate_list(os.getcwd())
 
+        ##Initiate the metadata writing process
         write_metadata(path_in="indirect")
 
-def write_metadata(path_in="direct"):
+def write_metadata(path_in:str="direct"):
+    """Initiates metadata writing on the intermediate mzML files"""
     global path_to_models
+
+    #Start progress bar whirring to indicate process has started to user
     Annotate_progress.config(mode="indeterminate")
     Annotate_progress.start()
     slashes = get_os()
+    #If conversion was called directly, prompt user for source mzml files to retrieve metadata from
     if path_in == "direct":
         path_to_models = filedialog.askdirectory(initialdir=os.getcwd())
     else:
         path_to_models = fr"{CD_entry.get()}{slashes}Output mzML Files"
     
+    #Start the annotation in a new thread
     thread = threading.Thread(target=lambda:imzML_metadata_process(path_to_models,slashes,x_speed=int(speed_entry.get()),y_step=int(Y_step_entry.get()),tgt_progress=Annotate_progress,path=CD_entry.get()))
     thread.daemon=True
     thread.start()
 
+    ##Monitor the annotation
     check_metadata_completion(thread)
 
 def check_metadata_completion(thread):
+    """Follows metadata writing process, moving on if thread has terminated or checking again if it hasn't"""
     global path_to_models
+    ##If thread is still going, run this function again after waiting 2 seconds
     if thread.is_alive():
         window.after(2000,check_metadata_completion,thread)
-    else:
+    else: ##Otherwise, move on
         if timing_mode:
             global tic
             toc = time.time()
             print(f"imzML metadata: {round(toc - tic,1)}s")
+        ##Update label to green, update file list to indicate process completion to user
         Annotate_recalibrate_label.config(fg=GREEN)
         model_file_list = os.listdir(path_to_models)
         model_file_list.sort()
@@ -223,6 +257,7 @@ def check_metadata_completion(thread):
         
 
 def launch_scout():
+    """Launches imzML_Scout.py when the user selects an imzML file on the indicated file"""
     tgt_file = file_list.selection_get()
     if tgt_file.split(".")[-1]=="ibd":
         file_start = tgt_file.split("ibd")[0]
@@ -233,6 +268,7 @@ def launch_scout():
     
 
 def resource_path(relative_path):
+    """Future placeholder for making standalone application work"""
     try:
         base_path = sys._MEIPASS
     except Exception:
@@ -240,6 +276,8 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
+
+##Build tkinter window
 window = tk.Tk()
 window.title("IMZML WRITER")
 window.config(padx=5,pady=5,bg=TEAL)

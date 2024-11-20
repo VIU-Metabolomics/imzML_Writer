@@ -11,7 +11,10 @@ from bs4 import BeautifulSoup
 
 
 
-def _viaPWIZ(path,write_mode):
+def _viaPWIZ(path:str,write_mode:str):
+    """Method to call msConvert directly if the detected platform is on windows, takes as argument:
+    path - path to the target files (string)
+    write_mode - "Centroid" or "Profile" as specified in the GUI"""
     ##check pwiz availability:
     file_type = get_file_type(path)
     current_dir = os.getcwd()
@@ -24,7 +27,9 @@ def _viaPWIZ(path,write_mode):
                             cwd=os.getcwd(),
                             env=os.environ) 
     except:
-        raise Exception("msConvert not available, check installation and verify path is specified correctly")
+        raise Exception("msConvert not available, check installation and verify msConvert path is specified correctly")
+
+    ##Call the actual conversion
     if write_mode=="Centroid":
         subprocess.Popen(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                     shell=True,
@@ -44,17 +49,21 @@ def _viaPWIZ(path,write_mode):
     
     os.chdir(current_dir)
 
-def get_file_type(path):
+def get_file_type(path:str):
+    """Identifies the file type in the specified path, ignoring hidden files starting with .
+    Returns the file extension"""
     files = os.listdir(path)
     while files[0].startswith("."):
         files.pop(0)
 
     return files[0].split(".")[-1]
 
-def RAW_to_mzML(path,sl,write_mode):
+def RAW_to_mzML(path:str,sl:str,write_mode:str):
+    """Calls msConvert via docker on linux and Mac, or calls _viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path"""
     if "win" in sys.platform and sys.platform != "darwin":
         _viaPWIZ(path,write_mode)
     else:
+        ##Setup the docker image including internal file structure and command
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
         client = docker.from_env()
         client.images.pull(DOCKER_IMAGE)
@@ -74,6 +83,7 @@ def RAW_to_mzML(path,sl,write_mode):
 
         env_vars = {"WINEDEBUG": "-all"}
         
+        ##Call/run the docker container
         client.containers.run(
             image=DOCKER_IMAGE,
             environment=env_vars,
@@ -85,7 +95,14 @@ def RAW_to_mzML(path,sl,write_mode):
             )
         
 
-def clean_raw_files(path,sl,file_type):
+def clean_raw_files(path:str,sl:str,file_type:str):
+    """Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:
+    Initial RAW files - raw vendor files
+    Output mzML Files - processed mzML files output by msConvert
+    Inputs:
+    path - path to directory to clean up
+    sl - legacy code, should just be '/'
+    file_type - extension for raw files to know what to sort"""
     mzML_folder = fr"{path}{sl}Output mzML Files"
     RAW_folder = fr"{path}{sl}Initial RAW files"
     os.mkdir(mzML_folder)
@@ -96,14 +113,22 @@ def clean_raw_files(path,sl,file_type):
         elif file_type in file and file != "Initial RAW files":
             shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
 
-def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE=20):
+def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20):
+    """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
+    aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
+    Inputs:
+    progress_target - tkinter progress bar object from the GUI to update as conversion progresses
+    path - Working path for source mzML files
+    Lock mass - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration
+    Tolerance - search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm"""
+
+    ##Ensure lock mass and tolerance are formatted as float
     LOCK_MASS = float(LOCK_MASS)
     TOLERANCE = float(TOLERANCE)
     files = os.listdir(PATH)
     files.sort()
 
     ##Extracts filter strings, num pixels for each scan, etc
-    num_scans=[]
     scan_filts=[]
     file_iter=-1
     spectrum_counts=[]
@@ -114,12 +139,14 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE
             file_iter+=1
             tmp = pymzml.run.Reader(fr"{PATH}{file}")
             spec_counts.append(tmp.get_spectrum_count())
+            ##Ignore partially collected datafiles that were cut-short (threshold of <85% the scans of the mean datafile)
             if np.mean(spec_counts)*0.85 > tmp.get_spectrum_count():
                 break
             
             
             mzml_files.append(file)
 
+            ##Retrieve list of filter strings from first file
             if file_iter==0:
                 for spectrum in tmp:
                     if spectrum["filter string"] not in scan_filts:
@@ -175,11 +202,13 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE
     image_files = {}
     output_files ={}
     for filt in scan_filts:
-        image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}")
+        if filt == None:
+            image_files[filt]=imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_None")
+        else:
+            image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}")
         output_files[filt]=(fr"{OUTPUT_NAME}_{filt}")
 
     #Build image grid, write directly to an imzML
-
     for y_row in range(y_pixels):
         active_file = pymzml.run.Reader(PATH + mzml_files[y_row])
         for filt in scan_filts:
@@ -201,19 +230,30 @@ def mzML_to_imzML_convert(progress_target,PATH=os.getcwd(),LOCK_MASS=0,TOLERANCE
                 if len(recalibrated_mz) != 0:
                     image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row,y_row))
 
+        ##Update progress bar in the GUI as each mzML finishes
         progress = int(y_row*100/(y_pixels-1)) 
         if progress > 0:   
             progress_target.stop() 
             progress_target.config(mode="determinate",value=int(y_row*100/(y_pixels-1)))
 
+    ##Close imzML objects for downstream annotation
     update_files = os.listdir()
     update_files.sort()
 
     for filt in scan_filts:
         image_files[filt].close()
 
-def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
+def imzML_metadata_process(model_files:str,sl:str,x_speed:float,y_step:float,tgt_progress,path:str):
+    """Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). Inputs:
+    model_files - Directory to the folder containing mzML files
+    sl - legacy, use '/'
+    x_speed - scan speed in the x-direction, µm/sec
+    y_step - step between strip lines, µm
+    tgt_progress - Tkinter progress bar object to update as the process continues
+    path - path to the directory where imzML files should be stored after annotation"""
     global OUTPUT_NAME, time_targets
+
+    ##Retrieve and sort files from the working directory (imzML) and model file directory (mzML)
     update_files = os.listdir()
     update_files.sort()
 
@@ -221,10 +261,11 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
     model_file_list = os.listdir(model_files)
     model_file_list.sort()
 
-    ##Extract scan filter list
+    ##Ignore hidden files
     while model_file_list[0].startswith("."):
         model_file_list.pop(0)
 
+    ##Extract filter strings from the first mzML source file
     tmp = pymzml.run.Reader(os.path.join(model_files,model_file_list[0]))
     for spectrum in tmp:
         if spectrum["filter string"] not in scan_filts:
@@ -232,19 +273,18 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
     
         final_time_point = spectrum["scan time"]
 
-    ##Extract common output name
+    ##Extract common output name based on common characters in first and last mzML file
     str_array = [letter for letter in model_file_list[0]]
     OUTPUT_NAME = "".join(str_array)
     while OUTPUT_NAME not in model_file_list[-1]:
         str_array.pop(-1)
         OUTPUT_NAME = "".join(str_array)
 
-    #Retrieve max times for time-alignment on longest spectra, build ideal time array
-    #Compute max number of pixels in each scan filter to construct pixel grids
 
+    ##Loop to annotate each imzML file
     iter = 0
     for filt in scan_filts:
-        #Find the target file
+        #Find the target file based on a filter string match
         iter+=1
         for file in update_files:
             if ".imzML" in file:
@@ -254,18 +294,20 @@ def imzML_metadata_process(model_files,sl,x_speed,y_step,tgt_progress,path):
                 elif partial_filter_string in filt:
                     target_file = file
 
+        ##Calls the actual annotation function
         annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step)
 
+        ##Update progress bar in the GUI
         progress = int(iter*100/len(scan_filts))
         if progress > 0:
             tgt_progress.stop()
             tgt_progress.config(mode="determinate",value=progress)
-               
 
-
+    ##After conversion is complete, clean up files by putting the annotated imzML files in a new directory within the datafile folder           
     move_files(OUTPUT_NAME,path)
 
-def move_files(probe_txt,path):
+def move_files(probe_txt:str,path:str):
+    """Moves the annotated imzML files into the same directory as the source raw files of the image under a new folder matching the datafile names"""
     files = os.listdir()
     try:
         new_directory = f"{path}/{probe_txt}"
@@ -277,15 +319,15 @@ def move_files(probe_txt,path):
         if probe_txt in file:
             shutil.move(file,f"{path}/{probe_txt}/{file}")
 
-def annotate_imzML(annotate_file,SRC_mzML,scan_time=0.001,filter_string="none given",x_speed=1,y_step=1):
-    """Takes pyimzml output imzML files and annotates them using some user input (imaging_parameters.xlsx)
-    and the corresponding mzML source file. Designed to be embeded as part of overall nanoDESI Raw-to-imzML pipeline.
+def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1):
+    """Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file. 
     annotate_file = the imzML file to be annotated
     SRC_mzML = the source file to pull metadata from
     scan_time = how long it took to scan across the tissue (default = 0.001)
     filter_string = what scan filter is actually captured  (default = "none given")
     """
 
+    #Error handling for when scan filter extraction fails
     result_file = annotate_file
     if filter_string == None:
         filter_string = "None"

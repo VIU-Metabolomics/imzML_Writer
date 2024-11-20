@@ -22,26 +22,35 @@ def main(_tgt_file = ""):
 
 
     def browse_for_file():
+        """Launch dialog box for user to find and select a target imzML file"""
         path_to_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("imzML Files","*.imzML")])
         file_entry.delete(0,tk.END)
         file_entry.insert(0,path_to_file)
 
     def get_aspect_ratio(img_file):
-        metadata = img_file.metadata.pretty()
-        x_pix_size = metadata["scan_settings"]["scanSettings1"]["pixel size (x)"]
-        y_pix_size = metadata["scan_settings"]["scanSettings1"]["pixel size y"]
+        """Tries to extract aspect ratio information (relative pixel dimensions) from the imzML. Uses 1x1 pixels if it fails"""
+        try:
+            metadata = img_file.metadata.pretty()
+            x_pix_size = metadata["scan_settings"]["scanSettings1"]["pixel size (x)"]
+            y_pix_size = metadata["scan_settings"]["scanSettings1"]["pixel size y"]
 
-        max_x_dimension = metadata["scan_settings"]["scanSettings1"]["max dimension x"]
+            max_x_dimension = metadata["scan_settings"]["scanSettings1"]["max dimension x"]
 
-        return y_pix_size/x_pix_size, x_pix_size, y_pix_size, max_x_dimension
+            return y_pix_size/x_pix_size, x_pix_size, y_pix_size, max_x_dimension
+        except:
+            return 1, 1, 1, 1
 
     def plot_ion_image(*_):
+        """Deals with data update for plotting a new ion image, retrieving targets from the user input fields"""
         global raw_ion_image, aspect_ratio,x_pix,y_pix, imzML_object, max_x_dimension
+
+        #Get the target data for the iamge
         target_mz = float(mz_entry.get())
         tolerance = float(tolerance_entry.get())
         filename = file_entry.get()
         mz_window=target_mz*tolerance/1e6
 
+        #Open the imzML datafile if needed
         with warnings.catch_warnings(action="ignore"):
             # coordinate_map = []
             if "imzML_object" in globals():
@@ -50,11 +59,13 @@ def main(_tgt_file = ""):
             else:
                 imzML_object = imzmlp.ImzMLParser(filename=filename,parse_lib='lxml')
 
+        #Check if TIC image was requested, view entire spectrum if so. Otherwise generate datagrid of requested m/z and tolerance combo
         if view_tic_option.get():
             ion_image = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
         else:
             ion_image = imzmlp.getionimage(imzML_object,target_mz,mz_window)
         
+        #Get aspect ratio
         [aspect_ratio, x_pix, y_pix, max_x_dimension] = get_aspect_ratio(imzML_object)
 
         #Normalize ion image (or don't) as specified in GUI
@@ -68,14 +79,17 @@ def main(_tgt_file = ""):
             norm_grid = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
             ion_image = np.divide(ion_image,norm_grid,out=np.zeros_like(ion_image),where=norm_grid!=0)
         
+        #Initiate new raw data variable so we can freely manipulate the ion image as needed
         raw_ion_image = ion_image
 
         fig = update_ion_image()
         return fig
 
     def update_ion_image(*_):
+        """Updates the actual ion image in the GUI, with various checks for user input settings and handling to remove old images"""
         global raw_ion_image,aspect_ratio,x_pix,y_pix,canvas_ionimage,title_label,fig,ion_image, plot1, last_selected_patch, last_selected_pixel, red_highlight_patch, color_NL
 
+        ##Retrieve contrast cutoffs for low-end and top-end
         low_thres = v_bottom.get()
         up_thres=v_top.get()
         target_mz = float(mz_entry.get())
@@ -83,24 +97,27 @@ def main(_tgt_file = ""):
 
         ion_image = raw_ion_image
 
-        ##Percentile method (preferred)
+        ##Apply the cutoffs, setting those below to 0 and those above to high_cutoff value
         low_cutoff = np.percentile(ion_image,low_thres*100)
         up_cutoff = np.percentile(ion_image,up_thres*100)
 
         ion_image = np.where(ion_image > up_cutoff,up_cutoff,ion_image)
         ion_image = np.where(ion_image < low_cutoff,0,ion_image)
 
+        #If custom normalization set, apply it to the colormap
         if NL_state.get():
             color_NL = norm_value.get()
         else:
             color_NL= up_cutoff
 
+        ##Initiate and raw ion image
         fig = Figure(dpi=100,facecolor=TEAL,layout='tight')
         
         plot1 = fig.add_subplot()
         plot1.imshow(ion_image,aspect=aspect_ratio,interpolation="none",vmin=0,vmax=color_NL,cmap=cmap_selected.get())
         plot1.axis('off')
 
+        #Remove old image objects before inserting a new one
         if not first_img.get():
             canvas_ionimage.get_tk_widget().destroy()
             title_label.destroy()
@@ -109,7 +126,10 @@ def main(_tgt_file = ""):
             last_selected_patch = None
             red_highlight_patch = None
 
+        #Add the ion image to the tkinter window
         canvas_ionimage = FigureCanvasTkAgg(fig,master=window_scout)
+        
+        #Draw the selected patch if available on update of the ion image
         if last_selected_patch != None:
             draw_last_selected_patch()
         canvas_ionimage.draw()
@@ -117,11 +137,13 @@ def main(_tgt_file = ""):
         toolbar.update()
         canvas_ionimage.get_tk_widget().grid(row=5,column=0,columnspan=3)
 
+        ##Draw a label for the ion image with target m/z, tolerance, and pixel dimensions
         title_string=[]
         title_string = f"{int(round(x_pix,0))} µm x {int(round(y_pix,1))} µm pixels; m/z {target_mz} @ {tolerance} ppm"
         title_label = tk.Label(window_scout,text=title_string,bg=TEAL,font=FONT)
         title_label.grid(row=6,column=0,columnspan=4)
 
+        #Initiate callbacks for when users mouse over the ion image for viewing/selecting highlighted pixel
         fig.canvas.mpl_connect("motion_notify_event",image_move)
         fig.canvas.callbacks.connect('button_press_event',report_coordinates)
         first_img.set(False)
@@ -129,6 +151,7 @@ def main(_tgt_file = ""):
         return fig
 
     def draw_last_selected_patch():
+        """Draws a red patch wherever the last selected pixel was"""
         global last_selected_patch, last_selected_pixel
         lx, ly = last_selected_pixel
 
@@ -148,7 +171,7 @@ def main(_tgt_file = ""):
         last_selected_patch = plot1.imshow(selected_overlay, aspect=aspect_ratio, interpolation="none")
         
     def image_move(event):
-        """Handle mouse movement over the image."""
+        """Handle mouse movement over the ion image and raws a green patch over the currently selectable region."""
         global ion_image, plot1, last_selected_patch, red_highlight_patch,canvas_ionimage, color_NL  # Track selected and red patches
 
         if event.xdata is not None and event.ydata is not None:
@@ -160,13 +183,11 @@ def main(_tgt_file = ""):
             highlight_image = np.zeros((ion_image.shape[0], ion_image.shape[1], 4))  # RGBA image for highlight
 
             # Define bounds for the highlight area
-            num_lines, pixels_per_line = ion_image.shape
-            # min_y = int(max(0, y_index - num_lines*0.01))
-            # max_y = int(min(ion_image.shape[0], y_index + num_lines*0.01))
+            pixels_per_line = ion_image.shape
 
             min_y = int(max(0, y_index))
             max_y = int(min(ion_image.shape[0], y_index+1))
-            min_x = int(max(0, x_index - pixels_per_line*0.008))
+            min_x = int(max(0, x_index - pixels_per_line[1]*0.008))
             max_x = int(min(ion_image.shape[1], x_index + 1))
 
             # Set the green color with varying opacity for the hover overlay
@@ -189,6 +210,7 @@ def main(_tgt_file = ""):
             canvas_ionimage.draw()
 
     def export_csv():
+        """Exports the current image data as a csv file, prompts the user as to where they'd like to save it."""
         global raw_ion_image
         dataframe = pd.DataFrame(raw_ion_image)
         path = os.path.dirname(file_entry.get()) 
@@ -196,11 +218,15 @@ def main(_tgt_file = ""):
         dataframe.to_csv(path_or_buf=file_name,header=False,index=False)
 
     def bulk_export_csv():
+        """Exports a batch of images as csv files, prompts the user for a spreadsheet of target m/z and names"""
         global red_highlight_patch, last_selected_patch, raw_ion_image
+
+        ##Prompt user for a spreadsheet of target m/z and names to give them
         target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
         target_list = pd.read_excel(target_list_file)
         target_list=cleanup_table(target_list,target_list_file)
 
+        ##Generate ion image for each entry, write the raw data to a CSV file
         for iter,row in target_list.iterrows():
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,row.values[1])
@@ -226,6 +252,7 @@ def main(_tgt_file = ""):
             dataframe = pd.DataFrame(raw_ion_image)
             dataframe.to_csv(path_or_buf=file,header=False,index=False)
 
+        ##Optionally, write the TIC image as well
         if include_TIC_var.get():
             view_tic_check.invoke()
             file = os.path.join(folder_name,f"TIC_Image.{used_extension}")
@@ -233,22 +260,28 @@ def main(_tgt_file = ""):
             dataframe.to_csv(path_or_buf=file,header=False,index=False)
 
     def find_scan_idx(event):
-            scans_per_line = int(max_x_dimension / x_pix)
-            line_scan_num = int(round(event.ydata,0))+1
-            scan_along_line = int(round(event.xdata,0))+1
-            return line_scan_num*scans_per_line + scan_along_line
+        """Based on where the user clicks, find the corresponding scan index in the imzML file"""
+        scans_per_line = int(max_x_dimension / x_pix)
+        line_scan_num = int(round(event.ydata,0))+1
+        scan_along_line = int(round(event.xdata,0))+1
+        return line_scan_num*scans_per_line + scan_along_line
 
 
     def export_image(fig):
+        """Export the currently viewed image as an image file (tif, png, jpg), prompt the user for where to put it"""
         global red_highlight_patch, last_selected_patch
+
+        ##Remove any highlight patches from the data
         if red_highlight_patch != None:
             red_highlight_patch.remove()
         
         if last_selected_patch !=None:
             last_selected_patch.remove()
         
+        #Prompt the user for where to save it
         file = filedialog.asksaveasfilename(initialdir=os.getcwd(),filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")])
         if file:
+            #Save the file
             file_format = file.split(".")[-1]
             fig.savefig(fname=file,
                         transparent=True,
@@ -257,14 +290,16 @@ def main(_tgt_file = ""):
                         bbox_inches="tight",
                         pad_inches=0)
 
+
     def check_normalization():
-        if normalization_method.get() == "custom":
+        """Handles contextual display on whether a custom normalization m/z is being applied"""
+        if normalization_method.get() == "custom": ##If custom NL, add an entry for that m/z and listeners to update the ion image when it changes
             normalize_custom_entry.grid(row=2,column=6)
             normalize_custom_entry.bind("<Return>",plot_ion_image)
             normalize_custom_entry.bind("<FocusOut>",plot_ion_image)
         else:
             try:
-                normalize_custom_entry.grid_remove()
+                normalize_custom_entry.grid_remove() #Remove the box for space if the box is unchecked
             except:
                 pass
         
@@ -274,7 +309,8 @@ def main(_tgt_file = ""):
             pass
         
     def report_coordinates(event):
-        global scan_idx, last_selected_pixel, color_NL
+        """Reports the current pixel x/y and updates the mass spectrum from the scan_idx"""
+        global scan_idx, last_selected_pixel
         if event.xdata != None:
             scan_idx = find_scan_idx(event)
             last_selected_pixel = (event.xdata, event.ydata)
@@ -285,31 +321,35 @@ def main(_tgt_file = ""):
         """Update the plot with the new selected pixel and draw the previous selection in red."""
         global ion_image, plot1, canvas_ionimage, last_selected_pixel, last_selected_patch
 
-        # Draw your ion image first
+        # Draw the ion image
         plot1.imshow(ion_image, aspect=aspect_ratio, interpolation="none", vmin=np.min(ion_image), vmax=color_NL, cmap=cmap_selected.get())
         
-        # Remove the old green highlight if it exists
+        # Remove old highlights
         if last_selected_patch is not None:
             last_selected_patch.remove()
 
-        # If we have a previous pixel, mark it in red
+        # Add red highlight, if a pixel is selected
         if last_selected_pixel:
             draw_last_selected_patch()
 
-        # Refresh the canvas to show updates
+        # Refresh the canvas
         canvas_ionimage.draw()
 
 
     def plot_mass_spectrum(scan_idx):
+        """Plot a mass spectrum and add listeners to watch for mouseovers/clicks to update the ion image to the nearest detectable m/z"""
         global imzML_object, mz, intensities, MS_vline, plot2, canvas_mass_spectrum
+
+        ##Retrieve the data for the target spectrum
         [mz, intensities] = imzML_object.getspectrum(scan_idx)
 
+        ##Plot the actual mass spectrum using vlines
         fig_spectrum = Figure(figsize=(4,4),dpi=100,facecolor=TEAL)
-
         plot2 = fig_spectrum.add_subplot()
         plot2.vlines(x=mz,ymin=0,ymax=intensities)
         plot2.set_ylim(0,plot2.get_ylim()[1])
         if not first_MS.get():
+            #Set the x lims and y lims, as input by the user
             plot2.set_xlim(float(start_var.get()),float(end_var.get()))
             in_bounds = [idx for idx, value in enumerate(mz) if float(start_var.get()) < value < float(end_var.get())]
             new_ylim = np.max(intensities[in_bounds]) *1.3
@@ -319,14 +359,18 @@ def main(_tgt_file = ""):
         plot2.set_ylabel("Intensity")
 
         try:
+            ##Remove old mass spectra so they aren't layered on top of each other
             canvas_mass_spectrum.destroy()
         except:
             pass
-
+        
+        ##Add mass spectrum to the GUI window
         canvas_mass_spectrum = FigureCanvasTkAgg(fig_spectrum,master=window_scout)
         canvas_mass_spectrum.get_tk_widget().grid(row=5,column=6,columnspan=4)
 
+
         if first_MS.get():
+            ##Handling for start/stop xlims entries, listeners to update when these are changed, etc.
             MS_vline = None
             start_mz = tk.Label(window_scout,text="Start m/z",bg=TEAL,font=FONT)
             end_mz = tk.Label(window_scout, text = "End m/z",bg=TEAL,font=FONT)
@@ -343,6 +387,7 @@ def main(_tgt_file = ""):
             end_mz_entry.bind("<Return>",lambda event:plot_mass_spectrum(scan_idx=scan_idx))
             end_mz_entry.bind("<FocusOut>",lambda event:plot_mass_spectrum(scan_idx=scan_idx))
 
+        ##Show previously selected m/z as needed
         current_mz = mz_entry.get()
         current_mz = float(current_mz)
         xlim = plot2.get_xlim()
@@ -352,17 +397,20 @@ def main(_tgt_file = ""):
             label_x_pos = current_mz - 0.5  # adjust label position to the left
         else:
             ha = 'left'   # align label to the left otherwise
-            label_x_pos = current_mz + 0.5  #
+            label_x_pos = current_mz + 0.5
+        
         y_position = 4/5 * plot2.get_ylim()[1]
         plot2.axvline(x=current_mz,color='red',linestyle='--')
         plot2.text(label_x_pos, y_position, f"{current_mz:.4f}", color='red', fontsize=10, ha=ha, va='center')
         canvas_mass_spectrum.draw()
 
+        ##Add listeners for mouseover and click on the mass spectrum
         fig_spectrum.canvas.mpl_connect("motion_notify_event",on_MS_move)
         fig_spectrum.canvas.callbacks.connect("button_press_event",change_target_mz)
         first_MS.set(False)
     
     def on_MS_move(event):
+        """Listener for mouseover events on the mass spectrum, finds the nearest m/z when you do so and displays it on the window"""
         new_mz = event.xdata
         if new_mz is not None:
             new_target = find_target_mz(new_mz)
@@ -374,16 +422,11 @@ def main(_tgt_file = ""):
             if 'MS_label' in globals() and MS_label is not None:
                 MS_label.remove()
 
-            # Get the current limits of the x-axis
             xlim = plot2.get_xlim()
-            
-            # Calculate the percentage along the x-axis
-            percentage = (new_target - xlim[0]) / (xlim[1] - xlim[0])
-            
-            # Set the y position of the label
+            percentage = (new_target - xlim[0]) / (xlim[1] - xlim[0]) #percentage along x-axis
             y_position = 2 / 3 * plot2.get_ylim()[1]
 
-            # Determine label position
+            # Contextual align label left/right of the bar depending on how close to the end of viewing window we are
             if percentage > 0.75:
                 ha = 'right'  # align label to the right if near the end
                 label_x_pos = new_target - 0.5  # adjust label position to the left
@@ -400,7 +443,7 @@ def main(_tgt_file = ""):
             canvas_mass_spectrum.draw()
 
     def find_target_mz(new_mz):
-        """Finds the target m/z value based on surrounding m/z values."""
+        """Finds the target m/z value based on surrounding, detectable m/z values."""
         if new_mz is None:
             return None  # Handle case for None input
 
@@ -426,6 +469,7 @@ def main(_tgt_file = ""):
         return new_target.item()  # Return the found target m/z value
 
     def change_target_mz(event):
+        """Update ion image with the newly selected m/z"""
         global scan_idx
         new_mz = event.xdata
         if new_mz != None:
@@ -436,11 +480,15 @@ def main(_tgt_file = ""):
             plot_mass_spectrum(scan_idx)
 
     def bulk_export():
+        """Export a series of ion images with the currently selected view settings. Prompts the user for a spreadsheet with target m/z and labels."""
         global fig
+        #prompt the user for the target list
         target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
         target_list = pd.read_excel(target_list_file)
+        #Contextual code to clean up table depending on whether headers were included, column order, etc.
         target_list=cleanup_table(target_list,target_list_file)
 
+        ##Iterate through each target m/z, drawing and then writing the ion image
         for iter,row in target_list.iterrows():
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,row.values[1])
@@ -453,6 +501,7 @@ def main(_tgt_file = ""):
                     messagebox.showwarning(title="Folder already exists!",message="You already have an ion image folder here, please rename, move, or delete it")
                     break
                 os.mkdir(folder_name)
+                #Prompt user for file extension to use
                 file = filedialog.asksaveasfilename(initialdir=folder_name,filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")],initialfile=img_name_base)
                 used_extension = file.split(".")[-1]
             else:
@@ -465,6 +514,7 @@ def main(_tgt_file = ""):
                         bbox_inches="tight",
                         pad_inches=0)
 
+        ##optionally, export a TIC image if selected
         if include_TIC_var.get():
             view_tic_check.invoke()
             file = os.path.join(folder_name,f"TIC_Image.{used_extension}")
@@ -484,23 +534,21 @@ def main(_tgt_file = ""):
 
     def draw_tic_image():
         plot_ion_image()
-        # global raw_ion_image
-        # raw_ion_image = imzmlp.getionimage(imzML_object,mz_value=200,tol=9999)
-        # update_ion_image()
 
     def custom_NL():
+        """Applies custom normalization limit as specified by the user"""
         ##0 = no custom, 1 = custom NL
         global NL_entry, norm_value, raw_ion_image
 
         custom_NL_desired = NL_state.get()
         if not custom_NL_desired:
             try:
-                NL_entry.destroy()
+                NL_entry.destroy() #remove entries for custom normalization limit when unchecked
                 update_NL_button.destroy()
             except:
                 pass
             update_ion_image()
-        elif custom_NL_desired:
+        elif custom_NL_desired: ##Add the entries when checked
             norm_value = tk.StringVar(window_scout)
             if norm_value.get()=="":    
                 norm_value.set(np.percentile(raw_ion_image,v_top.get()*100))
@@ -521,6 +569,7 @@ def main(_tgt_file = ""):
 
 
 
+    ##Build the GUI window
     window_scout = tk.Tk()
     window_scout.title("IMZML Scout")
     window_scout.config(padx=5,pady=5,bg=TEAL)
