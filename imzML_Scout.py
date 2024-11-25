@@ -481,7 +481,7 @@ def main(_tgt_file = ""):
 
     def bulk_export():
         """Export a series of ion images with the currently selected view settings. Prompts the user for a spreadsheet with target m/z and labels."""
-        global fig
+        global fig, red_highlight_patch, last_selected_patch
         #prompt the user for the target list
         target_list_file = filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Excel Spreadsheet",".xlsx"),("CSV File",".csv")])
         target_list = pd.read_excel(target_list_file)
@@ -493,6 +493,15 @@ def main(_tgt_file = ""):
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,row.values[1])
             plot_ion_image()
+            if red_highlight_patch != None:
+                red_highlight_patch.remove()
+                red_highlight_patch = None
+        
+            if last_selected_patch !=None:
+                last_selected_patch.remove()
+                last_selected_patch = None
+
+
 
             folder_name = os.path.join(os.path.dirname(file_entry.get()),"ion_images")
             img_name_base = f"{row.values[0]}-{str(row.values[1]).split(".")[0]}"
