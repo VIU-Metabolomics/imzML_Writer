@@ -12,6 +12,7 @@ import sys
 import time
 
 timing_mode = False
+tries = 0
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
@@ -95,7 +96,7 @@ def follow_raw_progress(raw_filetype:str):
     """Monitors progress of raw file conversion to mzML by comparing the number of raw vendor files to mzML files in the working directory
     Input:
     raw_filetype: string specifying the file extension of the raw files"""
-    global tic
+    global tic, tries
 
     #Retrieve list of files in working directory
     files = os.listdir(CD_entry.get())
@@ -121,11 +122,14 @@ def follow_raw_progress(raw_filetype:str):
     for file in mzML_files:
         file_size = os.path.getsize(f"{CD_entry.get()}/{file}")
         sizes.append(file_size)
-    if len(sizes) > 0:
-        if np.min(sizes) < np.mean(sizes)*0.75:
-            last_one_ready = False
-        else:
-            last_one_ready = True
+    
+    last_one_ready=False
+    tries_threshold = 3
+    if progress >= 100:
+        if len(sizes) > 0:
+            tries+=1
+            if not np.min(sizes) < np.mean(sizes)*0.75 or tries > tries_threshold:
+                last_one_ready = True
             
     #Update progress bar to show how many mzML files are finished compared to total
     if progress > 0:
