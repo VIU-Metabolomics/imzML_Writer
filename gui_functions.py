@@ -152,7 +152,6 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
             if file_iter==0:
                 for spectrum in tmp:
                     if isinstance(spectrum["filter string"],list):
-                            print(spectrum["filter string"])
                             list_type = True
                     if list_type:
                         scan_filts = spectrum["filter string"][0]
