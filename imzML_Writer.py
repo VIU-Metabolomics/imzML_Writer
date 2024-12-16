@@ -35,13 +35,13 @@ def get_path():
         populate_list(directory)
         FILE_TYPE = get_file_types(directory)
 
-        if FILE_TYPE != "mzML":
+        if FILE_TYPE.lower() != "mzML".lower():
             mzML_process.grid_remove()
             imzML_metadata.grid_remove()
-        elif FILE_TYPE == "mzML":
+        elif FILE_TYPE.lower() == "mzML".lower():
             full_process.grid_remove()
             imzML_metadata.grid_remove()
-        elif FILE_TYPE == "imzML":
+        elif FILE_TYPE.lower() == "imzML".lower():
             full_process.grid_remove()
             mzML_process.grid_remove()
 
@@ -128,7 +128,7 @@ def follow_raw_progress(raw_filetype:str):
     if progress >= 100:
         if len(sizes) > 0:
             tries+=1
-            if not np.min(sizes) < np.mean(sizes)*0.75 or tries > tries_threshold:
+            if not np.min(sizes) < np.mean(sizes)*0.85 or tries > tries_threshold:
                 last_one_ready = True
             
     #Update progress bar to show how many mzML files are finished compared to total

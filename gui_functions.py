@@ -108,7 +108,7 @@ def clean_raw_files(path:str,sl:str,file_type:str):
     os.mkdir(mzML_folder)
     os.mkdir(RAW_folder)
     for file in os.listdir(path):
-        if ".mzML" in file:
+        if ".mzML".lower() in file.lower():
             shutil.move(fr"{path}{sl}{file}",fr"{mzML_folder}{sl}{file}")
         elif file_type in file and file != "Initial RAW files":
             shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
@@ -134,8 +134,9 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
     spectrum_counts=[]
     mzml_files=[]
     spec_counts=[]
+    list_type = False
     for file in files:
-        if ".mzML" in file:
+        if ".mzML".lower() in file.lower():
             file_iter+=1
             tmp = pymzml.run.Reader(fr"{PATH}{file}")
             spec_counts.append(tmp.get_spectrum_count())
@@ -145,16 +146,33 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
             
             
             mzml_files.append(file)
+            
 
             ##Retrieve list of filter strings from first file
             if file_iter==0:
                 for spectrum in tmp:
-                    if spectrum["filter string"] not in scan_filts:
-                        scan_filts.append(spectrum["filter string"])
-            
-            tmp_spectrum_counts = {filt_name:0 for filt_name in scan_filts}
+                    if isinstance(spectrum["filter string"],list):
+                            print(spectrum["filter string"])
+                            list_type = True
+                    if list_type:
+                        scan_filts = spectrum["filter string"][0]
+                    else: 
+                        if spectrum["filter string"] not in scan_filts:
+                            scan_filts.append(spectrum["filter string"])
+            if not list_type:
+                tmp_spectrum_counts = {filt_name:0 for filt_name in scan_filts}
+            else:
+                str_list = set(spectrum["filter string"])
+                str_list = list(str_list)
+                tmp_spectrum_counts={}
+                for entry in str_list:
+                    tmp_spectrum_counts[entry]=0
+
             for spectrum in tmp:
-                tmp_spectrum_counts[spectrum["filter string"]] += 1
+                if not list_type:
+                    tmp_spectrum_counts[spectrum["filter string"]] += 1
+                elif list_type:
+                    tmp_spectrum_counts[spectrum["filter string"][0]]+= 1
             
             spectrum_counts.append(tmp_spectrum_counts)
 
@@ -172,6 +190,8 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
     max_x_pixels = {}
     y_pixels = len(spectrum_counts)
     contender_idx=[]
+    if isinstance(scan_filts,str):
+        scan_filts = [scan_filts]
 
     for filt in scan_filts:
         max_x = 0
@@ -188,7 +208,8 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
     for idx in contender_idx:
         tmp = pymzml.run.Reader(fr"{PATH}{mzml_files[idx]}")
         for spectrum in tmp:
-            scan_time = spectrum["scan time"]
+            # scan_time = spectrum["scan time"]
+            scan_time = spectrum.scan_time_in_minutes()
         max_times.append(scan_time)
 
     time_targets={}
@@ -216,7 +237,11 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
             spec_list = []
             for spectrum in active_file:
                 if spectrum["filter string"] == filt:
-                    tmp_times.append(spectrum["scan time"])
+                    # tmp_times.append(spectrum["scan time"])
+                    tmp_times.append(spectrum.scan_time_in_minutes())
+                    spec_list.append(spectrum)
+                elif list_type:
+                    tmp_times.append(spectrum.scan_time_in_minutes())
                     spec_list.append(spectrum)
 
             pvs_ppm_off = 0
@@ -271,7 +296,8 @@ def imzML_metadata_process(model_files:str,sl:str,x_speed:float,y_step:float,tgt
         if spectrum["filter string"] not in scan_filts:
             scan_filts.append(spectrum["filter string"])
     
-        final_time_point = spectrum["scan time"]
+        # final_time_point = spectrum["scan time"]
+        final_time_point = spectrum.scan_time_in_minutes()
 
     ##Extract common output name based on common characters in first and last mzML file
     str_array = [letter for letter in model_file_list[0]]
