@@ -231,11 +231,6 @@ def main(_tgt_file = ""):
             mz_entry.delete(0,tk.END)
             mz_entry.insert(0,row.values[1])
             plot_ion_image()
-            if red_highlight_patch != None:
-                red_highlight_patch.remove()
-        
-            if last_selected_patch !=None:
-                last_selected_patch.remove()
 
             folder_name = os.path.join(os.path.dirname(file_entry.get()),"ion_images")
             img_name_base = f"{row.values[0]}-{str(row.values[1]).split(".")[0]}"

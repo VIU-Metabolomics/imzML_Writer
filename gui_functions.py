@@ -141,7 +141,7 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
             tmp = pymzml.run.Reader(fr"{PATH}{file}")
             spec_counts.append(tmp.get_spectrum_count())
             ##Ignore partially collected datafiles that were cut-short (threshold of <85% the scans of the mean datafile)
-            if np.mean(spec_counts)*0.85 > tmp.get_spectrum_count():
+            if np.mean(spec_counts)*0.5 > tmp.get_spectrum_count():
                 break
             
             
@@ -230,6 +230,7 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
 
     #Build image grid, write directly to an imzML
     for y_row in range(y_pixels):
+        # print(f"starting line {y_row}")
         active_file = pymzml.run.Reader(PATH + mzml_files[y_row])
         for filt in scan_filts:
             tmp_times = []
