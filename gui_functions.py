@@ -7,7 +7,7 @@ import pymzml
 import numpy as np
 import pyimzml.ImzMLWriter as imzmlw
 from recalibrate_mz import recalibrate
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 
 
@@ -369,7 +369,6 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
     except:
         instrument_model = "Could not find"
 
-
     #Open un-annotated imzML
     with open(annotate_file) as file:
         data_need_annotation = file.read()
@@ -380,8 +379,26 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
     for replace_item in replace_list:
         data_need_annotation.find(replace_item).replace_with(data.find(replace_item))
 
-    #Write instrument model to mzML, filter string
+    #Write instrument model to imzML, filter string
     data_need_annotation.instrumentConfigurationList.instrumentConfiguration.attrs['id']=instrument_model
+    new_tag = Tag(builder=data_need_annotation.builder,
+                  name="cvParam",
+                  attrs={'accession':'MS:1000031',"cvRef":"MS","name":instrument_model})
+    # new_tag = data_need_annotation.new_tag("cvParam", accession="MS:1000031", cvRef="MS")
+    data_need_annotation.instrumentConfigurationList.instrumentConfiguration.append(new_tag)
+
+    #Remove empty instrument ref from imzML template
+    for paramgroup in data_need_annotation.select("referenceableParamGroupRef"):
+        if paramgroup['ref']=="CommonInstrumentParams":
+            paramgroup.extract()
+    
+    for cvParam in data_need_annotation.select("cvParam"):
+        if cvParam["accession"]=="MS:1000530":
+            del cvParam["value"]
+        if cvParam["accession"]=="IMS:1000411":
+            cvParam["accession"]="IMS:1000410"
+
+
 
     for tag in data_need_annotation.referenceableParamGroupList:
         if "scan1" in str(tag):
