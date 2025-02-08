@@ -396,7 +396,8 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
         if cvParam["accession"]=="MS:1000530":
             del cvParam["value"]
         if cvParam["accession"]=="IMS:1000411":
-            cvParam["accession"]="IMS:1000410"
+            cvParam["accession"]="IMS:1000413"
+            cvParam["name"]="flyback"
 
 
 
@@ -432,6 +433,12 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
         append_item = BeautifulSoup(append_item,'xml')
         data_need_annotation.scanSettingsList.scanSettings.append(append_item)
 
+
+    for cvParam in data_need_annotation.select("cvParam"):
+        if cvParam["accession"] in accessions:
+            cvParam["unitCvRef"]="UO"
+            cvParam["unitAccession"]="UO:0000017"
+            cvParam["unitName"]="micrometer"
 
     #Write the new file
     with open(result_file,'w') as file:
