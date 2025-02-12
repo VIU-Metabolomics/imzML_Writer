@@ -10,9 +10,11 @@
 
 5. In the command line, enter the command:
 
-   `docker pull chambm/pwiz-skyline-i-agree-to-the-vendor-licenses`
+```
+   docker pull chambm/pwiz-skyline-i-agree-to-the-vendor-licenses
+```
 
-   Note: This will take ~5 - 10 mins to install, you can follow the progress in the terminal, when complete, the new docker image will appear under images in the docker GUI
+Note: This will take ~5 - 10 mins to install, you can follow the progress in the terminal, when complete, the new docker image will appear under images in the docker GUI
 
 6. Download or clone the repo for imzML_Writer, and navigate your terminal to the resulting folder
 
@@ -20,13 +22,17 @@
 
 8. Install the requisite packages by running the command:
 
-   `pip3 install -r requirements.txt`
+```
+   pip3 install -r requirements.txt
+```
 
-   Note: If this fails, try replacing pip3 with pip (Apple silicon chips need pip3/python3, older intel chips use pip/python)
+Note: If this fails, try replacing pip3 with pip (Apple silicon chips need pip3/python3, older intel chips use pip/python)
 
 9. Launch imzML_Writer by typing the command:
 
-   `python3 imzML_Writer.py`
+```
+   python3 imzML_Writer.py
+```
 
 #**PC Install instructions**#
 
@@ -43,9 +49,11 @@
 
 5. Test you've successfully installed everything by entering into the terminal:
 
-   `msconvert`
+```
+   msconvert
+```
 
-   Note: This should return an info page on msConvert
+Note: This should return an info page on msConvert
 
 6. Download or clone the repo for imzML_Writer, and navigate your terminal to the resulting folder
 
@@ -53,11 +61,15 @@
 
 8. Install the requisite packages by running the command:
 
-   `pip install -r requirements.txt`
+```
+   pip install -r requirements.txt
+```
 
 9. Launch imzML_Writer by typing the command:
 
-   `python imzML_Writer.py`
+```
+   python imzML_Writer.py
+```
 
 ##Customizing colormaps:##
 You can change the available colormaps by editing/creating a "Scout_Config.xlsx" file in the working directory (where imzML_Scout.py is located). A default sheet is available in the Github repo. You can edit which colormaps are available by adding/removing colormap names in the spreadsheet. Additional colormaps can be found here in the matplotlib documentation:
