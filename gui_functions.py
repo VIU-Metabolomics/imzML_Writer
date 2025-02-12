@@ -8,7 +8,58 @@ import numpy as np
 import pyimzml.ImzMLWriter as imzmlw
 from recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup, Tag
+import string
 
+
+
+def get_drives():
+    from ctypes import windll
+    drives = []
+    bitmask = windll.kernel32.GetLogicalDrives()
+    for letter in string.ascii_uppercase:
+        if bitmask & 1:
+            drives.append(letter)
+        
+        bitmask >>= 1
+    
+    return drives
+
+
+def find_file(target, folder):
+    try:
+        for f in os.listdir(folder):
+            path = os.path.join(folder,f)
+            if os.path.isdir(path):
+                result = find_file(target, path)
+                if result is not None:
+                    return result
+                continue
+            if f == target:
+                return path
+    except Exception as e:
+        pass
+
+def find_msconvert():
+    drives = get_drives()
+
+    candidates = []
+    for drive in drives:
+        drive_str = (f"{drive}:\\".__repr__()).replace("'","")
+        candidates.append(find_file("msconvert.exe",drive_str))
+    
+
+    for candidate in candidates:
+        if candidate is not None:
+            if "msconvert.exe" in candidate:
+                res = subprocess.run(candidate, shell=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,
+                            stdin=subprocess.PIPE,
+                            cwd=os.getcwd(),
+                            env=os.environ)
+                if res.returncode == 0:
+                    #msconvert successfully found and called
+                    return candidate
 
 
 def _viaPWIZ(path:str,write_mode:str):
@@ -19,26 +70,31 @@ def _viaPWIZ(path:str,write_mode:str):
     file_type = get_file_type(path)
     current_dir = os.getcwd()
     os.chdir(path)
+    msconvert = "msconvert"
     try:
-        subprocess.run("msconvert", shell=True,
+        res = subprocess.run(msconvert, shell=True,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT,
                             stdin=subprocess.PIPE,
                             cwd=os.getcwd(),
                             env=os.environ) 
+        if res.returncode != 0:
+            print("msconvert not in PATH - searching drives for install")
+            msconvert = find_msconvert()
+            print("Found it!")
     except:
         raise Exception("msConvert not available, check installation and verify msConvert path is specified correctly")
 
     ##Call the actual conversion
     if write_mode=="Centroid":
-        subprocess.Popen(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+        subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                     shell=True,
                         stderr=subprocess.STDOUT,
                         stdin=subprocess.PIPE,
                         cwd=os.getcwd(),
                         env=os.environ)
     elif write_mode=="Profile":
-                subprocess.Popen(["msconvert", fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+                subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                     shell=True,
                         stderr=subprocess.STDOUT,
                         stdin=subprocess.PIPE,
@@ -230,14 +286,12 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
 
     #Build image grid, write directly to an imzML
     for y_row in range(y_pixels):
-        # print(f"starting line {y_row}")
         active_file = pymzml.run.Reader(PATH + mzml_files[y_row])
         for filt in scan_filts:
             tmp_times = []
             spec_list = []
             for spectrum in active_file:
                 if spectrum["filter string"] == filt:
-                    # tmp_times.append(spectrum["scan time"])
                     tmp_times.append(spectrum.scan_time_in_minutes())
                     spec_list.append(spectrum)
                 elif list_type:

@@ -12,6 +12,7 @@ import sys
 import time
 
 timing_mode = False
+PC_compiled = False
 tries = 0
 
 ##Colors and FONTS
@@ -268,7 +269,18 @@ def launch_scout():
         tgt_file = file_start+"imzML"
     path = CD_entry.get()
     file_path = f"{path}/{tgt_file}"
-    scout.main(_tgt_file=file_path)
+    if PC_compiled:
+        print(f"Attempting to open imzML - attempt #{1}")
+        res = subprocess.run(["imzML_Scout",file_path])
+        i = 1
+        while res.returncode != 0:
+            print(f"Return code: {res.returncode}")
+            print(res)
+            i+=1
+            print(f"Attempting to open imzML - attempt #{i}")
+            res = subprocess.run(["imzML_Scout",file_path])
+    else:
+        scout.main(_tgt_file=file_path)
     
 
 def resource_path(relative_path):
@@ -284,6 +296,7 @@ def resource_path(relative_path):
 ##Build tkinter window
 window = tk.Tk()
 window.title("IMZML WRITER")
+window.iconbitmap(resource_path("./Images/imzML_Writer.ico"))
 window.config(padx=5,pady=5,bg=TEAL)
 style = ttk.Style()
 style.theme_use('clam')

@@ -1,0 +1,9 @@
+New things since review:
+1. Standalone executables! - Both Mac and PC seem to be working ok, will require 2 dist for Mac (apple Silicon and intel)
+2. Dynamic msconvert mapping - still tries to call msconvert from PATH, but if that fails it searches any drives/directories it can access for msconvert and calls that instead
+
+
+TODO:
+-Improve documentation throughout (ReadTheDocs page?)
+-Pypi distribution for command line interface
+-Save path for msconvert once found so it doesn't have to look every time
