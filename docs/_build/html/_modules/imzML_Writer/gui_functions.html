@@ -1,0 +1,633 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>imzML_Writer.gui_functions &mdash; imzML Writer  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            imzML Writer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">imzML Writer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">imzML_Writer.gui_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for imzML_Writer.gui_functions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">docker</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pymzml</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyimzml.ImzMLWriter</span> <span class="k">as</span> <span class="nn">imzmlw</span>
+<span class="kn">from</span> <span class="nn">imzML_Writer.recalibrate_mz</span> <span class="kn">import</span> <span class="n">recalibrate</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+
+
+<div class="viewcode-block" id="get_drives">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.get_drives">[docs]</a>
+<span class="k">def</span> <span class="nf">get_drives</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">windll</span>
+    <span class="n">drives</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bitmask</span> <span class="o">=</span> <span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">GetLogicalDrives</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bitmask</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">drives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
+        
+        <span class="n">bitmask</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
+    
+    <span class="k">return</span> <span class="n">drives</span></div>
+
+
+
+<div class="viewcode-block" id="find_file">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.find_file">[docs]</a>
+<span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">find_file</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">result</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">path</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="find_msconvert">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.find_msconvert">[docs]</a>
+<span class="k">def</span> <span class="nf">find_msconvert</span><span class="p">():</span>
+    <span class="n">drives</span> <span class="o">=</span> <span class="n">get_drives</span><span class="p">()</span>
+
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">drives</span><span class="p">:</span>
+        <span class="n">drive_str</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drive</span><span class="si">}</span><span class="s2">:</span><span class="se">\\</span><span class="s2">&quot;</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">find_file</span><span class="p">(</span><span class="s2">&quot;msconvert.exe&quot;</span><span class="p">,</span><span class="n">drive_str</span><span class="p">))</span>
+    
+
+    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">candidate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;msconvert.exe&quot;</span> <span class="ow">in</span> <span class="n">candidate</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                            <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                            <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                            <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1">#msconvert successfully found and called</span>
+                    <span class="k">return</span> <span class="n">candidate</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method to call msConvert directly if the detected platform is on windows, takes as argument:</span>
+<span class="sd">    path - path to the target files (string)</span>
+<span class="sd">    write_mode - &quot;Centroid&quot; or &quot;Profile&quot; as specified in the GUI&quot;&quot;&quot;</span>
+    <span class="c1">##check pwiz availability:</span>
+    <span class="n">file_type</span> <span class="o">=</span> <span class="n">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">msconvert</span> <span class="o">=</span> <span class="s2">&quot;msconvert&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">msconvert</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                            <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                            <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                            <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;msconvert not in PATH - searching drives for install&quot;</span><span class="p">)</span>
+            <span class="n">msconvert</span> <span class="o">=</span> <span class="n">find_msconvert</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found it!&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;msConvert not available, check installation and verify msConvert path is specified correctly&quot;</span><span class="p">)</span>
+
+    <span class="c1">##Call the actual conversion</span>
+    <span class="k">if</span> <span class="n">write_mode</span><span class="o">==</span><span class="s2">&quot;Centroid&quot;</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">msconvert</span><span class="p">,</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">\*.</span><span class="si">{</span><span class="n">file_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;--mzML&quot;</span><span class="p">,</span> <span class="s2">&quot;--64&quot;</span><span class="p">,</span> <span class="s2">&quot;--filter&quot;</span><span class="p">,</span> <span class="s2">&quot;peakPicking true 1-&quot;</span><span class="p">,</span> <span class="s2">&quot;--simAsSpectra&quot;</span><span class="p">,</span> <span class="s2">&quot;--srmAsSpectra&quot;</span><span class="p">],</span><span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
+                    <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                        <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">write_mode</span><span class="o">==</span><span class="s2">&quot;Profile&quot;</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">msconvert</span><span class="p">,</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">\*.</span><span class="si">{</span><span class="n">file_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;--mzML&quot;</span><span class="p">,</span> <span class="s2">&quot;--64&quot;</span><span class="p">,</span> <span class="s2">&quot;--simAsSpectra&quot;</span><span class="p">,</span> <span class="s2">&quot;--srmAsSpectra&quot;</span><span class="p">],</span><span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
+                    <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                        <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;Invalid data write mode!&quot;</span><span class="p">)</span>
+    
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">current_dir</span><span class="p">)</span>
+
+<div class="viewcode-block" id="get_file_type">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.get_file_type">[docs]</a>
+<span class="k">def</span> <span class="nf">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identifies the file type in the specified path, ignoring hidden files starting with .</span>
+<span class="sd">    Returns the file extension&quot;&quot;&quot;</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+        <span class="n">files</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RAW_to_mzML">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.RAW_to_mzML">[docs]</a>
+<span class="k">def</span> <span class="nf">RAW_to_mzML</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls msConvert via docker on linux and Mac, or calls _viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;win&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+        <span class="n">_viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">write_mode</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">##Setup the docker image including internal file structure and command</span>
+        <span class="n">DOCKER_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;chambm/pwiz-skyline-i-agree-to-the-vendor-licenses&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
+
+        <span class="n">working_directory</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="n">file_type</span> <span class="o">=</span> <span class="n">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">vol</span> <span class="o">=</span> <span class="p">{</span><span class="n">working_directory</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bind&#39;</span><span class="p">:</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data&quot;</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;rw&#39;</span><span class="p">}}</span>
+
+        <span class="k">if</span> <span class="n">write_mode</span><span class="o">==</span><span class="s2">&quot;Centroid&quot;</span><span class="p">:</span>
+            <span class="n">comm</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;wine msconvert </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data</span><span class="si">{</span><span class="n">sl</span><span class="si">}</span><span class="s2">*.</span><span class="si">{</span><span class="n">file_type</span><span class="si">}</span><span class="s2"> --zlib=off --mzML --64 --outdir </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data --filter &#39;&quot;</span><span class="s1">&#39;peakPicking true 1-&#39;</span><span class="s2">&quot;&#39; --simAsSpectra --srmAsSpectra&quot;</span>
+        <span class="k">elif</span> <span class="n">write_mode</span><span class="o">==</span><span class="s2">&quot;Profile&quot;</span><span class="p">:</span>
+            <span class="n">comm</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;wine msconvert </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data</span><span class="si">{</span><span class="n">sl</span><span class="si">}</span><span class="s2">*.</span><span class="si">{</span><span class="n">file_type</span><span class="si">}</span><span class="s2"> --zlib=off --mzML --64 --outdir </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data --simAsSpectra --srmAsSpectra&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;Invalid data write mode!&quot;</span><span class="p">)</span>
+            
+
+        <span class="n">env_vars</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;WINEDEBUG&quot;</span><span class="p">:</span> <span class="s2">&quot;-all&quot;</span><span class="p">}</span>
+        
+        <span class="c1">##Call/run the docker container</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">image</span><span class="o">=</span><span class="n">DOCKER_IMAGE</span><span class="p">,</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">env_vars</span><span class="p">,</span>
+            <span class="n">volumes</span> <span class="o">=</span> <span class="n">vol</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span>
+            <span class="n">working_dir</span><span class="o">=</span><span class="n">working_directory</span><span class="p">,</span>
+            <span class="n">auto_remove</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">detach</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span></div>
+
+        
+
+<div class="viewcode-block" id="clean_raw_files">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.clean_raw_files">[docs]</a>
+<span class="k">def</span> <span class="nf">clean_raw_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">file_type</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:</span>
+<span class="sd">    Initial RAW files - raw vendor files</span>
+<span class="sd">    Output mzML Files - processed mzML files output by msConvert</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">    path - path to directory to clean up</span>
+<span class="sd">    sl - legacy code, should just be &#39;/&#39;</span>
+<span class="sd">    file_type - extension for raw files to know what to sort&quot;&quot;&quot;</span>
+    <span class="n">mzML_folder</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">Output mzML Files&quot;</span>
+    <span class="n">RAW_folder</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">Initial RAW files&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">mzML_folder</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">RAW_folder</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;.mzML&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mzML_folder</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">file_type</span> <span class="ow">in</span> <span class="n">file</span> <span class="ow">and</span> <span class="n">file</span> <span class="o">!=</span> <span class="s2">&quot;Initial RAW files&quot;</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RAW_folder</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mzML_to_imzML_convert">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.mzML_to_imzML_convert">[docs]</a>
+<span class="k">def</span> <span class="nf">mzML_to_imzML_convert</span><span class="p">(</span><span class="n">progress_target</span><span class="p">,</span><span class="n">PATH</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">LOCK_MASS</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">TOLERANCE</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),</span>
+<span class="sd">    aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">    progress_target - tkinter progress bar object from the GUI to update as conversion progresses</span>
+<span class="sd">    path - Working path for source mzML files</span>
+<span class="sd">    Lock mass - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration</span>
+<span class="sd">    Tolerance - search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm&quot;&quot;&quot;</span>
+
+    <span class="c1">##Ensure lock mass and tolerance are formatted as float</span>
+    <span class="n">LOCK_MASS</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">LOCK_MASS</span><span class="p">)</span>
+    <span class="n">TOLERANCE</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">TOLERANCE</span><span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">PATH</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="c1">##Extracts filter strings, num pixels for each scan, etc</span>
+    <span class="n">scan_filts</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">file_iter</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="n">spectrum_counts</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">mzml_files</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">spec_counts</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">list_type</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;.mzML&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">file_iter</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PATH</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">spec_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_spectrum_count</span><span class="p">())</span>
+            <span class="c1">##Ignore partially collected datafiles that were cut-short (threshold of &lt;85% the scans of the mean datafile)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">spec_counts</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">&gt;</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_spectrum_count</span><span class="p">():</span>
+                <span class="k">break</span>
+            
+            
+            <span class="n">mzml_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            
+
+            <span class="c1">##Retrieve list of filter strings from first file</span>
+            <span class="k">if</span> <span class="n">file_iter</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+                            <span class="n">list_type</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">list_type</span><span class="p">:</span>
+                        <span class="n">scan_filts</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span> 
+                        <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+                            <span class="n">scan_filts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">list_type</span><span class="p">:</span>
+                <span class="n">tmp_spectrum_counts</span> <span class="o">=</span> <span class="p">{</span><span class="n">filt_name</span><span class="p">:</span><span class="mi">0</span> <span class="k">for</span> <span class="n">filt_name</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">str_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">])</span>
+                <span class="n">str_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">str_list</span><span class="p">)</span>
+                <span class="n">tmp_spectrum_counts</span><span class="o">=</span><span class="p">{}</span>
+                <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">str_list</span><span class="p">:</span>
+                    <span class="n">tmp_spectrum_counts</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">list_type</span><span class="p">:</span>
+                    <span class="n">tmp_spectrum_counts</span><span class="p">[</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">list_type</span><span class="p">:</span>
+                    <span class="n">tmp_spectrum_counts</span><span class="p">[</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">+=</span> <span class="mi">1</span>
+            
+            <span class="n">spectrum_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_spectrum_counts</span><span class="p">)</span>
+
+    <span class="n">tmp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">spectrum</span>
+
+    <span class="c1">#Find conserved portion of name for output filename</span>
+    <span class="n">str_array</span> <span class="o">=</span> <span class="p">[</span><span class="n">letter</span> <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">mzml_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">OUTPUT_NAME</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">str_array</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">OUTPUT_NAME</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mzml_files</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">str_array</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">OUTPUT_NAME</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">str_array</span><span class="p">)</span>
+
+    <span class="c1">#Compute max number of pixels in each scan filter to construct pixel grids</span>
+    <span class="n">max_x_pixels</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">y_pixels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spectrum_counts</span><span class="p">)</span>
+    <span class="n">contender_idx</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scan_filts</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+        <span class="n">scan_filts</span> <span class="o">=</span> <span class="p">[</span><span class="n">scan_filts</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+        <span class="n">max_x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">idx</span> <span class="o">=-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">spec_file</span> <span class="ow">in</span> <span class="n">spectrum_counts</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">spec_file</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_x</span><span class="p">:</span>
+                <span class="n">max_x</span> <span class="o">=</span> <span class="n">spec_file</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+                <span class="n">contender_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">max_x_pixels</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_x</span>
+
+    <span class="c1">#Retrieve max times for time-alignment on longest spectra, build ideal time array</span>
+    <span class="n">max_times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">contender_idx</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PATH</span><span class="si">}{</span><span class="n">mzml_files</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+            <span class="c1"># scan_time = spectrum[&quot;scan time&quot;]</span>
+            <span class="n">scan_time</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span>
+        <span class="n">max_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scan_time</span><span class="p">)</span>
+
+    <span class="n">time_targets</span><span class="o">=</span><span class="p">{}</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">max_x_pixels</span><span class="p">:</span>
+        <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">max_times</span><span class="p">[</span><span class="nb">iter</span><span class="p">],</span><span class="n">max_x_pixels</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="n">time_targets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_array</span>
+
+    <span class="c1">#Initiate imzmL objects</span>
+    <span class="n">image_files</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">output_files</span> <span class="o">=</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filt</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">=</span><span class="n">imzmlw</span><span class="o">.</span><span class="n">ImzMLWriter</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_None&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span> <span class="o">=</span> <span class="n">imzmlw</span><span class="o">.</span><span class="n">ImzMLWriter</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">output_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Build image grid, write directly to an imzML</span>
+    <span class="k">for</span> <span class="n">y_row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_pixels</span><span class="p">):</span>
+        <span class="n">active_file</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">PATH</span> <span class="o">+</span> <span class="n">mzml_files</span><span class="p">[</span><span class="n">y_row</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+            <span class="n">tmp_times</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">spec_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">active_file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">filt</span><span class="p">:</span>
+                    <span class="n">tmp_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">())</span>
+                    <span class="n">spec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">list_type</span><span class="p">:</span>
+                    <span class="n">tmp_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">())</span>
+                    <span class="n">spec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="p">)</span>
+
+            <span class="n">pvs_ppm_off</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">x_row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_x_pixels</span><span class="p">[</span><span class="n">filt</span><span class="p">]):</span>
+                <span class="n">align_time</span> <span class="o">=</span> <span class="n">time_targets</span><span class="p">[</span><span class="n">filt</span><span class="p">][</span><span class="n">x_row</span><span class="p">]</span>
+                <span class="n">time_diffs</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmp_times</span> <span class="o">-</span> <span class="n">align_time</span><span class="p">)</span>
+                <span class="n">match_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">time_diffs</span> <span class="o">==</span> <span class="nb">min</span><span class="p">(</span><span class="n">time_diffs</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">match_spectra</span> <span class="o">=</span> <span class="n">spec_list</span><span class="p">[</span><span class="n">match_idx</span><span class="p">]</span>
+
+                <span class="p">[</span><span class="n">recalibrated_mz</span><span class="p">,</span> <span class="n">pvs_ppm_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">recalibrate</span><span class="p">(</span><span class="n">mz</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">mz</span><span class="p">,</span> <span class="nb">int</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,</span><span class="n">lock_mz</span><span class="o">=</span><span class="n">LOCK_MASS</span><span class="p">,</span><span class="n">search_tol</span><span class="o">=</span><span class="n">TOLERANCE</span><span class="p">,</span><span class="n">ppm_off</span><span class="o">=</span><span class="n">pvs_ppm_off</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">addSpectrum</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">,</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,(</span><span class="n">x_row</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">y_row</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1">##Update progress bar in the GUI as each mzML finishes</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_row</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="p">(</span><span class="n">y_pixels</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> 
+        <span class="k">if</span> <span class="n">progress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>   
+            <span class="n">progress_target</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> 
+            <span class="n">progress_target</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;determinate&quot;</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">y_row</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="p">(</span><span class="n">y_pixels</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+
+    <span class="c1">##Close imzML objects for downstream annotation</span>
+    <span class="n">update_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+    <span class="n">update_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+        <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="imzML_metadata_process">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.imzML_metadata_process">[docs]</a>
+<span class="k">def</span> <span class="nf">imzML_metadata_process</span><span class="p">(</span><span class="n">model_files</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">x_speed</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y_step</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">tgt_progress</span><span class="p">,</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). Inputs:</span>
+<span class="sd">    model_files - Directory to the folder containing mzML files</span>
+<span class="sd">    sl - legacy, use &#39;/&#39;</span>
+<span class="sd">    x_speed - scan speed in the x-direction, µm/sec</span>
+<span class="sd">    y_step - step between strip lines, µm</span>
+<span class="sd">    tgt_progress - Tkinter progress bar object to update as the process continues</span>
+<span class="sd">    path - path to the directory where imzML files should be stored after annotation&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">OUTPUT_NAME</span><span class="p">,</span> <span class="n">time_targets</span>
+
+    <span class="c1">##Retrieve and sort files from the working directory (imzML) and model file directory (mzML)</span>
+    <span class="n">update_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+    <span class="n">update_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="n">scan_filts</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">model_file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">model_files</span><span class="p">)</span>
+    <span class="n">model_file_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="c1">##Ignore hidden files</span>
+    <span class="k">while</span> <span class="n">model_file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+        <span class="n">model_file_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1">##Extract filter strings from the first mzML source file</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_files</span><span class="p">,</span><span class="n">model_file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+            <span class="n">scan_filts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">])</span>
+    
+        <span class="c1"># final_time_point = spectrum[&quot;scan time&quot;]</span>
+        <span class="n">final_time_point</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span>
+
+    <span class="c1">##Extract common output name based on common characters in first and last mzML file</span>
+    <span class="n">str_array</span> <span class="o">=</span> <span class="p">[</span><span class="n">letter</span> <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">model_file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">OUTPUT_NAME</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">str_array</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">OUTPUT_NAME</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_file_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">str_array</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">OUTPUT_NAME</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">str_array</span><span class="p">)</span>
+
+
+    <span class="c1">##Loop to annotate each imzML file</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+        <span class="c1">#Find the target file based on a filter string match</span>
+        <span class="nb">iter</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">update_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;.imzML&quot;</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">partial_filter_string</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">OUTPUT_NAME</span><span class="o">+</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.imzML&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">partial_filter_string</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+                    <span class="n">target_file</span> <span class="o">=</span> <span class="n">file</span>
+                <span class="k">elif</span> <span class="n">partial_filter_string</span> <span class="ow">in</span> <span class="n">filt</span><span class="p">:</span>
+                    <span class="n">target_file</span> <span class="o">=</span> <span class="n">file</span>
+
+        <span class="c1">##Calls the actual annotation function</span>
+        <span class="n">annotate_imzML</span><span class="p">(</span><span class="n">target_file</span><span class="p">,</span><span class="n">model_files</span><span class="o">+</span><span class="n">sl</span><span class="o">+</span><span class="n">model_file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">final_time_point</span><span class="p">,</span><span class="n">filt</span><span class="p">,</span><span class="n">x_speed</span><span class="o">=</span><span class="n">x_speed</span><span class="p">,</span><span class="n">y_step</span><span class="o">=</span><span class="n">y_step</span><span class="p">)</span>
+
+        <span class="c1">##Update progress bar in the GUI</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">iter</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">scan_filts</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">progress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">tgt_progress</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="n">tgt_progress</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;determinate&quot;</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+
+    <span class="c1">##After conversion is complete, clean up files by putting the annotated imzML files in a new directory within the datafile folder           </span>
+    <span class="n">move_files</span><span class="p">(</span><span class="n">OUTPUT_NAME</span><span class="p">,</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="move_files">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.move_files">[docs]</a>
+<span class="k">def</span> <span class="nf">move_files</span><span class="p">(</span><span class="n">probe_txt</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Moves the annotated imzML files into the same directory as the source raw files of the image under a new folder matching the datafile names&quot;&quot;&quot;</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">new_directory</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">probe_txt</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">new_directory</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">probe_txt</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">probe_txt</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="annotate_imzML">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.annotate_imzML">[docs]</a>
+<span class="k">def</span> <span class="nf">annotate_imzML</span><span class="p">(</span><span class="n">annotate_file</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">SRC_mzML</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">scan_time</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span><span class="n">filter_string</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;none given&quot;</span><span class="p">,</span><span class="n">x_speed</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">y_step</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file. </span>
+<span class="sd">    annotate_file = the imzML file to be annotated</span>
+<span class="sd">    SRC_mzML = the source file to pull metadata from</span>
+<span class="sd">    scan_time = how long it took to scan across the tissue (default = 0.001)</span>
+<span class="sd">    filter_string = what scan filter is actually captured  (default = &quot;none given&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#Error handling for when scan filter extraction fails</span>
+    <span class="n">result_file</span> <span class="o">=</span> <span class="n">annotate_file</span>
+    <span class="k">if</span> <span class="n">filter_string</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filter_string</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+
+    <span class="c1">#Retrieve data from source mzml</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">SRC_mzML</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;xml&#39;</span><span class="p">)</span>
+
+    <span class="c1">#Grab instrument model from the source mzML</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">instrument_model</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">referenceableParamGroup</span><span class="o">.</span><span class="n">cvParam</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">instrument_model</span> <span class="o">=</span> <span class="s2">&quot;Could not find&quot;</span>
+
+    <span class="c1">#Open un-annotated imzML</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">annotate_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">data_need_annotation</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data_need_annotation</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">data_need_annotation</span><span class="p">,</span><span class="s1">&#39;xml&#39;</span><span class="p">)</span>
+
+    <span class="c1">#Replace template data with key metadata from mzML</span>
+    <span class="n">replace_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;instrumentConfigurationList&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">replace_item</span> <span class="ow">in</span> <span class="n">replace_list</span><span class="p">:</span>
+        <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">replace_item</span><span class="p">)</span><span class="o">.</span><span class="n">replace_with</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">replace_item</span><span class="p">))</span>
+
+    <span class="c1">#Write instrument model to imzML, filter string</span>
+    <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">instrumentConfigurationList</span><span class="o">.</span><span class="n">instrumentConfiguration</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">instrument_model</span>
+    <span class="n">new_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">builder</span><span class="o">=</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">builder</span><span class="p">,</span>
+                  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cvParam&quot;</span><span class="p">,</span>
+                  <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;accession&#39;</span><span class="p">:</span><span class="s1">&#39;MS:1000031&#39;</span><span class="p">,</span><span class="s2">&quot;cvRef&quot;</span><span class="p">:</span><span class="s2">&quot;MS&quot;</span><span class="p">,</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="n">instrument_model</span><span class="p">})</span>
+    <span class="c1"># new_tag = data_need_annotation.new_tag(&quot;cvParam&quot;, accession=&quot;MS:1000031&quot;, cvRef=&quot;MS&quot;)</span>
+    <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">instrumentConfigurationList</span><span class="o">.</span><span class="n">instrumentConfiguration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_tag</span><span class="p">)</span>
+
+    <span class="c1">#Remove empty instrument ref from imzML template</span>
+    <span class="k">for</span> <span class="n">paramgroup</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;referenceableParamGroupRef&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">paramgroup</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;CommonInstrumentParams&quot;</span><span class="p">:</span>
+            <span class="n">paramgroup</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">cvParam</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;cvParam&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;accession&quot;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;MS:1000530&quot;</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;accession&quot;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;IMS:1000411&quot;</span><span class="p">:</span>
+            <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;accession&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;IMS:1000413&quot;</span>
+            <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;flyback&quot;</span>
+
+
+
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">referenceableParamGroupList</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;scan1&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">tag2</span> <span class="ow">in</span> <span class="n">tag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;MS:1000512&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">tag2</span><span class="p">):</span>
+                    <span class="n">tag2</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filter_string</span>
+                    
+
+        
+    <span class="c1">#Read pixel grid information from imzML</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">scanSettingsList</span><span class="o">.</span><span class="n">scanSettings</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;cvParam&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;accession&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;IMS:1000042&quot;</span><span class="p">:</span> <span class="c1">#num pixels x</span>
+                <span class="n">x_pixels</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;accession&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;IMS:1000043&quot;</span><span class="p">:</span> <span class="c1">#num pixels y</span>
+                <span class="n">y_pixels</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+    <span class="c1">#Calculate pixel sizes and overall dimensions from size of pixel grid, scan speed, step sizes</span>
+    <span class="n">x_pix_size</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x_speed</span> <span class="o">*</span> <span class="n">scan_time</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">x_pixels</span><span class="p">))</span>
+    <span class="n">max_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_pix_size</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">x_pixels</span><span class="p">))</span>
+    <span class="n">y_pix_size</span> <span class="o">=</span> <span class="n">y_step</span>
+    <span class="n">max_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_pix_size</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">y_pixels</span><span class="p">))</span>
+
+    <span class="n">accessions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;IMS:1000046&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000047&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000044&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000045&quot;</span><span class="p">]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pixel size (x)&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel size y&quot;</span><span class="p">,</span> <span class="s2">&quot;max dimension x&quot;</span><span class="p">,</span> <span class="s2">&quot;max dimension y&quot;</span><span class="p">]</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_pix_size</span><span class="p">,</span> <span class="n">y_pix_size</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">]</span>
+
+    <span class="c1">#Actual insertion of data - need to write string into a beautiful soup object with NO FORMATTING to append it</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">append_item</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;cvParam cvRef=&quot;IMS&quot; accession=&quot;</span><span class="si">{</span><span class="n">accessions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; name=&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; value=&quot;</span><span class="si">{</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">append_item</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">append_item</span><span class="p">,</span><span class="s1">&#39;xml&#39;</span><span class="p">)</span>
+        <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">scanSettingsList</span><span class="o">.</span><span class="n">scanSettings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">append_item</span><span class="p">)</span>
+
+
+    <span class="k">for</span> <span class="n">cvParam</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;cvParam&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;accession&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">accessions</span><span class="p">:</span>
+            <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitCvRef&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;UO&quot;</span>
+            <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitAccession&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;UO:0000017&quot;</span>
+            <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitName&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;micrometer&quot;</span>
+
+    <span class="c1">#Write the new file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">result_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">prettify</span><span class="p">()))</span></div>
+
+
+
+
+
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Joseph Monaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

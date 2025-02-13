@@ -1,0 +1,801 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>imzML_Writer.imzML_Scout &mdash; imzML Writer  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            imzML Writer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">imzML Writer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">imzML_Writer.imzML_Scout</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for imzML_Writer.imzML_Scout</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyimzml.ImzMLParser</span> <span class="k">as</span> <span class="nn">imzmlp</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span><span class="p">,</span> <span class="n">filedialog</span><span class="p">,</span> <span class="n">messagebox</span>
+<span class="kn">from</span> <span class="nn">RangeSlider.RangeSlider</span> <span class="kn">import</span> <span class="n">RangeSliderV</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span> 
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_tkagg</span> <span class="kn">import</span> <span class="p">(</span><span class="n">FigureCanvasTkAgg</span><span class="p">,</span> <span class="n">NavigationToolbar2Tk</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backend_tools</span> <span class="kn">import</span> <span class="n">ToolBase</span><span class="p">,</span> <span class="n">ToolToggleBase</span> 
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">imzML_Writer.analyte_list_cleanup</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.imzML_Scout.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">_tgt_file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="c1">##Colors and FONTS</span>
+    <span class="n">TEAL</span> <span class="o">=</span> <span class="s2">&quot;#2da7ad&quot;</span>
+    <span class="n">BEIGE</span> <span class="o">=</span> <span class="s2">&quot;#dbc076&quot;</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s2">&quot;#22d10f&quot;</span>
+    <span class="n">FONT</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;HELVETICA&quot;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">browse_for_file</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Launch dialog box for user to find and select a target imzML file&quot;&quot;&quot;</span>
+        <span class="n">path_to_file</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">askopenfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;imzML Files&quot;</span><span class="p">,</span><span class="s2">&quot;*.imzML&quot;</span><span class="p">)])</span>
+        <span class="n">file_entry</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+        <span class="n">file_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">path_to_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_aspect_ratio</span><span class="p">(</span><span class="n">img_file</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries to extract aspect ratio information (relative pixel dimensions) from the imzML. Uses 1x1 pixels if it fails&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">img_file</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">pretty</span><span class="p">()</span>
+            <span class="n">x_pix_size</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;scan_settings&quot;</span><span class="p">][</span><span class="s2">&quot;scanSettings1&quot;</span><span class="p">][</span><span class="s2">&quot;pixel size (x)&quot;</span><span class="p">]</span>
+            <span class="n">y_pix_size</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;scan_settings&quot;</span><span class="p">][</span><span class="s2">&quot;scanSettings1&quot;</span><span class="p">][</span><span class="s2">&quot;pixel size y&quot;</span><span class="p">]</span>
+
+            <span class="n">max_x_dimension</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;scan_settings&quot;</span><span class="p">][</span><span class="s2">&quot;scanSettings1&quot;</span><span class="p">][</span><span class="s2">&quot;max dimension x&quot;</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">y_pix_size</span><span class="o">/</span><span class="n">x_pix_size</span><span class="p">,</span> <span class="n">x_pix_size</span><span class="p">,</span> <span class="n">y_pix_size</span><span class="p">,</span> <span class="n">max_x_dimension</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">plot_ion_image</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deals with data update for plotting a new ion image, retrieving targets from the user input fields&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">raw_ion_image</span><span class="p">,</span> <span class="n">aspect_ratio</span><span class="p">,</span><span class="n">x_pix</span><span class="p">,</span><span class="n">y_pix</span><span class="p">,</span> <span class="n">imzML_object</span><span class="p">,</span> <span class="n">max_x_dimension</span>
+
+        <span class="c1">#Get the target data for the iamge</span>
+        <span class="n">target_mz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mz_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">tolerance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tolerance_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">file_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">mz_window</span><span class="o">=</span><span class="n">target_mz</span><span class="o">*</span><span class="n">tolerance</span><span class="o">/</span><span class="mf">1e6</span>
+
+        <span class="c1">#Open the imzML datafile if needed</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+            <span class="c1"># coordinate_map = []</span>
+            <span class="k">if</span> <span class="s2">&quot;imzML_object&quot;</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">imzML_object</span><span class="o">.</span><span class="n">filename</span> <span class="o">!=</span> <span class="n">filename</span><span class="p">:</span>
+                    <span class="n">imzML_object</span> <span class="o">=</span> <span class="n">imzmlp</span><span class="o">.</span><span class="n">ImzMLParser</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span><span class="n">parse_lib</span><span class="o">=</span><span class="s1">&#39;lxml&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">imzML_object</span> <span class="o">=</span> <span class="n">imzmlp</span><span class="o">.</span><span class="n">ImzMLParser</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span><span class="n">parse_lib</span><span class="o">=</span><span class="s1">&#39;lxml&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Check if TIC image was requested, view entire spectrum if so. Otherwise generate datagrid of requested m/z and tolerance combo</span>
+        <span class="k">if</span> <span class="n">view_tic_option</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">ion_image</span> <span class="o">=</span> <span class="n">imzmlp</span><span class="o">.</span><span class="n">getionimage</span><span class="p">(</span><span class="n">imzML_object</span><span class="p">,</span><span class="n">mz_value</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="mi">9999</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ion_image</span> <span class="o">=</span> <span class="n">imzmlp</span><span class="o">.</span><span class="n">getionimage</span><span class="p">(</span><span class="n">imzML_object</span><span class="p">,</span><span class="n">target_mz</span><span class="p">,</span><span class="n">mz_window</span><span class="p">)</span>
+        
+        <span class="c1">#Get aspect ratio</span>
+        <span class="p">[</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">x_pix</span><span class="p">,</span> <span class="n">y_pix</span><span class="p">,</span> <span class="n">max_x_dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_aspect_ratio</span><span class="p">(</span><span class="n">imzML_object</span><span class="p">)</span>
+
+        <span class="c1">#Normalize ion image (or don&#39;t) as specified in GUI</span>
+        <span class="n">norm_method</span> <span class="o">=</span> <span class="n">normalization_method</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">norm_method</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="n">norm_mz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">normalize_custom_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="n">norm_window</span> <span class="o">=</span> <span class="n">norm_mz</span> <span class="o">*</span> <span class="n">tolerance</span> <span class="o">/</span> <span class="mf">1e6</span>
+            <span class="n">norm_grid</span> <span class="o">=</span> <span class="n">imzmlp</span><span class="o">.</span><span class="n">getionimage</span><span class="p">(</span><span class="n">imzML_object</span><span class="p">,</span><span class="n">mz_value</span><span class="o">=</span><span class="n">norm_mz</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="n">norm_window</span><span class="p">)</span>
+            <span class="n">ion_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">ion_image</span><span class="p">,</span><span class="n">norm_grid</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ion_image</span><span class="p">),</span><span class="n">where</span><span class="o">=</span><span class="n">norm_grid</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">norm_method</span> <span class="o">==</span> <span class="s2">&quot;TIC&quot;</span><span class="p">:</span>
+            <span class="n">norm_grid</span> <span class="o">=</span> <span class="n">imzmlp</span><span class="o">.</span><span class="n">getionimage</span><span class="p">(</span><span class="n">imzML_object</span><span class="p">,</span><span class="n">mz_value</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="mi">9999</span><span class="p">)</span>
+            <span class="n">ion_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">ion_image</span><span class="p">,</span><span class="n">norm_grid</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ion_image</span><span class="p">),</span><span class="n">where</span><span class="o">=</span><span class="n">norm_grid</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="c1">#Initiate new raw data variable so we can freely manipulate the ion image as needed</span>
+        <span class="n">raw_ion_image</span> <span class="o">=</span> <span class="n">ion_image</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">update_ion_image</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fig</span>
+
+    <span class="k">def</span> <span class="nf">update_ion_image</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the actual ion image in the GUI, with various checks for user input settings and handling to remove old images&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">raw_ion_image</span><span class="p">,</span><span class="n">aspect_ratio</span><span class="p">,</span><span class="n">x_pix</span><span class="p">,</span><span class="n">y_pix</span><span class="p">,</span><span class="n">canvas_ionimage</span><span class="p">,</span><span class="n">title_label</span><span class="p">,</span><span class="n">fig</span><span class="p">,</span><span class="n">ion_image</span><span class="p">,</span> <span class="n">plot1</span><span class="p">,</span> <span class="n">last_selected_patch</span><span class="p">,</span> <span class="n">last_selected_pixel</span><span class="p">,</span> <span class="n">red_highlight_patch</span><span class="p">,</span> <span class="n">color_NL</span>
+
+        <span class="c1">##Retrieve contrast cutoffs for low-end and top-end</span>
+        <span class="n">low_thres</span> <span class="o">=</span> <span class="n">v_bottom</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">up_thres</span><span class="o">=</span><span class="n">v_top</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">target_mz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mz_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">tolerance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tolerance_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+        <span class="n">ion_image</span> <span class="o">=</span> <span class="n">raw_ion_image</span>
+
+        <span class="c1">##Apply the cutoffs, setting those below to 0 and those above to high_cutoff value</span>
+        <span class="n">low_cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ion_image</span><span class="p">,</span><span class="n">low_thres</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">up_cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ion_image</span><span class="p">,</span><span class="n">up_thres</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+
+        <span class="n">ion_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ion_image</span> <span class="o">&gt;</span> <span class="n">up_cutoff</span><span class="p">,</span><span class="n">up_cutoff</span><span class="p">,</span><span class="n">ion_image</span><span class="p">)</span>
+        <span class="n">ion_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ion_image</span> <span class="o">&lt;</span> <span class="n">low_cutoff</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">ion_image</span><span class="p">)</span>
+
+        <span class="c1">#If custom normalization set, apply it to the colormap</span>
+        <span class="k">if</span> <span class="n">NL_state</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">color_NL</span> <span class="o">=</span> <span class="n">norm_value</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_NL</span><span class="o">=</span> <span class="n">up_cutoff</span>
+
+        <span class="c1">##Initiate and raw ion image</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">layout</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        
+        <span class="n">plot1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">()</span>
+        <span class="n">plot1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ion_image</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span><span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=</span><span class="n">color_NL</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="n">cmap_selected</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">plot1</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+        <span class="c1">#Remove old image objects before inserting a new one</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">first_img</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">canvas_ionimage</span><span class="o">.</span><span class="n">get_tk_widget</span><span class="p">()</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+            <span class="n">title_label</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">last_selected_pixel</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">last_selected_patch</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">red_highlight_patch</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#Add the ion image to the tkinter window</span>
+        <span class="n">canvas_ionimage</span> <span class="o">=</span> <span class="n">FigureCanvasTkAgg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">master</span><span class="o">=</span><span class="n">window_scout</span><span class="p">)</span>
+        
+        <span class="c1">#Draw the selected patch if available on update of the ion image</span>
+        <span class="k">if</span> <span class="n">last_selected_patch</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">draw_last_selected_patch</span><span class="p">()</span>
+        <span class="n">canvas_ionimage</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="n">toolbar</span> <span class="o">=</span> <span class="n">NavigationToolbar2Tk</span><span class="p">(</span><span class="n">canvas_ionimage</span><span class="p">,</span> <span class="n">pack_toolbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">toolbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">canvas_ionimage</span><span class="o">.</span><span class="n">get_tk_widget</span><span class="p">()</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1">##Draw a label for the ion image with target m/z, tolerance, and pixel dimensions</span>
+        <span class="n">title_string</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">title_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x_pix</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span><span class="si">}</span><span class="s2"> µm x </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">y_pix</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="si">}</span><span class="s2"> µm pixels; m/z </span><span class="si">{</span><span class="n">target_mz</span><span class="si">}</span><span class="s2"> @ </span><span class="si">{</span><span class="n">tolerance</span><span class="si">}</span><span class="s2"> ppm&quot;</span>
+        <span class="n">title_label</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="n">title_string</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
+        <span class="n">title_label</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1">#Initiate callbacks for when users mouse over the ion image for viewing/selecting highlighted pixel</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s2">&quot;motion_notify_event&quot;</span><span class="p">,</span><span class="n">image_move</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span><span class="n">report_coordinates</span><span class="p">)</span>
+        <span class="n">first_img</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">fig</span>
+
+    <span class="k">def</span> <span class="nf">draw_last_selected_patch</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draws a red patch wherever the last selected pixel was&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">last_selected_patch</span><span class="p">,</span> <span class="n">last_selected_pixel</span>
+        <span class="n">lx</span><span class="p">,</span> <span class="n">ly</span> <span class="o">=</span> <span class="n">last_selected_pixel</span>
+
+        <span class="c1"># Prepare the green overlay for the selected pixel</span>
+        <span class="n">selected_overlay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># New overlay</span>
+        
+        <span class="n">num_lines</span><span class="p">,</span> <span class="n">pixels_per_line</span> <span class="o">=</span> <span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">selected_min_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ly</span><span class="p">))</span>
+        <span class="n">selected_max_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">num_lines</span><span class="p">,</span> <span class="n">ly</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">selected_min_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lx</span> <span class="o">-</span> <span class="n">pixels_per_line</span><span class="o">*</span><span class="mf">0.008</span><span class="p">))</span>
+        <span class="n">selected_max_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">pixels_per_line</span><span class="p">,</span> <span class="n">lx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+
+        <span class="c1"># Set the green color with some opacity for the selection overlay</span>
+        <span class="n">selected_overlay</span><span class="p">[</span><span class="n">selected_min_y</span><span class="p">:</span><span class="n">selected_max_y</span><span class="p">,</span> <span class="n">selected_min_x</span><span class="p">:</span><span class="n">selected_max_x</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]</span>  <span class="c1"># Green with 80% opacity</span>
+
+        <span class="n">last_selected_patch</span> <span class="o">=</span> <span class="n">plot1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">selected_overlay</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">image_move</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle mouse movement over the ion image and raws a green patch over the currently selectable region.&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">ion_image</span><span class="p">,</span> <span class="n">plot1</span><span class="p">,</span> <span class="n">last_selected_patch</span><span class="p">,</span> <span class="n">red_highlight_patch</span><span class="p">,</span><span class="n">canvas_ionimage</span><span class="p">,</span> <span class="n">color_NL</span>  <span class="c1"># Track selected and red patches</span>
+
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">xdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">ydata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Get the pixel index</span>
+            <span class="n">x_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">xdata</span><span class="p">)</span>
+            <span class="n">y_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">ydata</span><span class="p">)</span>
+
+            <span class="c1"># Create a copy of the original image to modify for hover</span>
+            <span class="n">highlight_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># RGBA image for highlight</span>
+
+            <span class="c1"># Define bounds for the highlight area</span>
+            <span class="n">pixels_per_line</span> <span class="o">=</span> <span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span>
+
+            <span class="n">min_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_index</span><span class="p">))</span>
+            <span class="n">max_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_index</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">min_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x_index</span> <span class="o">-</span> <span class="n">pixels_per_line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.008</span><span class="p">))</span>
+            <span class="n">max_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ion_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="c1"># Set the green color with varying opacity for the hover overlay</span>
+            <span class="n">highlight_image</span><span class="p">[</span><span class="n">min_y</span><span class="p">:</span><span class="n">max_y</span><span class="p">,</span> <span class="n">min_x</span><span class="p">:</span><span class="n">max_x</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]</span>  <span class="c1"># Green with 80% opacity        </span>
+            
+            <span class="c1"># Draw the ion image first</span>
+            <span class="n">plot1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ion_image</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ion_image</span><span class="p">),</span> <span class="n">vmax</span><span class="o">=</span><span class="n">color_NL</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_selected</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+            <span class="c1"># Overlay the red highlight</span>
+            <span class="k">if</span> <span class="n">red_highlight_patch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">red_highlight_patch</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>  <span class="c1"># Remove previous red highlight if it exists</span>
+                
+            <span class="n">red_highlight_patch</span> <span class="o">=</span> <span class="n">plot1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">highlight_image</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>  <span class="c1"># Store new red highlight</span>
+
+            <span class="c1"># If we have a last selected pixel, keep it drawn</span>
+            <span class="k">if</span> <span class="n">last_selected_pixel</span><span class="p">:</span>
+                <span class="n">draw_last_selected_patch</span><span class="p">()</span>
+
+            <span class="c1"># Refresh the canvas to show updates</span>
+            <span class="n">canvas_ionimage</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">export_csv</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports the current image data as a csv file, prompts the user as to where they&#39;d like to save it.&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">raw_ion_image</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">raw_ion_image</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> 
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">path</span><span class="p">,</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;CSV file&quot;</span><span class="p">,</span><span class="s2">&quot;.csv&quot;</span><span class="p">)])</span>
+        <span class="n">dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">bulk_export_csv</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports a batch of images as csv files, prompts the user for a spreadsheet of target m/z and names&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">red_highlight_patch</span><span class="p">,</span> <span class="n">last_selected_patch</span><span class="p">,</span> <span class="n">raw_ion_image</span>
+
+        <span class="c1">##Prompt user for a spreadsheet of target m/z and names to give them</span>
+        <span class="n">target_list_file</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">askopenfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Excel Spreadsheet&quot;</span><span class="p">,</span><span class="s2">&quot;.xlsx&quot;</span><span class="p">),(</span><span class="s2">&quot;CSV File&quot;</span><span class="p">,</span><span class="s2">&quot;.csv&quot;</span><span class="p">)])</span>
+        <span class="n">target_list</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">target_list_file</span><span class="p">)</span>
+        <span class="n">target_list</span><span class="o">=</span><span class="n">cleanup_table</span><span class="p">(</span><span class="n">target_list</span><span class="p">,</span><span class="n">target_list_file</span><span class="p">)</span>
+
+        <span class="c1">##Generate ion image for each entry, write the raw data to a CSV file</span>
+        <span class="k">for</span> <span class="nb">iter</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="n">target_list</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">mz_entry</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+            <span class="n">mz_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">plot_ion_image</span><span class="p">()</span>
+
+            <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()),</span><span class="s2">&quot;ion_images&quot;</span><span class="p">)</span>
+            <span class="n">img_name_base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="nb">iter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="p">):</span>
+                    <span class="n">messagebox</span><span class="o">.</span><span class="n">showwarning</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Folder already exists!&quot;</span><span class="p">,</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;You already have an ion image folder here, please rename, move, or delete it&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">folder_name</span><span class="p">)</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">folder_name</span><span class="p">,</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;CSV&quot;</span><span class="p">,</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)],</span><span class="n">initialfile</span><span class="o">=</span><span class="n">img_name_base</span><span class="p">)</span>
+                <span class="n">used_extension</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">img_name_base</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">used_extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">raw_ion_image</span><span class="p">)</span>
+            <span class="n">dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span><span class="o">=</span><span class="n">file</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1">##Optionally, write the TIC image as well</span>
+        <span class="k">if</span> <span class="n">include_TIC_var</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">view_tic_check</span><span class="o">.</span><span class="n">invoke</span><span class="p">()</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;TIC_Image.</span><span class="si">{</span><span class="n">used_extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">raw_ion_image</span><span class="p">)</span>
+            <span class="n">dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span><span class="o">=</span><span class="n">file</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">find_scan_idx</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Based on where the user clicks, find the corresponding scan index in the imzML file&quot;&quot;&quot;</span>
+        <span class="n">scans_per_line</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_x_dimension</span> <span class="o">/</span> <span class="n">x_pix</span><span class="p">)</span>
+        <span class="n">line_scan_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">ydata</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">scan_along_line</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">line_scan_num</span><span class="o">*</span><span class="n">scans_per_line</span> <span class="o">+</span> <span class="n">scan_along_line</span>
+
+
+    <span class="k">def</span> <span class="nf">export_image</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the currently viewed image as an image file (tif, png, jpg), prompt the user for where to put it&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">red_highlight_patch</span><span class="p">,</span> <span class="n">last_selected_patch</span>
+
+        <span class="c1">##Remove any highlight patches from the data</span>
+        <span class="k">if</span> <span class="n">red_highlight_patch</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">red_highlight_patch</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">last_selected_patch</span> <span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+            <span class="n">last_selected_patch</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        
+        <span class="c1">#Prompt the user for where to save it</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;TIF&quot;</span><span class="p">,</span> <span class="s2">&quot;.tif&quot;</span><span class="p">),(</span><span class="s2">&quot;PNG&quot;</span><span class="p">,</span><span class="s2">&quot;.png&quot;</span><span class="p">),(</span><span class="s2">&quot;JPG&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="n">file</span><span class="p">:</span>
+            <span class="c1">#Save the file</span>
+            <span class="n">file_format</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">file</span><span class="p">,</span>
+                        <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="c1">#dpi=300,</span>
+                        <span class="nb">format</span><span class="o">=</span><span class="n">file_format</span><span class="p">,</span>
+                        <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span>
+                        <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">check_normalization</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles contextual display on whether a custom normalization m/z is being applied&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">normalization_method</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span> <span class="c1">##If custom NL, add an entry for that m/z and listeners to update the ion image when it changes</span>
+            <span class="n">normalize_custom_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+            <span class="n">normalize_custom_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span><span class="n">plot_ion_image</span><span class="p">)</span>
+            <span class="n">normalize_custom_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span><span class="n">plot_ion_image</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">normalize_custom_entry</span><span class="o">.</span><span class="n">grid_remove</span><span class="p">()</span> <span class="c1">#Remove the box for space if the box is unchecked</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">plot_ion_image</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+    <span class="k">def</span> <span class="nf">report_coordinates</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reports the current pixel x/y and updates the mass spectrum from the scan_idx&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">scan_idx</span><span class="p">,</span> <span class="n">last_selected_pixel</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">xdata</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scan_idx</span> <span class="o">=</span> <span class="n">find_scan_idx</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="n">last_selected_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">ydata</span><span class="p">)</span>
+            <span class="n">update_plot_for_selected_pixel</span><span class="p">()</span>
+            <span class="n">plot_mass_spectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">update_plot_for_selected_pixel</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the plot with the new selected pixel and draw the previous selection in red.&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">ion_image</span><span class="p">,</span> <span class="n">plot1</span><span class="p">,</span> <span class="n">canvas_ionimage</span><span class="p">,</span> <span class="n">last_selected_pixel</span><span class="p">,</span> <span class="n">last_selected_patch</span>
+
+        <span class="c1"># Draw the ion image</span>
+        <span class="n">plot1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ion_image</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ion_image</span><span class="p">),</span> <span class="n">vmax</span><span class="o">=</span><span class="n">color_NL</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_selected</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        
+        <span class="c1"># Remove old highlights</span>
+        <span class="k">if</span> <span class="n">last_selected_patch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">last_selected_patch</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+        <span class="c1"># Add red highlight, if a pixel is selected</span>
+        <span class="k">if</span> <span class="n">last_selected_pixel</span><span class="p">:</span>
+            <span class="n">draw_last_selected_patch</span><span class="p">()</span>
+
+        <span class="c1"># Refresh the canvas</span>
+        <span class="n">canvas_ionimage</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">plot_mass_spectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot a mass spectrum and add listeners to watch for mouseovers/clicks to update the ion image to the nearest detectable m/z&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">imzML_object</span><span class="p">,</span> <span class="n">mz</span><span class="p">,</span> <span class="n">intensities</span><span class="p">,</span> <span class="n">MS_vline</span><span class="p">,</span> <span class="n">plot2</span><span class="p">,</span> <span class="n">canvas_mass_spectrum</span>
+
+        <span class="c1">##Retrieve the data for the target spectrum</span>
+        <span class="p">[</span><span class="n">mz</span><span class="p">,</span> <span class="n">intensities</span><span class="p">]</span> <span class="o">=</span> <span class="n">imzML_object</span><span class="o">.</span><span class="n">getspectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="p">)</span>
+
+        <span class="c1">##Plot the actual mass spectrum using vlines</span>
+        <span class="n">fig_spectrum</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="n">TEAL</span><span class="p">)</span>
+        <span class="n">plot2</span> <span class="o">=</span> <span class="n">fig_spectrum</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">()</span>
+        <span class="n">plot2</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">mz</span><span class="p">,</span><span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">ymax</span><span class="o">=</span><span class="n">intensities</span><span class="p">)</span>
+        <span class="n">plot2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">plot2</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">first_MS</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="c1">#Set the x lims and y lims, as input by the user</span>
+            <span class="n">plot2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">start_var</span><span class="o">.</span><span class="n">get</span><span class="p">()),</span><span class="nb">float</span><span class="p">(</span><span class="n">end_var</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
+            <span class="n">in_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mz</span><span class="p">)</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">start_var</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">end_var</span><span class="o">.</span><span class="n">get</span><span class="p">())]</span>
+            <span class="n">new_ylim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">intensities</span><span class="p">[</span><span class="n">in_bounds</span><span class="p">])</span> <span class="o">*</span><span class="mf">1.3</span>
+            <span class="n">plot2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">new_ylim</span><span class="p">)</span>
+            
+        <span class="n">plot2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;m/z&quot;</span><span class="p">)</span>
+        <span class="n">plot2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1">##Remove old mass spectra so they aren&#39;t layered on top of each other</span>
+            <span class="n">canvas_mass_spectrum</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        <span class="c1">##Add mass spectrum to the GUI window</span>
+        <span class="n">canvas_mass_spectrum</span> <span class="o">=</span> <span class="n">FigureCanvasTkAgg</span><span class="p">(</span><span class="n">fig_spectrum</span><span class="p">,</span><span class="n">master</span><span class="o">=</span><span class="n">window_scout</span><span class="p">)</span>
+        <span class="n">canvas_mass_spectrum</span><span class="o">.</span><span class="n">get_tk_widget</span><span class="p">()</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">first_MS</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="c1">##Handling for start/stop xlims entries, listeners to update when these are changed, etc.</span>
+            <span class="n">MS_vline</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">start_mz</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Start m/z&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
+            <span class="n">end_mz</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;End m/z&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
+            <span class="n">start_mz</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+            <span class="n">end_mz</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">start_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">plot2</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">start_mz_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">textvariable</span><span class="o">=</span><span class="n">start_var</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">end_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">plot2</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">end_mz_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">textvariable</span><span class="o">=</span><span class="n">end_var</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">start_mz_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+            <span class="n">end_mz_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+            <span class="n">start_mz_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span><span class="n">plot_mass_spectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="o">=</span><span class="n">scan_idx</span><span class="p">))</span>
+            <span class="n">start_mz_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span><span class="n">plot_mass_spectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="o">=</span><span class="n">scan_idx</span><span class="p">))</span>
+            <span class="n">end_mz_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span><span class="n">plot_mass_spectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="o">=</span><span class="n">scan_idx</span><span class="p">))</span>
+            <span class="n">end_mz_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span><span class="k">lambda</span> <span class="n">event</span><span class="p">:</span><span class="n">plot_mass_spectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="o">=</span><span class="n">scan_idx</span><span class="p">))</span>
+
+        <span class="c1">##Show previously selected m/z as needed</span>
+        <span class="n">current_mz</span> <span class="o">=</span> <span class="n">mz_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">current_mz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">current_mz</span><span class="p">)</span>
+        <span class="n">xlim</span> <span class="o">=</span> <span class="n">plot2</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_mz</span> <span class="o">-</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">percentage</span> <span class="o">&gt;</span> <span class="mf">0.75</span><span class="p">:</span>
+            <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;right&#39;</span>  <span class="c1"># align label to the right if near the end</span>
+            <span class="n">label_x_pos</span> <span class="o">=</span> <span class="n">current_mz</span> <span class="o">-</span> <span class="mf">0.5</span>  <span class="c1"># adjust label position to the left</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span>   <span class="c1"># align label to the left otherwise</span>
+            <span class="n">label_x_pos</span> <span class="o">=</span> <span class="n">current_mz</span> <span class="o">+</span> <span class="mf">0.5</span>
+        
+        <span class="n">y_position</span> <span class="o">=</span> <span class="mi">4</span><span class="o">/</span><span class="mi">5</span> <span class="o">*</span> <span class="n">plot2</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">plot2</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">current_mz</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+        <span class="n">plot2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">label_x_pos</span><span class="p">,</span> <span class="n">y_position</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_mz</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="n">ha</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">canvas_mass_spectrum</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+        <span class="c1">##Add listeners for mouseover and click on the mass spectrum</span>
+        <span class="n">fig_spectrum</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s2">&quot;motion_notify_event&quot;</span><span class="p">,</span><span class="n">on_MS_move</span><span class="p">)</span>
+        <span class="n">fig_spectrum</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;button_press_event&quot;</span><span class="p">,</span><span class="n">change_target_mz</span><span class="p">)</span>
+        <span class="n">first_MS</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">on_MS_move</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Listener for mouseover events on the mass spectrum, finds the nearest m/z when you do so and displays it on the window&quot;&quot;&quot;</span>
+        <span class="n">new_mz</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">xdata</span>
+        <span class="k">if</span> <span class="n">new_mz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_target</span> <span class="o">=</span> <span class="n">find_target_mz</span><span class="p">(</span><span class="n">new_mz</span><span class="p">)</span>
+
+            <span class="k">global</span> <span class="n">MS_vline</span><span class="p">,</span> <span class="n">plot2</span><span class="p">,</span> <span class="n">canvas_mass_spectrum</span><span class="p">,</span> <span class="n">MS_label</span>
+            <span class="k">if</span> <span class="n">MS_vline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">MS_vline</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s1">&#39;MS_label&#39;</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span> <span class="ow">and</span> <span class="n">MS_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">MS_label</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+            <span class="n">xlim</span> <span class="o">=</span> <span class="n">plot2</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+            <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_target</span> <span class="o">-</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1">#percentage along x-axis</span>
+            <span class="n">y_position</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">plot2</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># Contextual align label left/right of the bar depending on how close to the end of viewing window we are</span>
+            <span class="k">if</span> <span class="n">percentage</span> <span class="o">&gt;</span> <span class="mf">0.75</span><span class="p">:</span>
+                <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;right&#39;</span>  <span class="c1"># align label to the right if near the end</span>
+                <span class="n">label_x_pos</span> <span class="o">=</span> <span class="n">new_target</span> <span class="o">-</span> <span class="mf">0.5</span>  <span class="c1"># adjust label position to the left</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span>   <span class="c1"># align label to the left otherwise</span>
+                <span class="n">label_x_pos</span> <span class="o">=</span> <span class="n">new_target</span> <span class="o">+</span> <span class="mf">0.5</span>  <span class="c1"># adjust label position to the right</span>
+
+            <span class="n">MS_vline</span> <span class="o">=</span> <span class="n">plot2</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">new_target</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># Create the label with adjusted properties</span>
+            <span class="n">MS_label</span> <span class="o">=</span> <span class="n">plot2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">label_x_pos</span><span class="p">,</span> <span class="n">y_position</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_target</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="n">ha</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+            <span class="n">canvas_mass_spectrum</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">find_target_mz</span><span class="p">(</span><span class="n">new_mz</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds the target m/z value based on surrounding, detectable m/z values.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">new_mz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># Handle case for None input</span>
+
+        <span class="nb">iter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">new_target</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1"># Loop until a target value is found</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_target</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">low_pass</span> <span class="o">=</span> <span class="n">new_mz</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.005</span> <span class="o">*</span> <span class="nb">iter</span><span class="p">)</span>
+            <span class="n">high_pass</span> <span class="o">=</span> <span class="n">new_mz</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.005</span> <span class="o">*</span> <span class="nb">iter</span><span class="p">)</span>
+            <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Find indices of values within the low and high pass range</span>
+            <span class="n">matches_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mz</span><span class="p">)</span> <span class="k">if</span> <span class="n">low_pass</span> <span class="o">&lt;</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">high_pass</span><span class="p">]</span>
+            <span class="n">filt_mz</span> <span class="o">=</span> <span class="n">mz</span><span class="p">[</span><span class="n">matches_idx</span><span class="p">]</span>
+            <span class="n">filt_int</span> <span class="o">=</span> <span class="n">intensities</span><span class="p">[</span><span class="n">matches_idx</span><span class="p">]</span>
+            
+            <span class="c1"># Get index of the maximum intensity value</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filt_int</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">max_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">filt_int</span><span class="p">)</span> <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">filt_int</span><span class="p">)]</span>
+                <span class="n">new_target</span> <span class="o">=</span> <span class="n">filt_mz</span><span class="p">[</span><span class="n">max_idx</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">new_target</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>  <span class="c1"># Return the found target m/z value</span>
+
+    <span class="k">def</span> <span class="nf">change_target_mz</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ion image with the newly selected m/z&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">scan_idx</span>
+        <span class="n">new_mz</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">xdata</span>
+        <span class="k">if</span> <span class="n">new_mz</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_target</span> <span class="o">=</span> <span class="n">find_target_mz</span><span class="p">(</span><span class="n">new_mz</span><span class="p">)</span>
+            <span class="n">mz_entry</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+            <span class="n">mz_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">round</span><span class="p">(</span><span class="n">new_target</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+            <span class="n">plot_ion_image</span><span class="p">()</span>
+            <span class="n">plot_mass_spectrum</span><span class="p">(</span><span class="n">scan_idx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">bulk_export</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export a series of ion images with the currently selected view settings. Prompts the user for a spreadsheet with target m/z and labels.&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">fig</span><span class="p">,</span> <span class="n">red_highlight_patch</span><span class="p">,</span> <span class="n">last_selected_patch</span>
+        <span class="c1">#prompt the user for the target list</span>
+        <span class="n">target_list_file</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">askopenfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Excel Spreadsheet&quot;</span><span class="p">,</span><span class="s2">&quot;.xlsx&quot;</span><span class="p">),(</span><span class="s2">&quot;CSV File&quot;</span><span class="p">,</span><span class="s2">&quot;.csv&quot;</span><span class="p">)])</span>
+        <span class="n">target_list</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">target_list_file</span><span class="p">)</span>
+        <span class="c1">#Contextual code to clean up table depending on whether headers were included, column order, etc.</span>
+        <span class="n">target_list</span><span class="o">=</span><span class="n">cleanup_table</span><span class="p">(</span><span class="n">target_list</span><span class="p">,</span><span class="n">target_list_file</span><span class="p">)</span>
+
+        <span class="c1">##Iterate through each target m/z, drawing and then writing the ion image</span>
+        <span class="k">for</span> <span class="nb">iter</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="n">target_list</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">mz_entry</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+            <span class="n">mz_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">plot_ion_image</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">red_highlight_patch</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">red_highlight_patch</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                <span class="n">red_highlight_patch</span> <span class="o">=</span> <span class="kc">None</span>
+        
+            <span class="k">if</span> <span class="n">last_selected_patch</span> <span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+                <span class="n">last_selected_patch</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                <span class="n">last_selected_patch</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+
+            <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()),</span><span class="s2">&quot;ion_images&quot;</span><span class="p">)</span>
+            <span class="n">img_name_base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="nb">iter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder_name</span><span class="p">):</span>
+                    <span class="n">messagebox</span><span class="o">.</span><span class="n">showwarning</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Folder already exists!&quot;</span><span class="p">,</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;You already have an ion image folder here, please rename, move, or delete it&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">folder_name</span><span class="p">)</span>
+                <span class="c1">#Prompt user for file extension to use</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">folder_name</span><span class="p">,</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;TIF&quot;</span><span class="p">,</span> <span class="s2">&quot;.tif&quot;</span><span class="p">),(</span><span class="s2">&quot;PNG&quot;</span><span class="p">,</span><span class="s2">&quot;.png&quot;</span><span class="p">),(</span><span class="s2">&quot;JPG&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">)],</span><span class="n">initialfile</span><span class="o">=</span><span class="n">img_name_base</span><span class="p">)</span>
+                <span class="n">used_extension</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">img_name_base</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">used_extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">file</span><span class="p">,</span>
+                        <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="c1">#dpi=300,</span>
+                        <span class="nb">format</span><span class="o">=</span><span class="n">used_extension</span><span class="p">,</span>
+                        <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span>
+                        <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1">##optionally, export a TIC image if selected</span>
+        <span class="k">if</span> <span class="n">include_TIC_var</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">view_tic_check</span><span class="o">.</span><span class="n">invoke</span><span class="p">()</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;TIC_Image.</span><span class="si">{</span><span class="n">used_extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">file</span><span class="p">,</span>
+                <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="c1">#dpi=300,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="n">used_extension</span><span class="p">,</span>
+                <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span>
+                <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">view_tic</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">view_tic_option</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">draw_tic_image</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plot_ion_image</span><span class="p">()</span>        
+
+    <span class="k">def</span> <span class="nf">draw_tic_image</span><span class="p">():</span>
+        <span class="n">plot_ion_image</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">custom_NL</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies custom normalization limit as specified by the user&quot;&quot;&quot;</span>
+        <span class="c1">##0 = no custom, 1 = custom NL</span>
+        <span class="k">global</span> <span class="n">NL_entry</span><span class="p">,</span> <span class="n">norm_value</span><span class="p">,</span> <span class="n">raw_ion_image</span>
+
+        <span class="n">custom_NL_desired</span> <span class="o">=</span> <span class="n">NL_state</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">custom_NL_desired</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">NL_entry</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span> <span class="c1">#remove entries for custom normalization limit when unchecked</span>
+                <span class="n">update_NL_button</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">update_ion_image</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">custom_NL_desired</span><span class="p">:</span> <span class="c1">##Add the entries when checked</span>
+            <span class="n">norm_value</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">norm_value</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>    
+                <span class="n">norm_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">raw_ion_image</span><span class="p">,</span><span class="n">v_top</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+            
+            <span class="n">NL_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">textvariable</span><span class="o">=</span><span class="n">norm_value</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+            <span class="n">NL_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">update_NL_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Get this NL&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">update_NL</span><span class="p">)</span>
+            <span class="n">update_NL_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">NL_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span><span class="n">update_ion_image</span><span class="p">)</span>
+            <span class="n">NL_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span><span class="n">update_ion_image</span><span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">update_NL</span><span class="p">():</span>
+        <span class="n">norm_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">raw_ion_image</span><span class="p">,</span><span class="n">v_top</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+        <span class="n">update_ion_image</span><span class="p">()</span>
+
+
+
+
+
+    <span class="c1">##Build the GUI window</span>
+    <span class="n">window_scout</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+    <span class="n">window_scout</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;IMZML Scout&quot;</span><span class="p">)</span>
+    <span class="n">window_scout</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">)</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Style</span><span class="p">()</span>
+    <span class="n">style</span><span class="o">.</span><span class="n">theme_use</span><span class="p">(</span><span class="s1">&#39;clam&#39;</span><span class="p">)</span>
+
+    <span class="c1">##Target image:</span>
+    <span class="n">file_var</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">file_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">_tgt_file</span><span class="p">)</span>
+    <span class="n">file_button</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Browse for file&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">browse_for_file</span><span class="p">)</span>
+    <span class="n">file_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">textvariable</span><span class="o">=</span><span class="n">file_var</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="n">file_var</span><span class="o">.</span><span class="n">trace_add</span><span class="p">(</span><span class="s1">&#39;write&#39;</span><span class="p">,</span><span class="n">plot_ion_image</span><span class="p">)</span>
+
+    <span class="n">file_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">file_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="c1">##mz entry</span>
+    <span class="n">mz_var</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">mz_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;104.1069&quot;</span><span class="p">)</span>
+    <span class="n">mz_label</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Target m/z:&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
+    <span class="n">mz_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">textvariable</span><span class="o">=</span><span class="n">mz_var</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="c1">#mz_var.trace_add(&#39;write&#39;,plot_ion_image)</span>
+    <span class="n">mz_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span><span class="n">plot_ion_image</span><span class="p">)</span>
+    <span class="n">mz_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span><span class="n">plot_ion_image</span><span class="p">)</span>
+
+    <span class="n">mz_label</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">mz_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1">##Tolerance entry</span>
+    <span class="n">tol_var</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">tol_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;10&quot;</span><span class="p">)</span>
+    <span class="n">tolerance_label</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Tolerance (ppm):&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
+    <span class="n">tolerance_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">textvariable</span><span class="o">=</span><span class="n">tol_var</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="c1">#tol_var.trace_add(&#39;write&#39;,plot_ion_image)</span>
+    <span class="n">tolerance_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span><span class="n">plot_ion_image</span><span class="p">)</span>
+    <span class="n">tolerance_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span><span class="n">plot_ion_image</span><span class="p">)</span>
+
+    <span class="n">tolerance_label</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">tolerance_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1">##Normalization buttons</span>
+    <span class="n">normalize_custom_entry</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+    <span class="n">normalization_method</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">no_normalization</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Radiobutton</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">check_normalization</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;No Normalization&quot;</span><span class="p">,</span><span class="n">variable</span><span class="o">=</span><span class="n">normalization_method</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+    <span class="n">no_normalization</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">no_normalization</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+    <span class="n">custom_method</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Radiobutton</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">check_normalization</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Custom Normalize&quot;</span><span class="p">,</span><span class="n">variable</span><span class="o">=</span><span class="n">normalization_method</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;custom&quot;</span><span class="p">)</span>
+    <span class="n">custom_method</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">tic_method</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Radiobutton</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">check_normalization</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;TIC Normalize&quot;</span><span class="p">,</span><span class="n">variable</span><span class="o">=</span><span class="n">normalization_method</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;TIC&quot;</span><span class="p">)</span>
+    <span class="n">tic_method</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="c1">##Slider</span>
+    <span class="n">v_top</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">DoubleVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+    <span class="n">v_bottom</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">DoubleVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">v_slider</span> <span class="o">=</span> <span class="n">RangeSliderV</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,[</span><span class="n">v_bottom</span><span class="p">,</span><span class="n">v_top</span><span class="p">],</span><span class="n">padY</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="n">bgColor</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">valueSide</span><span class="o">=</span><span class="s2">&quot;RIGHT&quot;</span><span class="p">,</span><span class="n">font_color</span><span class="o">=</span><span class="s1">&#39;#ffffff&#39;</span><span class="p">,</span><span class="n">font_family</span><span class="o">=</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span><span class="n">line_s_color</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">digit_precision</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span><span class="n">step_size</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">v_slider</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">rowspan</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">v_top</span><span class="o">.</span><span class="n">trace_add</span><span class="p">(</span><span class="s1">&#39;write&#39;</span><span class="p">,</span><span class="n">update_ion_image</span><span class="p">)</span>
+    <span class="n">v_bottom</span><span class="o">.</span><span class="n">trace_add</span><span class="p">(</span><span class="s1">&#39;write&#39;</span><span class="p">,</span><span class="n">update_ion_image</span><span class="p">)</span>
+
+    <span class="c1">##Custom normalization limit</span>
+    <span class="n">NL_state</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">NL_checkbox</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Custom normalization limit?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">variable</span><span class="o">=</span><span class="n">NL_state</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">custom_NL</span><span class="p">)</span>
+    <span class="n">NL_checkbox</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1">##Colormap set</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cmap_config</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s2">&quot;Scout_Config.xlsx&quot;</span><span class="p">)</span>
+        <span class="n">colormap_options</span><span class="o">=</span><span class="n">cmap_config</span><span class="p">[</span><span class="s2">&quot;Cmap_Options&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to find/read colormap options file, loading defaults&quot;</span><span class="p">)</span>
+        <span class="n">colormap_options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span><span class="s2">&quot;plasma&quot;</span><span class="p">,</span><span class="s2">&quot;cividis&quot;</span><span class="p">,</span><span class="s2">&quot;hot&quot;</span><span class="p">,</span><span class="s2">&quot;jet&quot;</span><span class="p">]</span>
+    
+    <span class="n">cmap_selected</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">cmap_selected</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">colormap_options</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cmap_selector</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">cmap_selected</span><span class="p">,</span><span class="o">*</span><span class="n">colormap_options</span><span class="p">)</span>
+    <span class="n">cmap_selector</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">cmap_selected</span><span class="o">.</span><span class="n">trace_add</span><span class="p">(</span><span class="s1">&#39;write&#39;</span><span class="p">,</span><span class="n">update_ion_image</span><span class="p">)</span>
+
+    <span class="c1">##View TIC image</span>
+    <span class="n">view_tic_option</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">view_tic_check</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;View TIC?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">var</span><span class="o">=</span><span class="n">view_tic_option</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">view_tic</span><span class="p">)</span>
+    <span class="n">view_tic_check</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1">##Export buttons</span>
+    <span class="n">export_button</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Export Image&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">export_image</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+    <span class="n">export_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">b_export</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Bulk Export&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">bulk_export</span><span class="p">)</span>
+    <span class="n">b_export</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">csv_export</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;csv Export&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">export_csv</span><span class="p">)</span>
+    <span class="n">csv_export</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">b_csv_export</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Bulk csv export&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">bulk_export_csv</span><span class="p">)</span>
+    <span class="n">b_csv_export</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">include_TIC_var</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">include_tic</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">window_scout</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Include TIC?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">var</span><span class="o">=</span><span class="n">include_TIC_var</span><span class="p">)</span>
+    <span class="n">include_tic</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+    <span class="n">start_var</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">start_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">end_var</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">end_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">first_img</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">first_img</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">first_MS</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_scout</span><span class="p">)</span>
+    <span class="n">first_MS</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">on_startup</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">on_startup</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_tgt_file</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">plot_ion_image</span><span class="p">()</span>
+        
+        <span class="n">on_startup</span><span class="o">=</span><span class="kc">False</span>
+
+    <span class="n">window_scout</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Joseph Monaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

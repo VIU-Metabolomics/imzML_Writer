@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>imzML_Writer package &mdash; imzML Writer  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="imzML_Writer" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            imzML Writer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">imzML_Writer</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">imzML_Writer package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.analyte_list_cleanup">imzML_Writer.analyte_list_cleanup module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.check_column_order"><code class="docutils literal notranslate"><span class="pre">check_column_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.check_headers"><code class="docutils literal notranslate"><span class="pre">check_headers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.cleanup_table"><code class="docutils literal notranslate"><span class="pre">cleanup_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.name_cleanup"><code class="docutils literal notranslate"><span class="pre">name_cleanup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.gui_functions">imzML_Writer.gui_functions module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.RAW_to_mzML"><code class="docutils literal notranslate"><span class="pre">RAW_to_mzML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.annotate_imzML"><code class="docutils literal notranslate"><span class="pre">annotate_imzML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.clean_raw_files"><code class="docutils literal notranslate"><span class="pre">clean_raw_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.find_msconvert"><code class="docutils literal notranslate"><span class="pre">find_msconvert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.get_drives"><code class="docutils literal notranslate"><span class="pre">get_drives()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.get_file_type"><code class="docutils literal notranslate"><span class="pre">get_file_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.imzML_metadata_process"><code class="docutils literal notranslate"><span class="pre">imzML_metadata_process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.move_files"><code class="docutils literal notranslate"><span class="pre">move_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.mzML_to_imzML_convert"><code class="docutils literal notranslate"><span class="pre">mzML_to_imzML_convert()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.imzML_Scout">imzML_Writer.imzML_Scout module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.imzML_Scout.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.imzML_Writer">imzML_Writer.imzML_Writer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.imzML_Writer.gui"><code class="docutils literal notranslate"><span class="pre">gui()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.ms_convert_gui">imzML_Writer.ms_convert_gui module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.ms_convert_gui.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.recalibrate_mz">imzML_Writer.recalibrate_mz module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.recalibrate_mz.recalibrate"><code class="docutils literal notranslate"><span class="pre">recalibrate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">imzML Writer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">imzML_Writer</a></li>
+      <li class="breadcrumb-item active">imzML_Writer package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/imzML_Writer.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="imzml-writer-package">
+<h1>imzML_Writer package<a class="headerlink" href="#imzml-writer-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-imzML_Writer.analyte_list_cleanup">
+<span id="imzml-writer-analyte-list-cleanup-module"></span><h2>imzML_Writer.analyte_list_cleanup module<a class="headerlink" href="#module-imzML_Writer.analyte_list_cleanup" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.check_column_order">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">check_column_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#check_column_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.check_column_order" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.check_headers">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">check_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#check_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.check_headers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.cleanup_table">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">cleanup_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#cleanup_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.cleanup_table" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.name_cleanup">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">name_cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#name_cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.name_cleanup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-imzML_Writer.gui_functions">
+<span id="imzml-writer-gui-functions-module"></span><h2>imzML_Writer.gui_functions module<a class="headerlink" href="#module-imzML_Writer.gui_functions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.RAW_to_mzML">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">RAW_to_mzML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#RAW_to_mzML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.RAW_to_mzML" title="Link to this definition"></a></dt>
+<dd><p>Calls msConvert via docker on linux and Mac, or calls _viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.annotate_imzML">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">annotate_imzML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SRC_mzML</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'none</span> <span class="pre">given'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#annotate_imzML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.annotate_imzML" title="Link to this definition"></a></dt>
+<dd><p>Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file.
+annotate_file = the imzML file to be annotated
+SRC_mzML = the source file to pull metadata from
+scan_time = how long it took to scan across the tissue (default = 0.001)
+filter_string = what scan filter is actually captured  (default = “none given”)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.clean_raw_files">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">clean_raw_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#clean_raw_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.clean_raw_files" title="Link to this definition"></a></dt>
+<dd><p>Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:
+Initial RAW files - raw vendor files
+Output mzML Files - processed mzML files output by msConvert
+Inputs:
+path - path to directory to clean up
+sl - legacy code, should just be ‘/’
+file_type - extension for raw files to know what to sort</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.find_file">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">find_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#find_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.find_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.find_msconvert">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">find_msconvert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#find_msconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.find_msconvert" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.get_drives">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">get_drives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#get_drives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.get_drives" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.get_file_type">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">get_file_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#get_file_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.get_file_type" title="Link to this definition"></a></dt>
+<dd><p>Identifies the file type in the specified path, ignoring hidden files starting with .
+Returns the file extension</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.imzML_metadata_process">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">imzML_metadata_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_progress</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#imzML_metadata_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.imzML_metadata_process" title="Link to this definition"></a></dt>
+<dd><p>Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). Inputs:
+model_files - Directory to the folder containing mzML files
+sl - legacy, use ‘/’
+x_speed - scan speed in the x-direction, µm/sec
+y_step - step between strip lines, µm
+tgt_progress - Tkinter progress bar object to update as the process continues
+path - path to the directory where imzML files should be stored after annotation</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.move_files">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">move_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probe_txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#move_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.move_files" title="Link to this definition"></a></dt>
+<dd><p>Moves the annotated imzML files into the same directory as the source raw files of the image under a new folder matching the datafile names</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.gui_functions.mzML_to_imzML_convert">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">mzML_to_imzML_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PATH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/Users/josephmonaghan/Library/CloudStorage/OneDrive-VancouverIslandUniversity/imzML_TechnicalNote/imzML_Writer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LOCK_MASS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TOLERANCE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#mzML_to_imzML_convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.mzML_to_imzML_convert" title="Link to this definition"></a></dt>
+<dd><p>Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
+aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
+Inputs:
+progress_target - tkinter progress bar object from the GUI to update as conversion progresses
+path - Working path for source mzML files
+Lock mass - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration
+Tolerance - search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm</p>
+</dd></dl>
+
+</section>
+<section id="module-imzML_Writer.imzML_Scout">
+<span id="imzml-writer-imzml-scout-module"></span><h2>imzML_Writer.imzML_Scout module<a class="headerlink" href="#module-imzML_Writer.imzML_Scout" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.imzML_Scout.main">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.imzML_Scout.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_tgt_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/imzML_Scout.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.imzML_Scout.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-imzML_Writer.imzML_Writer">
+<span id="imzml-writer-imzml-writer-module"></span><h2>imzML_Writer.imzML_Writer module<a class="headerlink" href="#module-imzML_Writer.imzML_Writer" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.imzML_Writer.gui">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.imzML_Writer.</span></span><span class="sig-name descname"><span class="pre">gui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/imzML_Writer.html#gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.imzML_Writer.gui" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-imzML_Writer.ms_convert_gui">
+<span id="imzml-writer-ms-convert-gui-module"></span><h2>imzML_Writer.ms_convert_gui module<a class="headerlink" href="#module-imzML_Writer.ms_convert_gui" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.ms_convert_gui.main">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.ms_convert_gui.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgt_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/ms_convert_gui.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.ms_convert_gui.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-imzML_Writer.recalibrate_mz">
+<span id="imzml-writer-recalibrate-mz-module"></span><h2>imzML_Writer.recalibrate_mz module<a class="headerlink" href="#module-imzML_Writer.recalibrate_mz" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.recalibrate_mz.recalibrate">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.recalibrate_mz.</span></span><span class="sig-name descname"><span class="pre">recalibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppm_off</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/recalibrate_mz.html#recalibrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.recalibrate_mz.recalibrate" title="Link to this definition"></a></dt>
+<dd><p>Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift</p>
+</dd></dl>
+
+</section>
+<section id="module-imzML_Writer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-imzML_Writer" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="imzML_Writer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Joseph Monaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

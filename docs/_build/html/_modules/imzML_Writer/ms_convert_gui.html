@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>imzML_Writer.ms_convert_gui &mdash; imzML Writer  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            imzML Writer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">imzML Writer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">imzML_Writer.ms_convert_gui</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for imzML_Writer.ms_convert_gui</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span><span class="p">,</span> <span class="n">filedialog</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">docker</span>
+<span class="kn">from</span> <span class="nn">imzML_Writer.gui_functions</span> <span class="kn">import</span> <span class="n">get_file_type</span>
+
+<span class="c1">##Colors and FONTS</span>
+<span class="n">TEAL</span> <span class="o">=</span> <span class="s2">&quot;#2da7ad&quot;</span>
+<span class="n">BEIGE</span> <span class="o">=</span> <span class="s2">&quot;#dbc076&quot;</span>
+<span class="n">GREEN</span> <span class="o">=</span> <span class="s2">&quot;#22d10f&quot;</span>
+<span class="n">FONT</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;HELVETICA&quot;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.ms_convert_gui.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">tgt_dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">get_path</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;No arguments, prompts the user via dialog box for the directory containing the data to be processed.</span>
+<span class="sd">    Will call populate_list() method to show files in the UI listbox&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">FILE_TYPE</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">askdirectory</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">CD_entry</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+            <span class="n">CD_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">directory</span><span class="p">)</span>
+
+            <span class="n">populate_list</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+            <span class="c1">#FILE_TYPE = get_file_types(directory)</span>
+    
+    <span class="k">def</span> <span class="nf">populate_list</span><span class="p">(</span><span class="nb">dir</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;takes an argument dir and populates the UI listbox based on its contents</span>
+<span class="sd">        dir: pathname for active directory as a string&quot;&quot;&quot;</span>
+        <span class="n">file_list</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+        <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">ticker</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+                <span class="n">file_list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ticker</span><span class="p">,</span><span class="n">file</span><span class="p">)</span>
+                <span class="n">ticker</span><span class="o">+=</span><span class="mi">1</span>
+    
+    <span class="c1"># def get_file_types(dir) -&gt; str:</span>
+    <span class="c1">#     &quot;&quot;&quot;dir: pathname for active directory</span>
+    <span class="c1">#     returns file_type as a str</span>
+    <span class="c1">#     [taken as first non-hidden (i.e. doesn&#39;t start with &quot;.&quot;) file in the directory]&quot;&quot;&quot;</span>
+    <span class="c1">#     files = os.listdir(dir) </span>
+    <span class="c1">#     for file in files:</span>
+    <span class="c1">#         split_file = file.split(&quot;.&quot;)</span>
+    <span class="c1">#         file_type = split_file[-1]</span>
+
+    <span class="c1">#     file_type_label = tk.Label(window_msconvert,text=f&quot;File type: .{file_type}&quot;,bg=TEAL,font=FONT)</span>
+    <span class="c1">#     file_type_label.grid(row=1,column=3,columnspan=3)</span>
+    <span class="c1">#     return file_type</span>
+
+    <span class="k">def</span> <span class="nf">call_msconvert</span><span class="p">():</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">CD_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;win&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This GUI is for Mac/Linux, please use the MSConvert GUI from Proteowizard for PCs&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">DOCKER_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;chambm/pwiz-skyline-i-agree-to-the-vendor-licenses&quot;</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
+
+            <span class="n">working_directory</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="n">file_type</span> <span class="o">=</span> <span class="n">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+            <span class="n">vol</span> <span class="o">=</span> <span class="p">{</span><span class="n">working_directory</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bind&#39;</span><span class="p">:</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data&quot;</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;rw&#39;</span><span class="p">}}</span>
+
+            <span class="n">comm</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;wine msconvert </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data</span><span class="si">{</span><span class="n">sl</span><span class="si">}</span><span class="s2">*.</span><span class="si">{</span><span class="n">file_type</span><span class="si">}</span><span class="s2"> --zlib=off --mzML --64 --outdir </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data --filter &#39;&quot;</span><span class="s1">&#39;peakPicking true 1-&#39;</span><span class="s2">&quot;&#39; --simAsSpectra --srmAsSpectra&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span>
+
+            <span class="n">comm</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;wine msconvert </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data</span><span class="si">{</span><span class="n">sl</span><span class="si">}</span><span class="s2">*.</span><span class="si">{</span><span class="n">file_type</span><span class="si">}</span><span class="s2"> --mzML --64 --outdir </span><span class="si">{</span><span class="n">sl</span><span class="si">}{</span><span class="n">DOCKER_IMAGE</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">data --filter &#39;&quot;</span><span class="s1">&#39;peakPicking true 1-&#39;</span><span class="s2">&quot;&#39;&quot;</span>
+
+            <span class="k">if</span> <span class="n">zlib</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span> <span class="o">+</span> <span class="s2">&quot; --zlib=off&quot;</span>
+
+            <span class="k">if</span> <span class="n">SIM_as_spectra</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span> <span class="o">+</span> <span class="s2">&quot; --simAsSpectra&quot;</span>
+
+            <span class="k">if</span> <span class="n">SRM_as_spectra</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span> <span class="o">+</span> <span class="s2">&quot; --srmAsSpectra&quot;</span>
+
+            <span class="n">env_vars</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;WINEDEBUG&quot;</span><span class="p">:</span> <span class="s2">&quot;-all&quot;</span><span class="p">}</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="n">image</span><span class="o">=</span><span class="n">DOCKER_IMAGE</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="n">env_vars</span><span class="p">,</span>
+                <span class="n">volumes</span> <span class="o">=</span> <span class="n">vol</span><span class="p">,</span>
+                <span class="n">command</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span>
+                <span class="n">working_dir</span><span class="o">=</span><span class="n">working_directory</span><span class="p">,</span>
+                <span class="n">auto_remove</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">detach</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+
+
+
+    
+    <span class="n">window_msconvert</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+    <span class="n">window_msconvert</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;MAC - msConvert GUI&quot;</span><span class="p">)</span>
+    <span class="n">window_msconvert</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">)</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Style</span><span class="p">()</span>
+    <span class="n">style</span><span class="o">.</span><span class="n">theme_use</span><span class="p">(</span><span class="s1">&#39;clam&#39;</span><span class="p">)</span>
+
+    <span class="c1">##Choose Directory Button</span>
+    <span class="n">CD_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Select Folder&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">get_path</span><span class="p">)</span>
+    <span class="n">CD_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">CD_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Enter Directory Here&quot;</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="n">CD_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1">##Processing buttons</span>
+    <span class="n">convert_mzML</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Convert to mzML&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">call_msconvert</span><span class="p">)</span>
+    <span class="n">convert_mzML</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1">#Listbox for files in target folder</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Listbox</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">highlightcolor</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+    <span class="n">file_list</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">rowspan</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">zlib</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">)</span>
+    <span class="n">zlib_check</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;zlib compression?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">var</span><span class="o">=</span><span class="n">zlib</span><span class="p">)</span>
+    <span class="n">zlib_check</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">SIM_as_spectra</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">)</span>
+    <span class="n">SIM_check</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;SIM as spectra?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">var</span><span class="o">=</span><span class="n">SIM_as_spectra</span><span class="p">)</span>
+    <span class="n">SIM_check</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">SRM_as_spectra</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">)</span>
+    <span class="n">SRM_check</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">window_msconvert</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;SRM as spectra?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">var</span><span class="o">=</span><span class="n">SRM_as_spectra</span><span class="p">)</span>
+    <span class="n">SRM_check</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">window_msconvert</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span></div>
+
+
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Joseph Monaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

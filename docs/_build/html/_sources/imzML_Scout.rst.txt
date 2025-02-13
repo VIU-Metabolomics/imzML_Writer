@@ -1,0 +1,7 @@
+imzML\_Scout module
+===================
+
+.. automodule:: imzML_Scout
+   :members:
+   :undoc-members:
+   :show-inheritance:

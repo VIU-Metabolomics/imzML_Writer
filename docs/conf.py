@@ -6,28 +6,26 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'imzML Writer'
-copyright = '2025, Joseph Monaghan'
-author = 'Joseph Monaghan'
-release = '0.1'
-
 import os
 import sys
 
-sys.path.insert(0,os.path.abspath("../imzML_Writer"))
+sys.path.insert(0,os.path.abspath(".."))
+
+project = 'imzML Writer'
+copyright = '2025, Joseph Monaghan'
+author = 'Joseph Monaghan'
 
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-    'sphinx_rtd_theme',
-    'sphinx_autodoc_typehints',
-    'sphinx.ext.autosummary',
-    'sphinx_rtd_theme',
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx_autodoc_typehints",
+    "sphinx.ext.autosummary",
 ]
 
 templates_path = ['_templates']

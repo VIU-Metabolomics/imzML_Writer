@@ -1,0 +1,7 @@
+ms\_convert\_gui module
+=======================
+
+.. automodule:: ms_convert_gui
+   :members:
+   :undoc-members:
+   :show-inheritance:
