@@ -1,0 +1,14 @@
+README.md
+setup.py
+imzML_Writer/__init__.py
+imzML_Writer/analyte_list_cleanup.py
+imzML_Writer/gui_functions.py
+imzML_Writer/imzML_Scout.py
+imzML_Writer/imzML_Writer.py
+imzML_Writer/ms_convert_gui.py
+imzML_Writer/recalibrate_mz.py
+imzML_Writer.egg-info/PKG-INFO
+imzML_Writer.egg-info/SOURCES.txt
+imzML_Writer.egg-info/dependency_links.txt
+imzML_Writer.egg-info/requires.txt
+imzML_Writer.egg-info/top_level.txt
