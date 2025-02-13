@@ -1,0 +1,7 @@
+imzML\_Writer.gui\_functions module
+===================================
+
+.. automodule:: imzML_Writer.gui_functions
+   :members:
+   :undoc-members:
+   :show-inheritance:

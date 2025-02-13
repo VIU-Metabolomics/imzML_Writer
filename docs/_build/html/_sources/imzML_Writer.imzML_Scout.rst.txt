@@ -1,0 +1,7 @@
+imzML\_Writer.imzML\_Scout module
+=================================
+
+.. automodule:: imzML_Writer.imzML_Scout
+   :members:
+   :undoc-members:
+   :show-inheritance:

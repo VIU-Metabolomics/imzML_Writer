@@ -41,7 +41,7 @@ This may take a few minutes, as the image is ~5-6 GB. You can verify successful 
    :alt: Docker GUI showing successful msconvert image
 
 1. Standalone apps
-***************
+******************
 Mac
 ---
 Download the `Github repository <https://github.com/VIU-Metabolomics/imzML_Writer>`_ and grab the correct distribution 
@@ -102,7 +102,7 @@ This covers the basic GUI functionality, for further details on running the CLI 
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
    
-   imzML_Writer
+   modules

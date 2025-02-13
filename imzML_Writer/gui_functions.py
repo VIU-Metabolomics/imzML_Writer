@@ -62,7 +62,7 @@ def find_msconvert():
                     return candidate
 
 
-def _viaPWIZ(path:str,write_mode:str):
+def viaPWIZ(path:str,write_mode:str):
     """Method to call msConvert directly if the detected platform is on windows, takes as argument:
     path - path to the target files (string)
     write_mode - "Centroid" or "Profile" as specified in the GUI"""
@@ -115,9 +115,9 @@ def get_file_type(path:str):
     return files[0].split(".")[-1]
 
 def RAW_to_mzML(path:str,sl:str,write_mode:str):
-    """Calls msConvert via docker on linux and Mac, or calls _viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path"""
+    """Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path"""
     if "win" in sys.platform and sys.platform != "darwin":
-        _viaPWIZ(path,write_mode)
+        viaPWIZ(path,write_mode)
     else:
         ##Setup the docker image including internal file structure and command
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"

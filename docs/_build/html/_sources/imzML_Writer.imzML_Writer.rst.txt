@@ -1,0 +1,7 @@
+imzML\_Writer.imzML\_Writer module
+==================================
+
+.. automodule:: imzML_Writer.imzML_Writer
+   :members:
+   :undoc-members:
+   :show-inheritance:

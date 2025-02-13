@@ -39,8 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../imzML_Writer.html">imzML_Writer package</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -139,7 +142,9 @@
 
 
 
-<span class="k">def</span> <span class="nf">_viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="viaPWIZ">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.viaPWIZ">[docs]</a>
+<span class="k">def</span> <span class="nf">viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Method to call msConvert directly if the detected platform is on windows, takes as argument:</span>
 <span class="sd">    path - path to the target files (string)</span>
 <span class="sd">    write_mode - &quot;Centroid&quot; or &quot;Profile&quot; as specified in the GUI&quot;&quot;&quot;</span>
@@ -180,7 +185,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;Invalid data write mode!&quot;</span><span class="p">)</span>
     
-    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">current_dir</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">current_dir</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="get_file_type">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.get_file_type">[docs]</a>
@@ -197,9 +203,9 @@
 <div class="viewcode-block" id="RAW_to_mzML">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.RAW_to_mzML">[docs]</a>
 <span class="k">def</span> <span class="nf">RAW_to_mzML</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls msConvert via docker on linux and Mac, or calls _viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="s2">&quot;win&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
-        <span class="n">_viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">write_mode</span><span class="p">)</span>
+        <span class="n">viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">write_mode</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1">##Setup the docker image including internal file structure and command</span>
         <span class="n">DOCKER_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;chambm/pwiz-skyline-i-agree-to-the-vendor-licenses&quot;</span>

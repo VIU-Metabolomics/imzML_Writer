@@ -1,0 +1,7 @@
+imzML\_Writer.recalibrate\_mz module
+====================================
+
+.. automodule:: imzML_Writer.recalibrate_mz
+   :members:
+   :undoc-members:
+   :show-inheritance:
