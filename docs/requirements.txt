@@ -1,5 +1,4 @@
 sphinx==3.4.3
 sphinx_autodoc_typehints==1.12.0
-sphinx_autodoc_defaultarg==0.1.2
 sphinx_rtd_theme
 
