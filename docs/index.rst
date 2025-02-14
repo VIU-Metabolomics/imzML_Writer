@@ -9,7 +9,7 @@
 
 Welcome & Guide
 ==========================
-Welcome to the imzML_Writer documentation page! 
+Welcome to the `imzML_Writer <https://github.com/VIU-Metabolomics/imzML_Writer>`_ documentation page! 
 
 imzML_Writer is available as:
 
