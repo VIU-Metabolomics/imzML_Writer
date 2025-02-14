@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to use the GUI &mdash; imzML Writer  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="imzML_Writer" href="modules.html" />
+    <link rel="prev" title="Getting Started" href="QuickStart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            imzML Writer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GUI User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#imzml-writer">imzML Writer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#launch">1. Launch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#select-target-folder">2. Select target folder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#specify-imaging-parameters">3. Specify imaging parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#start-the-conversion">4. Start the conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#view-the-image-with-imzml-scout">5. View the image with imzML Scout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#explore-the-data">6. Explore the data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Function Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">imzML Writer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How to use the GUI</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/GUI_Guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-to-use-the-gui">
+<h1>How to use the GUI<a class="headerlink" href="#how-to-use-the-gui" title="Link to this heading"></a></h1>
+<section id="imzml-writer">
+<h2>imzML Writer<a class="headerlink" href="#imzml-writer" title="Link to this heading"></a></h2>
+<section id="launch">
+<h3>1. Launch<a class="headerlink" href="#launch" title="Link to this heading"></a></h3>
+<p>Launch imzML Writer by double clicking the <code class="docutils literal notranslate"><span class="pre">.app</span></code> / <code class="docutils literal notranslate"><span class="pre">.exe</span></code>:</p>
+<p><strong>Mac:</strong></p>
+<a class="reference internal image-reference" href="_images/Launch_apple.png"><img alt="Finder window showing imzML_Writer.app highlighted" src="_images/Launch_apple.png" style="width: 500px;" />
+</a>
+<p><strong>PC</strong>
+.. image:: /images/Launch_apple.png</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">width<span class="colon">:</span></dt>
+<dd class="field-odd"><p>500</p>
+</dd>
+<dt class="field-even">alt<span class="colon">:</span></dt>
+<dd class="field-even"><p>Finder window showing imzML_Writer.app highlighted</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Or from python using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
+
+<span class="n">iw</span><span class="o">.</span><span class="n">gui</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/pic1.png"><img alt="imzML Writer Launch Screen" src="_images/pic1.png" style="width: 500px;" />
+</a>
+</section>
+<section id="select-target-folder">
+<h3>2. Select target folder<a class="headerlink" href="#select-target-folder" title="Link to this heading"></a></h3>
+<p>Click select Folder to choose the directory containing the <code class="docutils literal notranslate"><span class="pre">.raw</span></code>, <code class="docutils literal notranslate"><span class="pre">.mzML</span></code>, or <code class="docutils literal notranslate"><span class="pre">.imzML</span></code> data files</p>
+<a class="reference internal image-reference" href="_images/pic1.png"><img alt="Highlighted choose directory button" src="_images/pic1.png" style="width: 500px;" />
+</a>
+<a class="reference internal image-reference" href="_images/pic2.png"><img alt="Navigating to target directory" src="_images/pic2.png" style="width: 500px;" />
+</a>
+</section>
+<section id="specify-imaging-parameters">
+<h3>3. Specify imaging parameters<a class="headerlink" href="#specify-imaging-parameters" title="Link to this heading"></a></h3>
+<p>Type in the experimental parameters (i.e., X scan speed, Y step, Lock mass) and choose the MS data mode of interest (i.e., Centroid or Profile)</p>
+<a class="reference internal image-reference" href="_images/pic3.png"><img alt="Populated user-input parameters" src="_images/pic3.png" style="width: 500px;" />
+</a>
+<dl class="field-list simple">
+<dt class="field-odd">X scan speed (µm/s)<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the speed at which the stage is moving, and the sample is scanned along the x direction</p>
+</dd>
+<dt class="field-even">Y step (µm)<span class="colon">:</span></dt>
+<dd class="field-even"><p>stepping size in µm unit (the distance between two adjacent lines in the y direction)</p>
+</dd>
+<dt class="field-odd">Lock mass<span class="colon">:</span></dt>
+<dd class="field-odd"><p>m/z of a known ion (typically m/z of an internal standard). This serves as a reference point to correct any mass measurement errors that may occur due to instrumental drift or other factors.</p>
+</dd>
+<dt class="field-even">Profile<span class="colon">:</span></dt>
+<dd class="field-even"><p>This mode writes the continuous signal from the raw vendor data. Providing a richer dataset, but larger file sizes and longer processing times.</p>
+</dd>
+<dt class="field-odd">Centroid<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Writes centroid data using msconvert’s peakPicking method.</p>
+</dd>
+</dl>
+</section>
+<section id="start-the-conversion">
+<h3>4. Start the conversion<a class="headerlink" href="#start-the-conversion" title="Link to this heading"></a></h3>
+<p>Select one of the conversion options (i.e., Full Conversion, mzML to imzML, or Write imzML Metadata). These should appear contextually based on the
+most-abundant file type in your directory. The process will then be begin and can be monitored with the progress bars:</p>
+<a class="reference internal image-reference" href="_images/pic4.png"><img alt="Partially converted dataset" src="_images/pic4.png" style="width: 500px;" />
+</a>
+<dl class="field-list simple">
+<dt class="field-odd">Raw → mzML<span class="colon">:</span></dt>
+<dd class="field-odd"><p>progress bar for the conversion of <code class="docutils literal notranslate"><span class="pre">.raw</span></code> files to <code class="docutils literal notranslate"><span class="pre">.mzML</span></code> format.</p>
+</dd>
+<dt class="field-even">Write imzML<span class="colon">:</span></dt>
+<dd class="field-even"><p>progress bar for the conversion of <code class="docutils literal notranslate"><span class="pre">.mzML</span></code> files to <code class="docutils literal notranslate"><span class="pre">.imzML</span></code> format.</p>
+</dd>
+<dt class="field-odd">Metadata<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Data from the source <code class="docutils literal notranslate"><span class="pre">.mzML</span></code> file and user-input parameters are used to populate metadata in the <code class="docutils literal notranslate"><span class="pre">.imzML</span></code> file(s).</p>
+</dd>
+</dl>
+<a class="reference internal image-reference" href="_images/pic5.png"><img alt="Fully converted dataset" src="_images/pic5.png" style="width: 500px;" />
+</a>
+</section>
+<section id="view-the-image-with-imzml-scout">
+<h3>5. View the image with imzML Scout<a class="headerlink" href="#view-the-image-with-imzml-scout" title="Link to this heading"></a></h3>
+<p>Choose an <code class="docutils literal notranslate"><span class="pre">.imzML</span></code> file from the file list once the process is complete. Files are split up by scan filters as specified in the mzML. You can view the selected imzML in imzML Scout by clicking <code class="docutils literal notranslate"><span class="pre">view</span> <span class="pre">imzML</span></code>:</p>
+<a class="reference internal image-reference" href="_images/pic5.png"><img alt="Highlighted view imzML button" src="_images/pic5.png" style="width: 500px;" />
+</a>
+</section>
+<section id="explore-the-data">
+<h3>6. Explore the data<a class="headerlink" href="#explore-the-data" title="Link to this heading"></a></h3>
+<a class="reference internal image-reference" href="_images/pic6.png"><img alt="Basic imzML Scout view" src="_images/pic6.png" style="width: 500px;" />
+</a>
+<p>View, explore, and/or export the ion images of all m/z features in the chosen scan filter using imzML Scout.</p>
+<p>Click on any pixel on the ion image, the pixel will turn red and the corresponding mass spectrum will be shown on the right.</p>
+<a class="reference internal image-reference" href="_images/pic7.png"><img alt="Clicked pixel and corresponding mass spectrum shown." src="_images/pic7.png" style="width: 500px;" />
+</a>
+<p>Within imzML Scout, you can select a new m/z to view in two ways:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Target m/z<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Type in the mass-to-charge (m/z) in the input field (e.g., 187.0794 is the red peak on the spectrum)</p>
+</dd>
+<dt class="field-even">Mass spectrum<span class="colon">:</span></dt>
+<dd class="field-even"><p>Hover the cursor over the mass spectrum and click on the desired m/z (e.g., 762.0759 – black peak).</p>
+</dd>
+</dl>
+<p>The mass spectrum can be zoomed in by punching in the Start <em>m/z</em> and End <em>m/z</em> to able to click on the low abundant peaks.</p>
+<p>Additional parameters can be specified as well:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Tolerance (ppm)<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The isolation width (full window; ppm) around the measured mass-to-charge (m/z) that is summed to generate the image.</p>
+</dd>
+<dt class="field-even">Normalization Method<span class="colon">:</span></dt>
+<dd class="field-even"><p>Select from TIC normalization, custom (e.g. internal standard) normalization, or no normalization.</p>
+</dd>
+</dl>
+<p>If desired, a custom normalization can be applied (e.g. to compare absolute abundances across images):</p>
+<a class="reference internal image-reference" href="_images/pic7.png"><img alt="Highlight box for custom normalization" src="_images/pic7.png" style="width: 500px;" />
+</a>
+<p>You can also generate the TIC image by checking the <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">TIC</span> <span class="pre">image</span></code> button:</p>
+<a class="reference internal image-reference" href="_images/pic7.png"><img alt="Show TIC image" src="_images/pic7.png" style="width: 500px;" />
+</a>
+<p>Colormaps can be specified from matplotlib’s <a href="#id1"><span class="problematic" id="id2">`standard colormaps&lt;https://matplotlib.org/stable/users/explain/colors/colormaps.html&gt;`_</span></a>, with several common maps included in the base install:</p>
+<a class="reference internal image-reference" href="_images/pic8.jpg"><img alt="Various colormaps of the same sample." src="_images/pic8.jpg" style="width: 500px;" />
+</a>
+<p>You can adjust the contrast settings by sliding the bars to right of the image:</p>
+<a class="reference internal image-reference" href="_images/pic9.png"><img alt="Narrow contrast" src="_images/pic9.png" style="width: 500px;" />
+</a>
+<a class="reference internal image-reference" href="_images/pic10.png"><img alt="Wide contrast" src="_images/pic10.png" style="width: 500px;" />
+</a>
+<p>imzML Scout also supports batch export of images in several image formats (<code class="docutils literal notranslate"><span class="pre">TIF</span></code>, <code class="docutils literal notranslate"><span class="pre">png</span></code>, <code class="docutils literal notranslate"><span class="pre">jpg</span></code>) or as a numeric matrix (<code class="docutils literal notranslate"><span class="pre">csv</span></code>). To batch
+export, click the <code class="docutils literal notranslate"><span class="pre">Bulk</span> <span class="pre">export</span></code> or <code class="docutils literal notranslate"><span class="pre">Bulk</span> <span class="pre">CSV</span> <span class="pre">export</span></code> button and navigate to the target spreadsheet (<code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>) specifying which images to export in the form:</p>
+<a class="reference internal image-reference" href="_images/pic11.png"><img alt="Example spreadsheet layout" src="_images/pic11.png" style="width: 250px;" />
+</a>
+<p>The <code class="docutils literal notranslate"><span class="pre">include</span> <span class="pre">TIC?</span></code> checkbox specifies whether the TIC image / TIC array should be included in the bulk export.</p>
+<p>Single targeted m/z can be also be exported by choosing either Export Image or csv Export.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="QuickStart.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="imzML_Writer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Joseph Monaghan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

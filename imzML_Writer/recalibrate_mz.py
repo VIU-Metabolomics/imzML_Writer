@@ -1,7 +1,17 @@
 import numpy as np
 
-def recalibrate(mz:list,int:list,lock_mz:float,search_tol:float,ppm_off:float):
-    """Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift"""
+def recalibrate(mz:list,int:list,lock_mz:float,search_tol:float,ppm_off:float=0):
+    """Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift. Applies correction
+    based on the highest m/z peak within the search tolerance.
+    
+    :param mz: List of mz values in the spectrum to recalibrate
+    :param int: Corresponding list of intensities
+    :param lock_mz: Target lock mass to calibrate to - should be in the majority/all spectra
+    :param search_tol: Tolerance with which to search for the lock mass (ppm)
+    :param ppm_off: Optional argument specifying the previous/typical ppm error, applied if the lock mass cannot be found (default = 0, no correction)
+    
+    :return recalibrated_mz: Recalibrated mz if applicable, based on either the ppm error to the lock mass or optional ppm_off argument
+    :return ppm_off: Applied correction in ppm"""
     ##Ignore all if lock_mz is 0 and return the original array
     if lock_mz == 0:
         return mz, int

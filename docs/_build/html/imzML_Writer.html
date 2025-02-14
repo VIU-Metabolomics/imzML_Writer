@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>imzML_Writer package &mdash; imzML Writer  documentation</title>
+  <title>imzML_Writer &mdash; imzML Writer  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -41,49 +41,48 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">imzML_Writer</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">imzML_Writer package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.analyte_list_cleanup">imzML_Writer.analyte_list_cleanup module</a><ul>
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GUI_Guide.html">GUI User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Function Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">imzML_Writer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.imzML_Writer">imzML_Writer.imzML_Writer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.imzML_Writer.gui"><code class="docutils literal notranslate"><span class="pre">gui()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.imzML_Scout">imzML_Writer.imzML_Scout</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.imzML_Scout.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.ms_convert_gui">imzML_Writer.ms_convert_gui</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.ms_convert_gui.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.utils">imzML_Writer.utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.RAW_to_mzML"><code class="docutils literal notranslate"><span class="pre">RAW_to_mzML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.annotate_imzML"><code class="docutils literal notranslate"><span class="pre">annotate_imzML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.clean_raw_files"><code class="docutils literal notranslate"><span class="pre">clean_raw_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.find_msconvert"><code class="docutils literal notranslate"><span class="pre">find_msconvert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.get_drives"><code class="docutils literal notranslate"><span class="pre">get_drives()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.get_file_type"><code class="docutils literal notranslate"><span class="pre">get_file_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.imzML_metadata_process"><code class="docutils literal notranslate"><span class="pre">imzML_metadata_process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.move_files"><code class="docutils literal notranslate"><span class="pre">move_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.mzML_to_imzML_convert"><code class="docutils literal notranslate"><span class="pre">mzML_to_imzML_convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.viaPWIZ"><code class="docutils literal notranslate"><span class="pre">viaPWIZ()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.recalibrate_mz">imzML_Writer.recalibrate_mz</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.recalibrate_mz.recalibrate"><code class="docutils literal notranslate"><span class="pre">recalibrate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.analyte_list_cleanup">imzML_Writer.analyte_list_cleanup</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.check_column_order"><code class="docutils literal notranslate"><span class="pre">check_column_order()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.check_headers"><code class="docutils literal notranslate"><span class="pre">check_headers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.cleanup_table"><code class="docutils literal notranslate"><span class="pre">cleanup_table()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.analyte_list_cleanup.name_cleanup"><code class="docutils literal notranslate"><span class="pre">name_cleanup()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.gui_functions">imzML_Writer.gui_functions module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.RAW_to_mzML"><code class="docutils literal notranslate"><span class="pre">RAW_to_mzML()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.annotate_imzML"><code class="docutils literal notranslate"><span class="pre">annotate_imzML()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.clean_raw_files"><code class="docutils literal notranslate"><span class="pre">clean_raw_files()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.find_msconvert"><code class="docutils literal notranslate"><span class="pre">find_msconvert()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.get_drives"><code class="docutils literal notranslate"><span class="pre">get_drives()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.get_file_type"><code class="docutils literal notranslate"><span class="pre">get_file_type()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.imzML_metadata_process"><code class="docutils literal notranslate"><span class="pre">imzML_metadata_process()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.move_files"><code class="docutils literal notranslate"><span class="pre">move_files()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.mzML_to_imzML_convert"><code class="docutils literal notranslate"><span class="pre">mzML_to_imzML_convert()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.gui_functions.viaPWIZ"><code class="docutils literal notranslate"><span class="pre">viaPWIZ()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.imzML_Scout">imzML_Writer.imzML_Scout module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.imzML_Scout.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.imzML_Writer">imzML_Writer.imzML_Writer module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.imzML_Writer.gui"><code class="docutils literal notranslate"><span class="pre">gui()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.ms_convert_gui">imzML_Writer.ms_convert_gui module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.ms_convert_gui.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.recalibrate_mz">imzML_Writer.recalibrate_mz module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.recalibrate_mz.recalibrate"><code class="docutils literal notranslate"><span class="pre">recalibrate()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -105,7 +104,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">imzML_Writer</a></li>
-      <li class="breadcrumb-item active">imzML_Writer package</li>
+      <li class="breadcrumb-item active">imzML_Writer</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/imzML_Writer.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -115,13 +114,287 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="imzml-writer-package">
-<h1>imzML_Writer package<a class="headerlink" href="#imzml-writer-package" title="Link to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+  <section id="imzml-writer">
+<h1>imzML_Writer<a class="headerlink" href="#imzml-writer" title="Link to this heading"></a></h1>
+<section id="module-imzML_Writer.imzML_Writer">
+<span id="imzml-writer-imzml-writer"></span><h2>imzML_Writer.imzML_Writer<a class="headerlink" href="#module-imzML_Writer.imzML_Writer" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.imzML_Writer.gui">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.imzML_Writer.</span></span><span class="sig-name descname"><span class="pre">gui</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgt_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/imzML_Writer.html#gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.imzML_Writer.gui" title="Link to this definition"></a></dt>
+<dd><p>Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tgt_dir</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – (optional) - initial directory for imzML Writer to open in (str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Typical launch will appear as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
+
+<span class="c1">##Launch with no target directory - navigate with UI</span>
+<span class="n">iw</span><span class="o">.</span><span class="n">gui</span><span class="p">()</span>
+
+<span class="c1">##Launch with target directory to open directory</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/path/to/your/imzML/files/example.imzML&quot;</span>
+<span class="n">iw</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For detailed instructions on navigating the GUI, see the user guide.</p>
+</section>
+<section id="module-imzML_Writer.imzML_Scout">
+<span id="imzml-writer-imzml-scout"></span><h2>imzML_Writer.imzML_Scout<a class="headerlink" href="#module-imzML_Writer.imzML_Scout" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.imzML_Scout.main">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.imzML_Scout.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgt_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/imzML_Scout.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.imzML_Scout.main" title="Link to this definition"></a></dt>
+<dd><p>Main control loop for imzML Scout GUI. Callable either with no arguments (find file via GUI) or by passing the file path to
+the target imzML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tgt_file</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Path to imzML file for visualization.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Typically called during normal operation of imzML_Writer, but call also be called directly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Scout</span> <span class="k">as</span> <span class="nn">scout</span>
+
+<span class="c1">##Call with no arguments opens it empty and you can use the GUI to search for your file</span>
+<span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+<span class="c1">##Call with full or relative pathing to the imzML will open the specified file</span>
+<span class="n">path_to_imzML</span> <span class="o">=</span> <span class="s2">&quot;/Example/File/path/my_image.imzML&quot;</span>
+<span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">path_to_imzML</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For detailed instructions on navigating the GUI, see the user guide.</p>
+</section>
+<section id="module-imzML_Writer.ms_convert_gui">
+<span id="imzml-writer-ms-convert-gui"></span><h2>imzML_Writer.ms_convert_gui<a class="headerlink" href="#module-imzML_Writer.ms_convert_gui" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.ms_convert_gui.main">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.ms_convert_gui.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgt_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/ms_convert_gui.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.ms_convert_gui.main" title="Link to this definition"></a></dt>
+<dd><p><strong>Experimental</strong> - Provides a Mac GUI for MSConvert as a wrapper around the msconvert Docker image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tgt_dir</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – (optional) Initial directory for the GUI to open in.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-imzML_Writer.utils">
+<span id="imzml-writer-utils"></span><h2>imzML_Writer.utils<a class="headerlink" href="#module-imzML_Writer.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.RAW_to_mzML">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">RAW_to_mzML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Centroid'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#RAW_to_mzML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.RAW_to_mzML" title="Link to this definition"></a></dt>
+<dd><p>Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – path to files containing raw instrument data.</p></li>
+<li><p><strong>sl</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Legacy code - string “/” to deal with pathing.</p></li>
+<li><p><strong>write_mode</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Write mode for msconvert - ‘Profile’ or ‘Centroid’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.annotate_imzML">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">annotate_imzML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SRC_mzML</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'none</span> <span class="pre">given'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#annotate_imzML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.annotate_imzML" title="Link to this definition"></a></dt>
+<dd><p>Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure
+for compatibility with imzML viewers/processors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotate_file</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the imzML file to be annotated</p></li>
+<li><p><strong>SRC_mzML</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the source file to pull metadata from</p></li>
+<li><p><strong>scan_time</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The total time required to scan across the imaging area at speed x_speed (mins)</p></li>
+<li><p><strong>filter_string</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – what scan filter is actually captured  (default = “none given”)</p></li>
+<li><p><strong>x_speed</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The scan speed across the imaging area during linescans (µm/s)</p></li>
+<li><p><strong>y_step</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The distance between adjacent strip lines across the imaging area (µm/s)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.clean_raw_files">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">clean_raw_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#clean_raw_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.clean_raw_files" title="Link to this definition"></a></dt>
+<dd><p>Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:</p>
+<p><strong>Initial RAW files</strong> - raw vendor files</p>
+<p><strong>Output mzML Files</strong> - processed mzML files output by msConvert</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – path to directory to clean up</p></li>
+<li><p><strong>sl</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – legacy code, should just be ‘/’</p></li>
+<li><p><strong>file_type</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – extension for raw vendor data to place into raw file directory</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.find_file">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">find_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#find_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.find_file" title="Link to this definition"></a></dt>
+<dd><p>Recursely searches the folder for the target file - helps find msconvert in cases
+where it isn’t specified in the path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Target file as a string</p></li>
+<li><p><strong>folder</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Top-level folder to search through</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>full path to file if found, [ ] if not present</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.find_msconvert">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">find_msconvert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#find_msconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.find_msconvert" title="Link to this definition"></a></dt>
+<dd><p>Finds msconvert by searching all available drives, verifies success by calling
+info of msconvert</p>
+<p>TODO - Get this to save the path for future runs so it doesn’t need to search every time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Full path to msconvert.exe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.get_drives">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">get_drives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#get_drives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.get_drives" title="Link to this definition"></a></dt>
+<dd><p>On windows machines, retrieves the accessible drives (e.g C:, D:, etc.) in to for automated seeking
+of msconvert.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Available drives, as a list of strings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.get_file_type">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">get_file_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#get_file_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.get_file_type" title="Link to this definition"></a></dt>
+<dd><p>Identifies the most abundant file type in the specified path, ignoring hidden files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – path to files specified as a string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Most abundant file extension in path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.imzML_metadata_process">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">imzML_metadata_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#imzML_metadata_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.imzML_metadata_process" title="Link to this definition"></a></dt>
+<dd><p>Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_files</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Directory to the folder containing mzML files</p></li>
+<li><p><strong>x_speed</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – scan speed in the x-direction, µm/sec</p></li>
+<li><p><strong>y_step</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – step between strip lines, µm</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – path to the directory where imzML files should be stored after annotation</p></li>
+<li><p><strong>tgt_progress</strong> – Tkinter progress bar object to update as the process continues</p></li>
+<li><p><strong>sl</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – legacy, use ‘/’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.move_files">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">move_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probe_txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#move_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.move_files" title="Link to this definition"></a></dt>
+<dd><p>Moves files matching a search string (probe_txt) in the current working directory into the specified directory in a new folder called ‘probe_txt’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>probe_txt</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The search string to find in the current directory.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The target directory to move files to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.mzML_to_imzML_convert">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">mzML_to_imzML_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PATH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">os.getcwd()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LOCK_MASS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TOLERANCE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#mzML_to_imzML_convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.mzML_to_imzML_convert" title="Link to this definition"></a></dt>
+<dd><p>Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
+aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>progress_target</strong> – tkinter progress bar object from the GUI to update as conversion progresses</p></li>
+<li><p><strong>PATH</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – <ul>
+<li><p>Working path for source mzML files</p></li>
+</ul>
+</p></li>
+<li><p><strong>LOCK_MASS</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – <ul>
+<li><p>m/z to use for coarse m/z recalibration if desired. 0 = No recalibration</p></li>
+</ul>
+</p></li>
+<li><p><strong>TOLERANCE</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.viaPWIZ">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">viaPWIZ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#viaPWIZ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.viaPWIZ" title="Link to this definition"></a></dt>
+<dd><p>Method to call msconvert directly if the detected platform is on windows. Converts all target files in the path to mzML in the specified mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – path to the target files</p></li>
+<li><p><strong>write_mode</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – “Centroid” or “Profile” modes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-imzML_Writer.recalibrate_mz">
+<span id="imzml-writer-recalibrate-mz"></span><h2>imzML_Writer.recalibrate_mz<a class="headerlink" href="#module-imzML_Writer.recalibrate_mz" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.recalibrate_mz.recalibrate">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.recalibrate_mz.</span></span><span class="sig-name descname"><span class="pre">recalibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppm_off</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/recalibrate_mz.html#recalibrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.recalibrate_mz.recalibrate" title="Link to this definition"></a></dt>
+<dd><p>Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift. Applies correction
+based on the highest m/z peak within the search tolerance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mz</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span>) – List of mz values in the spectrum to recalibrate</p></li>
+<li><p><strong>int</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span>) – Corresponding list of intensities</p></li>
+<li><p><strong>lock_mz</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Target lock mass to calibrate to - should be in the majority/all spectra</p></li>
+<li><p><strong>search_tol</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Tolerance with which to search for the lock mass (ppm)</p></li>
+<li><p><strong>ppm_off</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Optional argument specifying the previous/typical ppm error, applied if the lock mass cannot be found (default = 0, no correction)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return recalibrated_mz<span class="colon">:</span></dt>
+<dd class="field-even"><p>Recalibrated mz if applicable, based on either the ppm error to the lock mass or optional ppm_off argument</p>
+</dd>
+<dt class="field-odd">Return ppm_off<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Applied correction in ppm</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-imzML_Writer.analyte_list_cleanup">
-<span id="imzml-writer-analyte-list-cleanup-module"></span><h2>imzML_Writer.analyte_list_cleanup module<a class="headerlink" href="#module-imzML_Writer.analyte_list_cleanup" title="Link to this heading"></a></h2>
+<span id="imzml-writer-analyte-list-cleanup"></span><h2>imzML_Writer.analyte_list_cleanup<a class="headerlink" href="#module-imzML_Writer.analyte_list_cleanup" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.check_column_order">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">check_column_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#check_column_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.check_column_order" title="Link to this definition"></a></dt>
@@ -193,133 +466,6 @@ rereads the sheet specified at [path] with no headers and manually inserts them.
 </dl>
 </dd></dl>
 
-</section>
-<section id="module-imzML_Writer.gui_functions">
-<span id="imzml-writer-gui-functions-module"></span><h2>imzML_Writer.gui_functions module<a class="headerlink" href="#module-imzML_Writer.gui_functions" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.RAW_to_mzML">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">RAW_to_mzML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#RAW_to_mzML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.RAW_to_mzML" title="Link to this definition"></a></dt>
-<dd><p>Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.annotate_imzML">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">annotate_imzML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SRC_mzML</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'none</span> <span class="pre">given'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#annotate_imzML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.annotate_imzML" title="Link to this definition"></a></dt>
-<dd><p>Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file.
-annotate_file = the imzML file to be annotated
-SRC_mzML = the source file to pull metadata from
-scan_time = how long it took to scan across the tissue (default = 0.001)
-filter_string = what scan filter is actually captured  (default = “none given”)</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.clean_raw_files">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">clean_raw_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#clean_raw_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.clean_raw_files" title="Link to this definition"></a></dt>
-<dd><p>Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:
-Initial RAW files - raw vendor files
-Output mzML Files - processed mzML files output by msConvert
-Inputs:
-path - path to directory to clean up
-sl - legacy code, should just be ‘/’
-file_type - extension for raw files to know what to sort</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.find_file">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">find_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#find_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.find_file" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.find_msconvert">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">find_msconvert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#find_msconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.find_msconvert" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.get_drives">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">get_drives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#get_drives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.get_drives" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.get_file_type">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">get_file_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#get_file_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.get_file_type" title="Link to this definition"></a></dt>
-<dd><p>Identifies the file type in the specified path, ignoring hidden files starting with .
-Returns the file extension</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.imzML_metadata_process">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">imzML_metadata_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_progress</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#imzML_metadata_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.imzML_metadata_process" title="Link to this definition"></a></dt>
-<dd><p>Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). Inputs:
-model_files - Directory to the folder containing mzML files
-sl - legacy, use ‘/’
-x_speed - scan speed in the x-direction, µm/sec
-y_step - step between strip lines, µm
-tgt_progress - Tkinter progress bar object to update as the process continues
-path - path to the directory where imzML files should be stored after annotation</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.move_files">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">move_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probe_txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#move_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.move_files" title="Link to this definition"></a></dt>
-<dd><p>Moves the annotated imzML files into the same directory as the source raw files of the image under a new folder matching the datafile names</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.mzML_to_imzML_convert">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">mzML_to_imzML_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PATH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/Users/josephmonaghan/Library/CloudStorage/OneDrive-VancouverIslandUniversity/imzML_TechnicalNote/imzML_Writer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LOCK_MASS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TOLERANCE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#mzML_to_imzML_convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.mzML_to_imzML_convert" title="Link to this definition"></a></dt>
-<dd><p>Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
-aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
-Inputs:
-progress_target - tkinter progress bar object from the GUI to update as conversion progresses
-path - Working path for source mzML files
-Lock mass - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration
-Tolerance - search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.gui_functions.viaPWIZ">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.gui_functions.</span></span><span class="sig-name descname"><span class="pre">viaPWIZ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/gui_functions.html#viaPWIZ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.gui_functions.viaPWIZ" title="Link to this definition"></a></dt>
-<dd><p>Method to call msConvert directly if the detected platform is on windows, takes as argument:
-path - path to the target files (string)
-write_mode - “Centroid” or “Profile” as specified in the GUI</p>
-</dd></dl>
-
-</section>
-<section id="module-imzML_Writer.imzML_Scout">
-<span id="imzml-writer-imzml-scout-module"></span><h2>imzML_Writer.imzML_Scout module<a class="headerlink" href="#module-imzML_Writer.imzML_Scout" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.imzML_Scout.main">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.imzML_Scout.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_tgt_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/imzML_Scout.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.imzML_Scout.main" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</section>
-<section id="module-imzML_Writer.imzML_Writer">
-<span id="imzml-writer-imzml-writer-module"></span><h2>imzML_Writer.imzML_Writer module<a class="headerlink" href="#module-imzML_Writer.imzML_Writer" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.imzML_Writer.gui">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.imzML_Writer.</span></span><span class="sig-name descname"><span class="pre">gui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/imzML_Writer.html#gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.imzML_Writer.gui" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</section>
-<section id="module-imzML_Writer.ms_convert_gui">
-<span id="imzml-writer-ms-convert-gui-module"></span><h2>imzML_Writer.ms_convert_gui module<a class="headerlink" href="#module-imzML_Writer.ms_convert_gui" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.ms_convert_gui.main">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.ms_convert_gui.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgt_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/ms_convert_gui.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.ms_convert_gui.main" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</section>
-<section id="module-imzML_Writer.recalibrate_mz">
-<span id="imzml-writer-recalibrate-mz-module"></span><h2>imzML_Writer.recalibrate_mz module<a class="headerlink" href="#module-imzML_Writer.recalibrate_mz" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.recalibrate_mz.recalibrate">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.recalibrate_mz.</span></span><span class="sig-name descname"><span class="pre">recalibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppm_off</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/recalibrate_mz.html#recalibrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.recalibrate_mz.recalibrate" title="Link to this definition"></a></dt>
-<dd><p>Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift</p>
-</dd></dl>
-
-</section>
-<section id="module-imzML_Writer">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-imzML_Writer" title="Link to this heading"></a></h2>
 </section>
 </section>
 

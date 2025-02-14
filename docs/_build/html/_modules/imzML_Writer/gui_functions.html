@@ -41,7 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../imzML_Writer.html">imzML_Writer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">imzML_Writer</a></li>
 </ul>
 
         </div>
@@ -86,6 +86,10 @@
 <div class="viewcode-block" id="get_drives">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.get_drives">[docs]</a>
 <span class="k">def</span> <span class="nf">get_drives</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;On windows machines, retrieves the accessible drives (e.g C:\, D:\, etc.) in to for automated seeking</span>
+<span class="sd">    of msconvert.</span>
+
+<span class="sd">    :return: Available drives, as a list of strings.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">windll</span>
     <span class="n">drives</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">bitmask</span> <span class="o">=</span> <span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">GetLogicalDrives</span><span class="p">()</span>
@@ -101,7 +105,13 @@
 
 <div class="viewcode-block" id="find_file">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.find_file">[docs]</a>
-<span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="n">target</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">folder</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursely searches the folder for the target file - helps find msconvert in cases</span>
+<span class="sd">    where it isn&#39;t specified in the path.</span>
+<span class="sd">    </span>
+<span class="sd">    :param target: Target file as a string</span>
+<span class="sd">    :param folder: Top-level folder to search through</span>
+<span class="sd">    :return: full path to file if found, [ ] if not present&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span><span class="n">f</span><span class="p">)</span>
@@ -119,6 +129,12 @@
 <div class="viewcode-block" id="find_msconvert">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.find_msconvert">[docs]</a>
 <span class="k">def</span> <span class="nf">find_msconvert</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds msconvert by searching all available drives, verifies success by calling</span>
+<span class="sd">    info of msconvert</span>
+<span class="sd">    </span>
+<span class="sd">    TODO - Get this to save the path for future runs so it doesn&#39;t need to search every time</span>
+<span class="sd">    </span>
+<span class="sd">    :return: Full path to msconvert.exe&quot;&quot;&quot;</span>
     <span class="n">drives</span> <span class="o">=</span> <span class="n">get_drives</span><span class="p">()</span>
 
     <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
@@ -145,9 +161,11 @@
 <div class="viewcode-block" id="viaPWIZ">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.viaPWIZ">[docs]</a>
 <span class="k">def</span> <span class="nf">viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method to call msConvert directly if the detected platform is on windows, takes as argument:</span>
-<span class="sd">    path - path to the target files (string)</span>
-<span class="sd">    write_mode - &quot;Centroid&quot; or &quot;Profile&quot; as specified in the GUI&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method to call msconvert directly if the detected platform is on windows. Converts all target files in the path to mzML in the specified mode.</span>
+
+<span class="sd">    :param path: path to the target files</span>
+<span class="sd">    :param write_mode: &quot;Centroid&quot; or &quot;Profile&quot; modes</span>
+<span class="sd">    :return: None&quot;&quot;&quot;</span>
     <span class="c1">##check pwiz availability:</span>
     <span class="n">file_type</span> <span class="o">=</span> <span class="n">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -191,19 +209,39 @@
 <div class="viewcode-block" id="get_file_type">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.get_file_type">[docs]</a>
 <span class="k">def</span> <span class="nf">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identifies the file type in the specified path, ignoring hidden files starting with .</span>
-<span class="sd">    Returns the file extension&quot;&quot;&quot;</span>
-    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">while</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
-        <span class="n">files</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identifies the most abundant file type in the specified path, ignoring hidden files.</span>
 
-    <span class="k">return</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+<span class="sd">    :param path: path to files specified as a string.</span>
+<span class="sd">    :return: Most abundant file extension in path&quot;&quot;&quot;</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">file_poss</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_poss</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">file_poss</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file_poss</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">+=</span> <span class="mi">1</span>
+    
+    <span class="n">num_biggest</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">file_poss</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">file_poss</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">num_biggest</span><span class="p">:</span>
+            <span class="n">extension</span> <span class="o">=</span> <span class="n">ext</span>
+            <span class="n">num_biggest</span> <span class="o">=</span> <span class="n">file_poss</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">extension</span></div>
 
 
 <div class="viewcode-block" id="RAW_to_mzML">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.RAW_to_mzML">[docs]</a>
-<span class="k">def</span> <span class="nf">RAW_to_mzML</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">RAW_to_mzML</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="n">write_mode</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;Centroid&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path</span>
+
+<span class="sd">    TODO - Build in better waiting logic so the GUI waits until msconvert or docker actually finishes before returning the shell</span>
+
+<span class="sd">    :param path: path to files containing raw instrument data.</span>
+<span class="sd">    :param sl: Legacy code - string &quot;/&quot; to deal with pathing.</span>
+<span class="sd">    :param write_mode: Write mode for msconvert - &#39;Profile&#39; or &#39;Centroid&#39;.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="s2">&quot;win&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
         <span class="n">viaPWIZ</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">write_mode</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -244,12 +282,14 @@
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.clean_raw_files">[docs]</a>
 <span class="k">def</span> <span class="nf">clean_raw_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">file_type</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:</span>
-<span class="sd">    Initial RAW files - raw vendor files</span>
-<span class="sd">    Output mzML Files - processed mzML files output by msConvert</span>
-<span class="sd">    Inputs:</span>
-<span class="sd">    path - path to directory to clean up</span>
-<span class="sd">    sl - legacy code, should just be &#39;/&#39;</span>
-<span class="sd">    file_type - extension for raw files to know what to sort&quot;&quot;&quot;</span>
+
+<span class="sd">    **Initial RAW files** - raw vendor files</span>
+
+<span class="sd">    **Output mzML Files** - processed mzML files output by msConvert</span>
+
+<span class="sd">    :param path: path to directory to clean up</span>
+<span class="sd">    :param sl: legacy code, should just be &#39;/&#39;</span>
+<span class="sd">    :param file_type: extension for raw vendor data to place into raw file directory&quot;&quot;&quot;</span>
     <span class="n">mzML_folder</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">Output mzML Files&quot;</span>
     <span class="n">RAW_folder</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">Initial RAW files&quot;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">mzML_folder</span><span class="p">)</span>
@@ -263,14 +303,14 @@
 
 <div class="viewcode-block" id="mzML_to_imzML_convert">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.mzML_to_imzML_convert">[docs]</a>
-<span class="k">def</span> <span class="nf">mzML_to_imzML_convert</span><span class="p">(</span><span class="n">progress_target</span><span class="p">,</span><span class="n">PATH</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">LOCK_MASS</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">TOLERANCE</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">mzML_to_imzML_convert</span><span class="p">(</span><span class="n">progress_target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">PATH</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">LOCK_MASS</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">TOLERANCE</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),</span>
 <span class="sd">    aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.</span>
-<span class="sd">    Inputs:</span>
-<span class="sd">    progress_target - tkinter progress bar object from the GUI to update as conversion progresses</span>
-<span class="sd">    path - Working path for source mzML files</span>
-<span class="sd">    Lock mass - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration</span>
-<span class="sd">    Tolerance - search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    :param progress_target: tkinter progress bar object from the GUI to update as conversion progresses</span>
+<span class="sd">    :param PATH: - Working path for source mzML files</span>
+<span class="sd">    :param LOCK_MASS: - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration</span>
+<span class="sd">    :param TOLERANCE: Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm&quot;&quot;&quot;</span>
 
     <span class="c1">##Ensure lock mass and tolerance are formatted as float</span>
     <span class="n">LOCK_MASS</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">LOCK_MASS</span><span class="p">)</span>
@@ -405,7 +445,8 @@
 
         <span class="c1">##Update progress bar in the GUI as each mzML finishes</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_row</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="p">(</span><span class="n">y_pixels</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> 
-        <span class="k">if</span> <span class="n">progress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>   
+
+        <span class="k">if</span> <span class="n">progress</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">progress_target</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>   
             <span class="n">progress_target</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span> 
             <span class="n">progress_target</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;determinate&quot;</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">y_row</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="p">(</span><span class="n">y_pixels</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
 
@@ -419,14 +460,15 @@
 
 <div class="viewcode-block" id="imzML_metadata_process">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.imzML_metadata_process">[docs]</a>
-<span class="k">def</span> <span class="nf">imzML_metadata_process</span><span class="p">(</span><span class="n">model_files</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">x_speed</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y_step</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">tgt_progress</span><span class="p">,</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). Inputs:</span>
-<span class="sd">    model_files - Directory to the folder containing mzML files</span>
-<span class="sd">    sl - legacy, use &#39;/&#39;</span>
-<span class="sd">    x_speed - scan speed in the x-direction, µm/sec</span>
-<span class="sd">    y_step - step between strip lines, µm</span>
-<span class="sd">    tgt_progress - Tkinter progress bar object to update as the process continues</span>
-<span class="sd">    path - path to the directory where imzML files should be stored after annotation&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">imzML_metadata_process</span><span class="p">(</span><span class="n">model_files</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">x_speed</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">y_step</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">tgt_progress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). </span>
+<span class="sd">    </span>
+<span class="sd">    :param model_files: Directory to the folder containing mzML files</span>
+<span class="sd">    :param x_speed: scan speed in the x-direction, µm/sec</span>
+<span class="sd">    :param y_step: step between strip lines, µm</span>
+<span class="sd">    :param path: path to the directory where imzML files should be stored after annotation</span>
+<span class="sd">    :param tgt_progress: Tkinter progress bar object to update as the process continues</span>
+<span class="sd">    :param sl: legacy, use &#39;/&#39;&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">OUTPUT_NAME</span><span class="p">,</span> <span class="n">time_targets</span>
 
     <span class="c1">##Retrieve and sort files from the working directory (imzML) and model file directory (mzML)</span>
@@ -476,7 +518,7 @@
 
         <span class="c1">##Update progress bar in the GUI</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">iter</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">scan_filts</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">progress</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">progress</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">tgt_progress</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tgt_progress</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
             <span class="n">tgt_progress</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;determinate&quot;</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
 
@@ -487,7 +529,10 @@
 <div class="viewcode-block" id="move_files">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.move_files">[docs]</a>
 <span class="k">def</span> <span class="nf">move_files</span><span class="p">(</span><span class="n">probe_txt</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Moves the annotated imzML files into the same directory as the source raw files of the image under a new folder matching the datafile names&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Moves files matching a search string (probe_txt) in the current working directory into the specified directory in a new folder called &#39;probe_txt&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    :param probe_txt: The search string to find in the current directory.</span>
+<span class="sd">    :param path: The target directory to move files to&quot;&quot;&quot;</span>
     <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">new_directory</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">probe_txt</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -503,11 +548,15 @@
 <div class="viewcode-block" id="annotate_imzML">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.gui_functions.annotate_imzML">[docs]</a>
 <span class="k">def</span> <span class="nf">annotate_imzML</span><span class="p">(</span><span class="n">annotate_file</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">SRC_mzML</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">scan_time</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span><span class="n">filter_string</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;none given&quot;</span><span class="p">,</span><span class="n">x_speed</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">y_step</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file. </span>
-<span class="sd">    annotate_file = the imzML file to be annotated</span>
-<span class="sd">    SRC_mzML = the source file to pull metadata from</span>
-<span class="sd">    scan_time = how long it took to scan across the tissue (default = 0.001)</span>
-<span class="sd">    filter_string = what scan filter is actually captured  (default = &quot;none given&quot;)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure</span>
+<span class="sd">    for compatibility with imzML viewers/processors.</span>
+
+<span class="sd">    :param annotate_file: the imzML file to be annotated</span>
+<span class="sd">    :param SRC_mzML: the source file to pull metadata from</span>
+<span class="sd">    :param scan_time: The total time required to scan across the imaging area at speed x_speed (mins)</span>
+<span class="sd">    :param filter_string: what scan filter is actually captured  (default = &quot;none given&quot;)</span>
+<span class="sd">    :param x_speed: The scan speed across the imaging area during linescans (µm/s)</span>
+<span class="sd">    :param y_step: The distance between adjacent strip lines across the imaging area (µm/s)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1">#Error handling for when scan filter extraction fails</span>

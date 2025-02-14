@@ -40,7 +40,7 @@ This may take a few minutes, as the image is ~5-6 GB. You can verify successful 
    :width: 600
    :alt: Docker GUI showing successful msconvert image
 
-1. Standalone apps
+Standalone apps
 ******************
 Mac
 ---
@@ -71,7 +71,7 @@ images - imzML file structure
 Then, open the folder and launch *imzML Writer* by double-clicking imzML_Writer.exe. This will launch a terminal window and the GUI. Provided msconvert is installed and added to the path, you should be good to go!
 
 
-1. Python package
+Python package
 *****************
 Installing as a python package is the **recommended** option for most users, allowing for both stable GUI use and a command line interface (CLI) for batch processing.
 
@@ -103,6 +103,8 @@ This covers the basic GUI functionality, for further details on running the CLI 
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
    
-   modules
+   Quick Start <QuickStart>
+   GUI User Guide <GUI_Guide>
+   Function Documentation <modules>
+

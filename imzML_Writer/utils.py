@@ -13,6 +13,10 @@ import string
 
 
 def get_drives():
+    """On windows machines, retrieves the accessible drives (e.g C:\, D:\, etc.) in to for automated seeking
+    of msconvert.
+
+    :return: Available drives, as a list of strings."""
     from ctypes import windll
     drives = []
     bitmask = windll.kernel32.GetLogicalDrives()
@@ -25,7 +29,13 @@ def get_drives():
     return drives
 
 
-def find_file(target, folder):
+def find_file(target:str, folder:str):
+    """Recursely searches the folder for the target file - helps find msconvert in cases
+    where it isn't specified in the path.
+    
+    :param target: Target file as a string
+    :param folder: Top-level folder to search through
+    :return: full path to file if found, [ ] if not present"""
     try:
         for f in os.listdir(folder):
             path = os.path.join(folder,f)
@@ -40,6 +50,12 @@ def find_file(target, folder):
         pass
 
 def find_msconvert():
+    """Finds msconvert by searching all available drives, verifies success by calling
+    info of msconvert
+    
+    TODO - Get this to save the path for future runs so it doesn't need to search every time
+    
+    :return: Full path to msconvert.exe"""
     drives = get_drives()
 
     candidates = []
@@ -63,9 +79,11 @@ def find_msconvert():
 
 
 def viaPWIZ(path:str,write_mode:str):
-    """Method to call msConvert directly if the detected platform is on windows, takes as argument:
-    path - path to the target files (string)
-    write_mode - "Centroid" or "Profile" as specified in the GUI"""
+    """Method to call msconvert directly if the detected platform is on windows. Converts all target files in the path to mzML in the specified mode.
+
+    :param path: path to the target files
+    :param write_mode: "Centroid" or "Profile" modes
+    :return: None"""
     ##check pwiz availability:
     file_type = get_file_type(path)
     current_dir = os.getcwd()
@@ -106,16 +124,34 @@ def viaPWIZ(path:str,write_mode:str):
     os.chdir(current_dir)
 
 def get_file_type(path:str):
-    """Identifies the file type in the specified path, ignoring hidden files starting with .
-    Returns the file extension"""
+    """Identifies the most abundant file type in the specified path, ignoring hidden files.
+
+    :param path: path to files specified as a string.
+    :return: Most abundant file extension in path"""
     files = os.listdir(path)
-    while files[0].startswith("."):
-        files.pop(0)
+    file_poss = {}
+    for file in files:
+        if not file.startswith("."):
+            ext = file.split(".")[-1]
+            if ext not in file_poss.keys():
+                file_poss[ext] = 1
+            else:
+                file_poss[ext]+= 1
+    
+    num_biggest = 0
+    for ext in file_poss.keys():
+        if file_poss[ext] > num_biggest:
+            extension = ext
+            num_biggest = file_poss[ext]
+    
+    return extension
 
-    return files[0].split(".")[-1]
+def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
+    """Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path
 
-def RAW_to_mzML(path:str,sl:str,write_mode:str):
-    """Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path"""
+    :param path: path to files containing raw instrument data.
+    :param sl: Legacy code - string "/" to deal with pathing.
+    :param write_mode: Write mode for msconvert - 'Profile' or 'Centroid'."""
     if "win" in sys.platform and sys.platform != "darwin":
         viaPWIZ(path,write_mode)
     else:
@@ -153,12 +189,14 @@ def RAW_to_mzML(path:str,sl:str,write_mode:str):
 
 def clean_raw_files(path:str,sl:str,file_type:str):
     """Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:
-    Initial RAW files - raw vendor files
-    Output mzML Files - processed mzML files output by msConvert
-    Inputs:
-    path - path to directory to clean up
-    sl - legacy code, should just be '/'
-    file_type - extension for raw files to know what to sort"""
+
+    **Initial RAW files** - raw vendor files
+
+    **Output mzML Files** - processed mzML files output by msConvert
+
+    :param path: path to directory to clean up
+    :param sl: legacy code, should just be '/'
+    :param file_type: extension for raw vendor data to place into raw file directory"""
     mzML_folder = fr"{path}{sl}Output mzML Files"
     RAW_folder = fr"{path}{sl}Initial RAW files"
     os.mkdir(mzML_folder)
@@ -169,14 +207,14 @@ def clean_raw_files(path:str,sl:str,file_type:str):
         elif file_type in file and file != "Initial RAW files":
             shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
 
-def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20):
+def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20):
     """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
     aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
-    Inputs:
-    progress_target - tkinter progress bar object from the GUI to update as conversion progresses
-    path - Working path for source mzML files
-    Lock mass - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration
-    Tolerance - search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm"""
+    
+    :param progress_target: tkinter progress bar object from the GUI to update as conversion progresses
+    :param PATH: - Working path for source mzML files
+    :param LOCK_MASS: - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration
+    :param TOLERANCE: Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm"""
 
     ##Ensure lock mass and tolerance are formatted as float
     LOCK_MASS = float(LOCK_MASS)
@@ -311,7 +349,8 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
 
         ##Update progress bar in the GUI as each mzML finishes
         progress = int(y_row*100/(y_pixels-1)) 
-        if progress > 0:   
+
+        if progress > 0 and progress_target != None:   
             progress_target.stop() 
             progress_target.config(mode="determinate",value=int(y_row*100/(y_pixels-1)))
 
@@ -322,14 +361,15 @@ def mzML_to_imzML_convert(progress_target,PATH:str=os.getcwd(),LOCK_MASS:float=0
     for filt in scan_filts:
         image_files[filt].close()
 
-def imzML_metadata_process(model_files:str,sl:str,x_speed:float,y_step:float,tgt_progress,path:str):
-    """Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). Inputs:
-    model_files - Directory to the folder containing mzML files
-    sl - legacy, use '/'
-    x_speed - scan speed in the x-direction, µm/sec
-    y_step - step between strip lines, µm
-    tgt_progress - Tkinter progress bar object to update as the process continues
-    path - path to the directory where imzML files should be stored after annotation"""
+def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,tgt_progress=None,sl:str="/"):
+    """Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). 
+    
+    :param model_files: Directory to the folder containing mzML files
+    :param x_speed: scan speed in the x-direction, µm/sec
+    :param y_step: step between strip lines, µm
+    :param path: path to the directory where imzML files should be stored after annotation
+    :param tgt_progress: Tkinter progress bar object to update as the process continues
+    :param sl: legacy, use '/'"""
     global OUTPUT_NAME, time_targets
 
     ##Retrieve and sort files from the working directory (imzML) and model file directory (mzML)
@@ -379,7 +419,7 @@ def imzML_metadata_process(model_files:str,sl:str,x_speed:float,y_step:float,tgt
 
         ##Update progress bar in the GUI
         progress = int(iter*100/len(scan_filts))
-        if progress > 0:
+        if progress > 0 and tgt_progress != None:
             tgt_progress.stop()
             tgt_progress.config(mode="determinate",value=progress)
 
@@ -387,7 +427,10 @@ def imzML_metadata_process(model_files:str,sl:str,x_speed:float,y_step:float,tgt
     move_files(OUTPUT_NAME,path)
 
 def move_files(probe_txt:str,path:str):
-    """Moves the annotated imzML files into the same directory as the source raw files of the image under a new folder matching the datafile names"""
+    """Moves files matching a search string (probe_txt) in the current working directory into the specified directory in a new folder called 'probe_txt'
+    
+    :param probe_txt: The search string to find in the current directory.
+    :param path: The target directory to move files to"""
     files = os.listdir()
     try:
         new_directory = f"{path}/{probe_txt}"
@@ -400,11 +443,15 @@ def move_files(probe_txt:str,path:str):
             shutil.move(file,f"{path}/{probe_txt}/{file}")
 
 def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1):
-    """Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file. 
-    annotate_file = the imzML file to be annotated
-    SRC_mzML = the source file to pull metadata from
-    scan_time = how long it took to scan across the tissue (default = 0.001)
-    filter_string = what scan filter is actually captured  (default = "none given")
+    """Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure
+    for compatibility with imzML viewers/processors.
+
+    :param annotate_file: the imzML file to be annotated
+    :param SRC_mzML: the source file to pull metadata from
+    :param scan_time: The total time required to scan across the imaging area at speed x_speed (mins)
+    :param filter_string: what scan filter is actually captured  (default = "none given")
+    :param x_speed: The scan speed across the imaging area during linescans (µm/s)
+    :param y_step: The distance between adjacent strip lines across the imaging area (µm/s)
     """
 
     #Error handling for when scan filter extraction fails

@@ -29,6 +29,7 @@ extensions = [
     "sphinx_rtd_theme",
 ]
 
+autodoc_preserve_defaults = True
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 

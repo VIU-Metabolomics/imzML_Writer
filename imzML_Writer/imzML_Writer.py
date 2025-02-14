@@ -5,7 +5,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 import os
-from imzML_Writer.gui_functions import *
+from imzML_Writer.utils import *
 import threading
 import imzML_Writer.imzML_Scout as scout
 import sys
@@ -14,6 +14,7 @@ from importlib import resources
 
 timing_mode = False
 PC_compiled = False
+on_startup = True
 tries = 0
 
 ##Colors and FONTS
@@ -22,7 +23,11 @@ BEIGE = "#dbc076"
 GREEN = "#22d10f"
 FONT = ("HELVETICA", 18, 'bold')
 
-def gui():
+def gui(tgt_dir:str=None):
+    """Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.
+    
+    :param tgt_dir: (optional) - initial directory for imzML Writer to open in (str)"""
+
     ##UI Functions
     def get_path():
         """No arguments, prompts the user via dialog box for the directory containing the data to be processed.
@@ -181,7 +186,11 @@ def gui():
         sl = get_os()
         path_name=fr"{cur_path}{sl}"
         ##Start thread to convert the process
-        thread = threading.Thread(target=lambda:mzML_to_imzML_convert(PATH=path_name,progress_target=write_imzML_progress,LOCK_MASS=lock_mass_entry.get()))
+        thread = threading.Thread(
+            target=lambda:mzML_to_imzML_convert(
+                PATH=path_name,
+                progress_target=write_imzML_progress,
+                LOCK_MASS=lock_mass_entry.get()))
         thread.daemon=True
         thread.start()
 
@@ -226,7 +235,13 @@ def gui():
             path_to_models = fr"{CD_entry.get()}{slashes}Output mzML Files"
         
         #Start the annotation in a new thread
-        thread = threading.Thread(target=lambda:imzML_metadata_process(path_to_models,slashes,x_speed=int(speed_entry.get()),y_step=int(Y_step_entry.get()),tgt_progress=Annotate_progress,path=CD_entry.get()))
+        thread = threading.Thread(
+            target=lambda:imzML_metadata_process(
+                model_files=path_to_models,
+                x_speed=int(speed_entry.get()),
+                y_step=int(Y_step_entry.get()),
+                tgt_progress=Annotate_progress,
+                path=CD_entry.get()))
         thread.daemon=True
         thread.start()
 
@@ -405,7 +420,29 @@ def gui():
     write_options_dropdown=tk.OptionMenu(window,write_option_var,*data_writing_options)
     write_options_dropdown.grid(row=4,column=4)
 
+    if on_startup:
+        on_startup = False
+        if tgt_dir != None:
+            CD_entry.delete(0,tk.END)
+            CD_entry.insert(0,tgt_dir)
+
+            populate_list(tgt_dir)
+            FILE_TYPE = get_file_types(tgt_dir)
+
+            if FILE_TYPE.lower() != "mzML".lower():
+                mzML_process.grid_remove()
+                imzML_metadata.grid_remove()
+            elif FILE_TYPE.lower() == "mzML".lower():
+                full_process.grid_remove()
+                imzML_metadata.grid_remove()
+            elif FILE_TYPE.lower() == "imzML".lower():
+                full_process.grid_remove()
+                mzML_process.grid_remove()
+
     window.mainloop()
 
 if __name__=="__main__":
-    gui()
+    try:
+        gui(sys.argv[1])
+    except:
+        gui()

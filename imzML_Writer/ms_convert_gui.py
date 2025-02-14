@@ -4,7 +4,7 @@ import os
 import threading
 import sys
 import docker
-from imzML_Writer.gui_functions import get_file_type
+from imzML_Writer.utils import get_file_type
 
 ##Colors and FONTS
 TEAL = "#2da7ad"
@@ -12,7 +12,10 @@ BEIGE = "#dbc076"
 GREEN = "#22d10f"
 FONT = ("HELVETICA", 18, 'bold')
 
-def main(tgt_dir=""):
+def main(tgt_dir:str=None):
+    """**Experimental** - Provides a Mac GUI for MSConvert as a wrapper around the msconvert Docker image.
+    
+    :param tgt_dir: (optional) Initial directory for the GUI to open in."""
 
     def get_path():
         """No arguments, prompts the user via dialog box for the directory containing the data to be processed.
@@ -38,19 +41,6 @@ def main(tgt_dir=""):
             if not file.startswith("."):
                 file_list.insert(ticker,file)
                 ticker+=1
-    
-    # def get_file_types(dir) -> str:
-    #     """dir: pathname for active directory
-    #     returns file_type as a str
-    #     [taken as first non-hidden (i.e. doesn't start with ".") file in the directory]"""
-    #     files = os.listdir(dir) 
-    #     for file in files:
-    #         split_file = file.split(".")
-    #         file_type = split_file[-1]
-
-    #     file_type_label = tk.Label(window_msconvert,text=f"File type: .{file_type}",bg=TEAL,font=FONT)
-    #     file_type_label.grid(row=1,column=3,columnspan=3)
-    #     return file_type
 
     def call_msconvert():
         sl = "/"

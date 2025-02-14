@@ -13,11 +13,14 @@ import numpy as np
 import pandas as pd
 from imzML_Writer.analyte_list_cleanup import *
 
-def main(_tgt_file = ""):
+def main(tgt_file:str = ""):
+    """Main control loop for imzML Scout GUI. Callable either with no arguments (find file via GUI) or by passing the file path to
+    the target imzML.
+    
+    :param tgt_file: Path to imzML file for visualization."""
     ##Colors and FONTS
     TEAL = "#2da7ad"
     BEIGE = "#dbc076"
-    GREEN = "#22d10f"
     FONT = ("HELVETICA", 18, 'bold')
 
 
@@ -582,7 +585,7 @@ def main(_tgt_file = ""):
 
     ##Target image:
     file_var = tk.StringVar(window_scout)
-    file_var.set(_tgt_file)
+    file_var.set(tgt_file)
     file_button=tk.Button(window_scout,text="Browse for file",bg=TEAL,highlightbackground=TEAL, command=browse_for_file)
     file_entry = tk.Entry(window_scout,textvariable=file_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
     file_var.trace_add('write',plot_ion_image)
@@ -686,7 +689,7 @@ def main(_tgt_file = ""):
     on_startup = True
 
     if on_startup:
-        if _tgt_file != "":
+        if tgt_file != "":
             plot_ion_image()
         
         on_startup=False

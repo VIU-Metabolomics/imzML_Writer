@@ -39,8 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">imzML_Writer</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -70,8 +73,18 @@
 
 <div class="viewcode-block" id="recalibrate">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.recalibrate_mz.recalibrate">[docs]</a>
-<span class="k">def</span> <span class="nf">recalibrate</span><span class="p">(</span><span class="n">mz</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span><span class="nb">int</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span><span class="n">lock_mz</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">search_tol</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">ppm_off</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">recalibrate</span><span class="p">(</span><span class="n">mz</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span><span class="nb">int</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span><span class="n">lock_mz</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">search_tol</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">ppm_off</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift. Applies correction</span>
+<span class="sd">    based on the highest m/z peak within the search tolerance.</span>
+<span class="sd">    </span>
+<span class="sd">    :param mz: List of mz values in the spectrum to recalibrate</span>
+<span class="sd">    :param int: Corresponding list of intensities</span>
+<span class="sd">    :param lock_mz: Target lock mass to calibrate to - should be in the majority/all spectra</span>
+<span class="sd">    :param search_tol: Tolerance with which to search for the lock mass (ppm)</span>
+<span class="sd">    :param ppm_off: Optional argument specifying the previous/typical ppm error, applied if the lock mass cannot be found (default = 0, no correction)</span>
+<span class="sd">    </span>
+<span class="sd">    :return recalibrated_mz: Recalibrated mz if applicable, based on either the ppm error to the lock mass or optional ppm_off argument</span>
+<span class="sd">    :return ppm_off: Applied correction in ppm&quot;&quot;&quot;</span>
     <span class="c1">##Ignore all if lock_mz is 0 and return the original array</span>
     <span class="k">if</span> <span class="n">lock_mz</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mz</span><span class="p">,</span> <span class="nb">int</span>

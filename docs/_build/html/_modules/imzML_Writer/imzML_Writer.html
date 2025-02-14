@@ -39,8 +39,11 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">imzML_Writer</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -73,7 +76,7 @@
 <span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
 <span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span><span class="p">,</span> <span class="n">filedialog</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">imzML_Writer.gui_functions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">imzML_Writer.utils</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Scout</span> <span class="k">as</span> <span class="nn">scout</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -82,6 +85,7 @@
 
 <span class="n">timing_mode</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">PC_compiled</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">on_startup</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
 
 <span class="c1">##Colors and FONTS</span>
@@ -92,7 +96,11 @@
 
 <div class="viewcode-block" id="gui">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.imzML_Writer.gui">[docs]</a>
-<span class="k">def</span> <span class="nf">gui</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">gui</span><span class="p">(</span><span class="n">tgt_dir</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.</span>
+<span class="sd">    </span>
+<span class="sd">    :param tgt_dir: (optional) - initial directory for imzML Writer to open in (str)&quot;&quot;&quot;</span>
+
     <span class="c1">##UI Functions</span>
     <span class="k">def</span> <span class="nf">get_path</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;No arguments, prompts the user via dialog box for the directory containing the data to be processed.</span>
@@ -251,7 +259,11 @@
         <span class="n">sl</span> <span class="o">=</span> <span class="n">get_os</span><span class="p">()</span>
         <span class="n">path_name</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cur_path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="c1">##Start thread to convert the process</span>
-        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">mzML_to_imzML_convert</span><span class="p">(</span><span class="n">PATH</span><span class="o">=</span><span class="n">path_name</span><span class="p">,</span><span class="n">progress_target</span><span class="o">=</span><span class="n">write_imzML_progress</span><span class="p">,</span><span class="n">LOCK_MASS</span><span class="o">=</span><span class="n">lock_mass_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">mzML_to_imzML_convert</span><span class="p">(</span>
+                <span class="n">PATH</span><span class="o">=</span><span class="n">path_name</span><span class="p">,</span>
+                <span class="n">progress_target</span><span class="o">=</span><span class="n">write_imzML_progress</span><span class="p">,</span>
+                <span class="n">LOCK_MASS</span><span class="o">=</span><span class="n">lock_mass_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
         <span class="n">thread</span><span class="o">.</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span>
         <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
@@ -296,7 +308,13 @@
             <span class="n">path_to_models</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CD_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="si">}{</span><span class="n">slashes</span><span class="si">}</span><span class="s2">Output mzML Files&quot;</span>
         
         <span class="c1">#Start the annotation in a new thread</span>
-        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">imzML_metadata_process</span><span class="p">(</span><span class="n">path_to_models</span><span class="p">,</span><span class="n">slashes</span><span class="p">,</span><span class="n">x_speed</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">speed_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()),</span><span class="n">y_step</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">Y_step_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()),</span><span class="n">tgt_progress</span><span class="o">=</span><span class="n">Annotate_progress</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">CD_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">imzML_metadata_process</span><span class="p">(</span>
+                <span class="n">model_files</span><span class="o">=</span><span class="n">path_to_models</span><span class="p">,</span>
+                <span class="n">x_speed</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">speed_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()),</span>
+                <span class="n">y_step</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">Y_step_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()),</span>
+                <span class="n">tgt_progress</span><span class="o">=</span><span class="n">Annotate_progress</span><span class="p">,</span>
+                <span class="n">path</span><span class="o">=</span><span class="n">CD_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
         <span class="n">thread</span><span class="o">.</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span>
         <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
@@ -475,11 +493,33 @@
     <span class="n">write_options_dropdown</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span><span class="n">window</span><span class="p">,</span><span class="n">write_option_var</span><span class="p">,</span><span class="o">*</span><span class="n">data_writing_options</span><span class="p">)</span>
     <span class="n">write_options_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">on_startup</span><span class="p">:</span>
+        <span class="n">on_startup</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">tgt_dir</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">CD_entry</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+            <span class="n">CD_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tgt_dir</span><span class="p">)</span>
+
+            <span class="n">populate_list</span><span class="p">(</span><span class="n">tgt_dir</span><span class="p">)</span>
+            <span class="n">FILE_TYPE</span> <span class="o">=</span> <span class="n">get_file_types</span><span class="p">(</span><span class="n">tgt_dir</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">FILE_TYPE</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;mzML&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">mzML_process</span><span class="o">.</span><span class="n">grid_remove</span><span class="p">()</span>
+                <span class="n">imzML_metadata</span><span class="o">.</span><span class="n">grid_remove</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">FILE_TYPE</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;mzML&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">full_process</span><span class="o">.</span><span class="n">grid_remove</span><span class="p">()</span>
+                <span class="n">imzML_metadata</span><span class="o">.</span><span class="n">grid_remove</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">FILE_TYPE</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;imzML&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">full_process</span><span class="o">.</span><span class="n">grid_remove</span><span class="p">()</span>
+                <span class="n">mzML_process</span><span class="o">.</span><span class="n">grid_remove</span><span class="p">()</span>
+
     <span class="n">window</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">gui</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">gui</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">gui</span><span class="p">()</span>
 </pre></div>
 
            </div>
