@@ -39,9 +39,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">imzML_Writer</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GUI_Guide.html">GUI User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Function Documentation</a></li>
 </ul>
 
         </div>
@@ -85,7 +86,7 @@
 
 <span class="n">timing_mode</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">PC_compiled</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">on_startup</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">_on_startup</span><span class="o">=</span><span class="kc">True</span>
 <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
 
 <span class="c1">##Colors and FONTS</span>
@@ -97,6 +98,7 @@
 <div class="viewcode-block" id="gui">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.imzML_Writer.gui">[docs]</a>
 <span class="k">def</span> <span class="nf">gui</span><span class="p">(</span><span class="n">tgt_dir</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">_on_startup</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.</span>
 <span class="sd">    </span>
 <span class="sd">    :param tgt_dir: (optional) - initial directory for imzML Writer to open in (str)&quot;&quot;&quot;</span>
@@ -229,7 +231,7 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RAW to mzML: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">toc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tic</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
             <span class="n">slashes</span> <span class="o">=</span> <span class="n">get_os</span><span class="p">()</span>
             <span class="c1">#Clean up file structure by placing mzML and raw files in separate folders</span>
-            <span class="n">clean_raw_files</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">CD_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span><span class="n">sl</span><span class="o">=</span><span class="n">slashes</span><span class="p">,</span><span class="n">file_type</span><span class="o">=</span><span class="n">raw_filetype</span><span class="p">)</span>
+            <span class="n">clean_raw_files</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">CD_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span><span class="n">file_type</span><span class="o">=</span><span class="n">raw_filetype</span><span class="p">)</span>
             <span class="c1">#Make it obvious the process is complete by changing the label to green</span>
             <span class="n">RAW_label</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">fg</span><span class="o">=</span><span class="n">GREEN</span><span class="p">)</span>
 
@@ -252,16 +254,14 @@
         <span class="n">write_imzML_progress</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;indeterminate&quot;</span><span class="p">)</span>
         <span class="n">write_imzML_progress</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cur_path</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;Output mzML Files&quot;</span><span class="p">:</span>
-            <span class="n">clean_raw_files</span><span class="p">(</span><span class="n">cur_path</span><span class="p">,</span><span class="n">get_os</span><span class="p">(),</span><span class="s2">&quot;     &quot;</span><span class="p">)</span>
+            <span class="n">clean_raw_files</span><span class="p">(</span><span class="n">cur_path</span><span class="p">,</span><span class="s2">&quot;     &quot;</span><span class="p">)</span>
             <span class="n">cur_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur_path</span><span class="p">,</span><span class="s2">&quot;Output mzML Files&quot;</span><span class="p">)</span>
         
 
-        <span class="n">sl</span> <span class="o">=</span> <span class="n">get_os</span><span class="p">()</span>
-        <span class="n">path_name</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cur_path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="c1">##Start thread to convert the process</span>
         <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
             <span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">mzML_to_imzML_convert</span><span class="p">(</span>
-                <span class="n">PATH</span><span class="o">=</span><span class="n">path_name</span><span class="p">,</span>
+                <span class="n">PATH</span><span class="o">=</span><span class="n">cur_path</span><span class="p">,</span>
                 <span class="n">progress_target</span><span class="o">=</span><span class="n">write_imzML_progress</span><span class="p">,</span>
                 <span class="n">LOCK_MASS</span><span class="o">=</span><span class="n">lock_mass_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
         <span class="n">thread</span><span class="o">.</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span>
@@ -369,7 +369,7 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attempting to open imzML - attempt #</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;imzML_Scout&quot;</span><span class="p">,</span><span class="n">file_path</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">_tgt_file</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">tgt_file</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
         
 
     <span class="k">def</span> <span class="nf">resource_path</span><span class="p">(</span><span class="n">relative_path</span><span class="p">):</span>
@@ -493,8 +493,8 @@
     <span class="n">write_options_dropdown</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span><span class="n">window</span><span class="p">,</span><span class="n">write_option_var</span><span class="p">,</span><span class="o">*</span><span class="n">data_writing_options</span><span class="p">)</span>
     <span class="n">write_options_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">on_startup</span><span class="p">:</span>
-        <span class="n">on_startup</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">_on_startup</span><span class="p">:</span>
+        <span class="n">_on_startup</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">tgt_dir</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">CD_entry</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
             <span class="n">CD_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">tgt_dir</span><span class="p">)</span>

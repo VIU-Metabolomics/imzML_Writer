@@ -1,8 +1,5 @@
 How to use the GUI
 ==================
-
-imzML Writer
--------------
 1. Launch
 ++++++++++
 Launch imzML Writer by double clicking the ``.app`` / ``.exe``:

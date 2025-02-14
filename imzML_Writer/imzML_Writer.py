@@ -157,7 +157,7 @@ def gui(tgt_dir:str=None):
                 print(f"RAW to mzML: {round(toc - tic,1)}s")
             slashes = get_os()
             #Clean up file structure by placing mzML and raw files in separate folders
-            clean_raw_files(path=CD_entry.get(),sl=slashes,file_type=raw_filetype)
+            clean_raw_files(path=CD_entry.get(),file_type=raw_filetype)
             #Make it obvious the process is complete by changing the label to green
             RAW_label.config(fg=GREEN)
 
@@ -180,16 +180,14 @@ def gui(tgt_dir:str=None):
         write_imzML_progress.config(mode="indeterminate")
         write_imzML_progress.start()
         if os.path.basename(cur_path) != "Output mzML Files":
-            clean_raw_files(cur_path,get_os(),"     ")
+            clean_raw_files(cur_path,"     ")
             cur_path = os.path.join(cur_path,"Output mzML Files")
         
 
-        sl = get_os()
-        path_name=fr"{cur_path}{sl}"
         ##Start thread to convert the process
         thread = threading.Thread(
             target=lambda:mzML_to_imzML_convert(
-                PATH=path_name,
+                PATH=cur_path,
                 progress_target=write_imzML_progress,
                 LOCK_MASS=lock_mass_entry.get()))
         thread.daemon=True

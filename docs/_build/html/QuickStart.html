@@ -43,7 +43,22 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imzml-writer">imzML Writer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ms-convert">MS Convert</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#launching-the-gui">Launching the GUI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">imzML Writer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#imzml-scout">imzML Scout</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-interface">Command Line Interface</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="GUI_Guide.html">GUI User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Function Documentation</a></li>
 </ul>
@@ -74,6 +89,111 @@
              
   <section id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<section id="imzml-writer">
+<h3>imzML Writer<a class="headerlink" href="#imzml-writer" title="Link to this heading"></a></h3>
+<p>The fastest way to get up and running with <code class="docutils literal notranslate"><span class="pre">imzML</span> <span class="pre">Writer</span></code> is via pip:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">imzML-Writer</span></code></p>
+<section id="ms-convert">
+<h4>MS Convert<a class="headerlink" href="#ms-convert" title="Link to this heading"></a></h4>
+<p>You also need msconvert in order to run imzML Writer. imzML Writer relies on MS convert to convert raw instrument data into the open format mzML.</p>
+<p>On PC, download the latest msconvert release from <a class="reference external" href="https://proteowizard.sourceforge.io/download.html">ProteoWizard</a> and navigate through the installer. Make sure that msconvert
+is added to the system PATH, either during installation or by following the instructions <a class="reference external" href="https://www.eukhost.com/kb/how-to-add-to-the-path-on-windows-10-and-windows-11/">here</a>.</p>
+<p>On Mac, download  <a class="reference external" href="https://www.docker.com/products/docker-desktop/">Docker</a> and open up the GUI dashboard. Then, you can <a class="reference external" href="https://hub.docker.com/r/chambm/pwiz-skyline-i-agree-to-the-vendor-licenses">download the image for MSconvert</a> by opening the <strong>Terminal app</strong> and running the command:</p>
+<p><code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span> <span class="pre">chambm/pwiz-skyline-i-agree-to-the-vendor-licenses</span></code></p>
+<p>This may take a few minutes, as the image is ~5-6 GB. You can verify successful install in the Docker dashboard under the images tab:</p>
+<a class="reference internal image-reference" href="_images/Docker_pwiz_install.png"><img alt="Docker GUI showing successful msconvert image" src="_images/Docker_pwiz_install.png" style="width: 600px;" />
+</a>
+</section>
+</section>
+</section>
+<section id="launching-the-gui">
+<h2>Launching the GUI<a class="headerlink" href="#launching-the-gui" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>imzML Writer<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Once you have both, simple GUI usage is as simple as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
+
+<span class="c1">##Launch the imzML Writer in the current directory</span>
+<span class="n">iw</span><span class="o">.</span><span class="n">gui</span><span class="p">()</span>
+
+<span class="c1">##Launch the GUI to a specific directory</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/example/path/to/my/files/&quot;</span>
+<span class="n">iw</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="imzml-scout">
+<h3>imzML Scout<a class="headerlink" href="#imzml-scout" title="Link to this heading"></a></h3>
+<p>Or, if you’re only interested in viewing images you can launch scout directly on an imzML:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Scout</span> <span class="k">as</span> <span class="nn">scout</span>
+
+<span class="c1">#Direct launch and find files via GUI</span>
+<span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+<span class="c1">#Open a specific image</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/example/path/to/my/files/image/image.imzML&quot;</span>
+<span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="command-line-interface">
+<h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Link to this heading"></a></h2>
+<p>The utilities for imzML Writer are also available under <code class="docutils literal notranslate"><span class="pre">imzML_Writer.utils</span></code>, allowing you to build command-line converters for your images:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">imzML_Writer.utils</span> <span class="k">as</span> <span class="nn">iw_utils</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<span class="n">raw_data_path</span> <span class="o">=</span> <span class="s2">&quot;/Users/josephmonaghan/Downloads/quick_test&quot;</span>
+<span class="n">x_scan_speed</span> <span class="o">=</span> <span class="mi">40</span> <span class="c1"># µm</span>
+<span class="n">y_step_size</span> <span class="o">=</span> <span class="mi">150</span> <span class="c1"># µm</span>
+<span class="n">write_mode</span> <span class="o">=</span> <span class="s2">&quot;Centroid&quot;</span>
+<span class="n">filetype</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span>
+
+<span class="c1">#Convert RAW to mzML</span>
+<span class="n">iw_utils</span><span class="o">.</span><span class="n">RAW_to_mzML</span><span class="p">(</span><span class="n">raw_data_path</span><span class="p">)</span>
+
+<span class="c1">##Waiting loop to check if msconvert has finished it&#39;s work:</span>
+<span class="n">all_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">raw_data_path</span><span class="p">)</span>
+<span class="n">num_raw_files</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">all_files</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">filetype</span><span class="p">:</span>
+        <span class="n">num_raw_files</span><span class="o">+=</span><span class="mi">1</span>
+
+<span class="n">num_mzML</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">num_mzML</span> <span class="o">&lt;</span> <span class="n">num_raw_files</span><span class="p">:</span>
+    <span class="n">num_mzML</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">all_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">raw_data_path</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">all_files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;mzML&quot;</span><span class="p">:</span>
+            <span class="n">num_mzML</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+
+<span class="c1">##Once MSconvert is done, clean up the file structure, sorting data into folders:</span>
+<span class="c1">#Initial Raw Files - Starting files</span>
+<span class="c1">#Output mzML Files - mzML files</span>
+<span class="n">iw_utils</span><span class="o">.</span><span class="n">clean_raw_files</span><span class="p">(</span><span class="n">raw_data_path</span><span class="p">,</span><span class="n">filetype</span><span class="p">)</span>
+
+<span class="c1">#Write the barebones imzML and align pixels</span>
+<span class="n">mzML_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">raw_data_path</span><span class="p">,</span><span class="s2">&quot;Output mzML Files&quot;</span><span class="p">)</span>
+<span class="n">iw_utils</span><span class="o">.</span><span class="n">mzML_to_imzML_convert</span><span class="p">(</span><span class="n">PATH</span><span class="o">=</span><span class="n">mzML_path</span><span class="p">)</span>
+
+<span class="c1">##Annotate the imzML files and place them in the original directory</span>
+<span class="n">iw_utils</span><span class="o">.</span><span class="n">imzML_metadata_process</span><span class="p">(</span>
+    <span class="n">model_files</span><span class="o">=</span><span class="n">mzML_path</span><span class="p">,</span>
+    <span class="n">x_speed</span><span class="o">=</span><span class="n">x_scan_speed</span><span class="p">,</span>
+    <span class="n">y_step</span><span class="o">=</span><span class="n">y_step_size</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">raw_data_path</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 

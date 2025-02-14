@@ -121,13 +121,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.imzML_Writer.gui">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.imzML_Writer.</span></span><span class="sig-name descname"><span class="pre">gui</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgt_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/imzML_Writer.html#gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.imzML_Writer.gui" title="Link to this definition"></a></dt>
-<dd><p>Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tgt_dir</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – (optional) - initial directory for imzML Writer to open in (str)</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <p>Typical launch will appear as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
@@ -221,7 +215,7 @@ for compatibility with imzML viewers/processors.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.utils.clean_raw_files">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">clean_raw_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#clean_raw_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.clean_raw_files" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">clean_raw_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#clean_raw_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.clean_raw_files" title="Link to this definition"></a></dt>
 <dd><p>Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:</p>
 <p><strong>Initial RAW files</strong> - raw vendor files</p>
 <p><strong>Output mzML Files</strong> - processed mzML files output by msConvert</p>
@@ -229,7 +223,6 @@ for compatibility with imzML viewers/processors.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – path to directory to clean up</p></li>
-<li><p><strong>sl</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – legacy code, should just be ‘/’</p></li>
 <li><p><strong>file_type</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – extension for raw vendor data to place into raw file directory</p></li>
 </ul>
 </dd>

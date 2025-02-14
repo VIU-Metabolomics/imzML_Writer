@@ -187,7 +187,7 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
             )
         
 
-def clean_raw_files(path:str,sl:str,file_type:str):
+def clean_raw_files(path:str,file_type:str):
     """Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:
 
     **Initial RAW files** - raw vendor files
@@ -195,17 +195,19 @@ def clean_raw_files(path:str,sl:str,file_type:str):
     **Output mzML Files** - processed mzML files output by msConvert
 
     :param path: path to directory to clean up
-    :param sl: legacy code, should just be '/'
     :param file_type: extension for raw vendor data to place into raw file directory"""
-    mzML_folder = fr"{path}{sl}Output mzML Files"
-    RAW_folder = fr"{path}{sl}Initial RAW files"
-    os.mkdir(mzML_folder)
-    os.mkdir(RAW_folder)
+    mzML_folder = os.path.join(path,"Output mzML Files")
+    RAW_folder = os.path.join(path,"Initial RAW files")
+    if not os.path.isdir(mzML_folder):
+        os.mkdir(mzML_folder)
+    if not os.path.isdir(RAW_folder):
+        os.mkdir(RAW_folder)
+
     for file in os.listdir(path):
         if ".mzML".lower() in file.lower():
-            shutil.move(fr"{path}{sl}{file}",fr"{mzML_folder}{sl}{file}")
+            shutil.move(os.path.join(path,file),os.path.join(mzML_folder,file))
         elif file_type in file and file != "Initial RAW files":
-            shutil.move(fr"{path}{sl}{file}",fr"{RAW_folder}{sl}{file}")
+            shutil.move(os.path.join(path,file),os.path.join(RAW_folder,file))
 
 def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20):
     """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
@@ -232,7 +234,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     for file in files:
         if ".mzML".lower() in file.lower():
             file_iter+=1
-            tmp = pymzml.run.Reader(fr"{PATH}{file}")
+            tmp = pymzml.run.Reader(os.path.join(PATH,file))
             spec_counts.append(tmp.get_spectrum_count())
             ##Ignore partially collected datafiles that were cut-short (threshold of <85% the scans of the mean datafile)
             if np.mean(spec_counts)*0.5 > tmp.get_spectrum_count():
@@ -299,7 +301,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     #Retrieve max times for time-alignment on longest spectra, build ideal time array
     max_times = []
     for idx in contender_idx:
-        tmp = pymzml.run.Reader(fr"{PATH}{mzml_files[idx]}")
+        tmp = pymzml.run.Reader(os.path.join(PATH,mzml_files[idx]))
         for spectrum in tmp:
             # scan_time = spectrum["scan time"]
             scan_time = spectrum.scan_time_in_minutes()
@@ -324,7 +326,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
 
     #Build image grid, write directly to an imzML
     for y_row in range(y_pixels):
-        active_file = pymzml.run.Reader(PATH + mzml_files[y_row])
+        active_file = pymzml.run.Reader(os.path.join(PATH,mzml_files[y_row]))
         for filt in scan_filts:
             tmp_times = []
             spec_list = []

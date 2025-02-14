@@ -102,7 +102,7 @@ This covers the basic GUI functionality, for further details on running the CLI 
 
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    
    Quick Start <QuickStart>
    GUI User Guide <GUI_Guide>

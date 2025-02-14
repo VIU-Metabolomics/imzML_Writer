@@ -39,9 +39,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">imzML_Writer</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GUI_Guide.html">GUI User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Function Documentation</a></li>
 </ul>
 
         </div>
@@ -278,7 +279,7 @@
 
 <div class="viewcode-block" id="clean_raw_files">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.clean_raw_files">[docs]</a>
-<span class="k">def</span> <span class="nf">clean_raw_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">sl</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">file_type</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">clean_raw_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">file_type</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:</span>
 
 <span class="sd">    **Initial RAW files** - raw vendor files</span>
@@ -286,17 +287,19 @@
 <span class="sd">    **Output mzML Files** - processed mzML files output by msConvert</span>
 
 <span class="sd">    :param path: path to directory to clean up</span>
-<span class="sd">    :param sl: legacy code, should just be &#39;/&#39;</span>
 <span class="sd">    :param file_type: extension for raw vendor data to place into raw file directory&quot;&quot;&quot;</span>
-    <span class="n">mzML_folder</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">Output mzML Files&quot;</span>
-    <span class="n">RAW_folder</span> <span class="o">=</span> <span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}</span><span class="s2">Initial RAW files&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">mzML_folder</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">RAW_folder</span><span class="p">)</span>
+    <span class="n">mzML_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s2">&quot;Output mzML Files&quot;</span><span class="p">)</span>
+    <span class="n">RAW_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s2">&quot;Initial RAW files&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">mzML_folder</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">mzML_folder</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">RAW_folder</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">RAW_folder</span><span class="p">)</span>
+
     <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;.mzML&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mzML_folder</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">file</span><span class="p">),</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mzML_folder</span><span class="p">,</span><span class="n">file</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">file_type</span> <span class="ow">in</span> <span class="n">file</span> <span class="ow">and</span> <span class="n">file</span> <span class="o">!=</span> <span class="s2">&quot;Initial RAW files&quot;</span><span class="p">:</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RAW_folder</span><span class="si">}{</span><span class="n">sl</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">file</span><span class="p">),</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">RAW_folder</span><span class="p">,</span><span class="n">file</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="mzML_to_imzML_convert">
@@ -326,7 +329,7 @@
     <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
         <span class="k">if</span> <span class="s2">&quot;.mzML&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
             <span class="n">file_iter</span><span class="o">+=</span><span class="mi">1</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PATH</span><span class="si">}{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span><span class="n">file</span><span class="p">))</span>
             <span class="n">spec_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_spectrum_count</span><span class="p">())</span>
             <span class="c1">##Ignore partially collected datafiles that were cut-short (threshold of &lt;85% the scans of the mean datafile)</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">spec_counts</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">&gt;</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_spectrum_count</span><span class="p">():</span>
@@ -393,7 +396,7 @@
     <span class="c1">#Retrieve max times for time-alignment on longest spectra, build ideal time array</span>
     <span class="n">max_times</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">contender_idx</span><span class="p">:</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PATH</span><span class="si">}{</span><span class="n">mzml_files</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span><span class="n">mzml_files</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
             <span class="c1"># scan_time = spectrum[&quot;scan time&quot;]</span>
             <span class="n">scan_time</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span>
@@ -418,7 +421,7 @@
 
     <span class="c1">#Build image grid, write directly to an imzML</span>
     <span class="k">for</span> <span class="n">y_row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_pixels</span><span class="p">):</span>
-        <span class="n">active_file</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">PATH</span> <span class="o">+</span> <span class="n">mzml_files</span><span class="p">[</span><span class="n">y_row</span><span class="p">])</span>
+        <span class="n">active_file</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span><span class="n">mzml_files</span><span class="p">[</span><span class="n">y_row</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
             <span class="n">tmp_times</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">spec_list</span> <span class="o">=</span> <span class="p">[]</span>
