@@ -1,6 +1,7 @@
 [![Documentation Status](https://readthedocs.org/projects/imzml-writer/badge/?version=latest)](https://imzml-writer.readthedocs.io/en/latest/?badge=latest)
 
-#**Installation:**
+# **Installation:**
+
 Installing imzML Writer has gotten easier! We're now available as:
 
 1. (**Recommended**) As a python package available from pip:
@@ -13,9 +14,11 @@ pip install imzml-writer
 
 3. (**Developer mode**) By cloning the Github repo for direct usage.
 
-#**Documentation**
+# **Documentation**
+
 Detailed installation instructions, quickstart guides, and documentation are available on the ReadTheDocs page:
 https://imzml-writer.readthedocs.io/en/latest/
 
-#**Contact us**
+# **Contact us**
+
 Please direct any questions, concerns, or feature requests to me at Joseph.Monaghan@viu.ca
