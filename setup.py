@@ -10,7 +10,7 @@ with open('requirements.txt','r') as f:
 
 setup (
     name = "imzML_Writer",
-    version = "0.0.12",
+    version = "0.0.13",
     url = "https://github.com/VIU-Metabolomics/imzML_Writer",
     author = "Joseph Monaghan",
     author_email = "Joseph.Monaghan@viu.ca",
