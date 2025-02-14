@@ -14,7 +14,7 @@ from importlib import resources
 
 timing_mode = False
 PC_compiled = False
-on_startup = True
+_on_startup=True
 tries = 0
 
 ##Colors and FONTS
@@ -24,6 +24,7 @@ GREEN = "#22d10f"
 FONT = ("HELVETICA", 18, 'bold')
 
 def gui(tgt_dir:str=None):
+    global _on_startup
     """Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.
     
     :param tgt_dir: (optional) - initial directory for imzML Writer to open in (str)"""
@@ -296,7 +297,7 @@ def gui(tgt_dir:str=None):
                 print(f"Attempting to open imzML - attempt #{i}")
                 res = subprocess.run(["imzML_Scout",file_path])
         else:
-            scout.main(_tgt_file=file_path)
+            scout.main(tgt_file=file_path)
         
 
     def resource_path(relative_path):
@@ -420,8 +421,8 @@ def gui(tgt_dir:str=None):
     write_options_dropdown=tk.OptionMenu(window,write_option_var,*data_writing_options)
     write_options_dropdown.grid(row=4,column=4)
 
-    if on_startup:
-        on_startup = False
+    if _on_startup:
+        _on_startup = False
         if tgt_dir != None:
             CD_entry.delete(0,tk.END)
             CD_entry.insert(0,tgt_dir)
