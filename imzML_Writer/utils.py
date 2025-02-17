@@ -9,6 +9,7 @@ import pyimzml.ImzMLWriter as imzmlw
 from imzML_Writer.recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup, Tag
 import string
+import re
 
 
 
@@ -123,6 +124,34 @@ def viaPWIZ(path:str,write_mode:str):
     
     os.chdir(current_dir)
 
+##The below three functions (tryint, alphanum_keys, human_sort) are borrowed from an excellent post by Ned Batchelder for 'natural sorting' in Python
+##http://nedbatchelder.com/blog/200712/human_sorting.html
+def tryint(s):
+    """
+    Return an int if possible, or `s` unchanged.
+    """
+    try:
+        return int(s)
+    except ValueError:
+        return s
+
+def alphanum_key(s):
+    """
+    Turn a string into a list of string and number chunks.
+
+    >>> alphanum_key("z23a")
+    ["z", 23, "a"]
+
+    """
+    return [ tryint(c) for c in re.split('([0-9]+)', s) ]
+
+def human_sort(l):
+    """
+    Sort a list in the way that humans expect.
+    """
+    return l.sort(key=alphanum_key)
+
+
 def get_file_type(path:str):
     """Identifies the most abundant file type in the specified path, ignoring hidden files.
 
@@ -222,7 +251,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     LOCK_MASS = float(LOCK_MASS)
     TOLERANCE = float(TOLERANCE)
     files = os.listdir(PATH)
-    files.sort()
+    human_sort(files)
 
     ##Extracts filter strings, num pixels for each scan, etc
     scan_filts=[]

@@ -58,7 +58,8 @@ def gui(tgt_dir:str=None):
         dir: pathname for active directory as a string"""
         file_list.delete(0,tk.END)
         files = os.listdir(dir)
-        files.sort()
+        human_sort(files)
+        # files.sort()
         ticker = 0
         for file in files:
             if not file.startswith(".") and not file.endswith(".ibd"):

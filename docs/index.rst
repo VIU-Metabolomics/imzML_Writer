@@ -22,7 +22,6 @@ Installation
 ============
 
 .. _msconvertlabel:
-
 MS Convert
 **********
 On all three versions, imzML Writer relies on MS convert to convert raw instrument data into the open format mzML, requiring a working install.
@@ -60,7 +59,7 @@ If so, click ok (***not** move to trash*), navigate to your security settings (`
 images - Security override
 
 
-If docker was installed :ref:`as above <_msconvertlabel>`, this should launch the UI and the application is ready for typical operation.
+If docker was installed :ref:`as above <msconvertlabel>`, this should launch the UI and the application is ready for typical operation.
 
 PC
 --
