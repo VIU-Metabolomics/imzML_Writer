@@ -123,7 +123,7 @@ def viaPWIZ(path:str,write_mode:str):
     file_type = get_file_type(path)
     current_dir = os.getcwd()
     os.chdir(path)
-    msconvert = "mscnvert"
+    msconvert = "msconvert"
     try:
         res = subprocess.run(msconvert, shell=True,
                             stdout=subprocess.PIPE,
