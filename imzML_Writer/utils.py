@@ -147,28 +147,27 @@ def viaPWIZ(path:str,write_mode:str):
                 if res.returncode != 0:
                     raise
             except:
-                search_method = msconvert_searchUI()
-                if search_method == "manual":
-                    msconvert = filedialog.askopenfilename(initialdir=os.getcwd(),title="Please select msconvert.exe",filetypes=[("msconvert.exe","msconvert.exe")])
-                    msconvert = os.path.abspath(msconvert)
-                elif search_method == "auto":
-                    msconvert = autofind_msconvert()
-                    msconvert = os.path.abspath(msconvert)
-                res = subprocess.run(msconvert, shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    stdin=subprocess.PIPE,
-                    cwd=os.getcwd(),
-                    env=os.environ)
-                if res == 0:
-                    mod_path = os.path.dirname(os.path.abspath(__file__))
-                    settings_path = os.path.join(mod_path,"msconvert_path.json")
-                    set_path = {"msconvert_path": msconvert}
-                    with open(settings_path,'w') as file:
-                        json.dump(set_path,file)
-                else:
-                    raise
-
+                    search_method = msconvert_searchUI()
+                    if search_method == "manual":
+                        msconvert = filedialog.askopenfilename(initialdir=os.getcwd(),title="Please select msconvert.exe",filetypes=[("msconvert.exe","msconvert.exe")])
+                        msconvert = os.path.abspath(msconvert)
+                    elif search_method == "auto":
+                        msconvert = autofind_msconvert()
+                        msconvert = os.path.abspath(msconvert)
+                    res = subprocess.run(msconvert, shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        stdin=subprocess.PIPE,
+                        cwd=os.getcwd(),
+                        env=os.environ)
+                    if res.returncode == 0:
+                        mod_path = os.path.dirname(os.path.abspath(__file__))
+                        settings_path = os.path.join(mod_path,"msconvert_path.json")
+                        set_path = {"msconvert_path": msconvert}
+                        with open(settings_path,'w') as file:
+                            json.dump(set_path,file)
+                    else:
+                        raise
     except:
         raise Exception("msConvert not available, check installation and verify msConvert path is specified correctly")
 
