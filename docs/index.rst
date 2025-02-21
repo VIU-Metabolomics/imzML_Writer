@@ -13,9 +13,9 @@ Welcome to the `imzML_Writer <https://github.com/VIU-Metabolomics/imzML_Writer>`
 
 imzML_Writer is available as:
 
-#. A simple standalone executable on both Mac and PC (.app and .exe respectively; *WARNING: experimental*)
-#. A distributable package on Pypi (for CLI, stable GUI, ``pip install imzML-Writer``; **recommended option**)
-#. Cloning the Github repo (development mode)
+#. (**RECOMMENDED**) A distributable package on Pypi (for CLI, stable GUI, ``pip install imzML-Writer``) A simple standalone executable on both Mac and PC (.app and .exe respectively; *WARNING: experimental*)
+#. (**EXPERIMENTAL**) A simple standalone executable on both Mac and PC (.app and .exe respectively).
+#. (**DEV MODE**) Cloning the Github repo.
 
 
 Installation

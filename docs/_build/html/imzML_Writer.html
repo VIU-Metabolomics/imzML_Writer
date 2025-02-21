@@ -60,15 +60,18 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-imzML_Writer.utils">imzML_Writer.utils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.RAW_to_mzML"><code class="docutils literal notranslate"><span class="pre">RAW_to_mzML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.alphanum_key"><code class="docutils literal notranslate"><span class="pre">alphanum_key()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.annotate_imzML"><code class="docutils literal notranslate"><span class="pre">annotate_imzML()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.clean_raw_files"><code class="docutils literal notranslate"><span class="pre">clean_raw_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.find_msconvert"><code class="docutils literal notranslate"><span class="pre">find_msconvert()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.get_drives"><code class="docutils literal notranslate"><span class="pre">get_drives()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.get_file_type"><code class="docutils literal notranslate"><span class="pre">get_file_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.human_sort"><code class="docutils literal notranslate"><span class="pre">human_sort()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.imzML_metadata_process"><code class="docutils literal notranslate"><span class="pre">imzML_metadata_process()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.move_files"><code class="docutils literal notranslate"><span class="pre">move_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.mzML_to_imzML_convert"><code class="docutils literal notranslate"><span class="pre">mzML_to_imzML_convert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.tryint"><code class="docutils literal notranslate"><span class="pre">tryint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.viaPWIZ"><code class="docutils literal notranslate"><span class="pre">viaPWIZ()</span></code></a></li>
 </ul>
 </li>
@@ -195,6 +198,16 @@ the target imzML.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.alphanum_key">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">alphanum_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#alphanum_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.alphanum_key" title="Link to this definition"></a></dt>
+<dd><p>Turn a string into a list of string and number chunks.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">alphanum_key</span><span class="p">(</span><span class="s2">&quot;z23a&quot;</span><span class="p">)</span>
+<span class="go">[&quot;z&quot;, 23, &quot;a&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.utils.annotate_imzML">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">annotate_imzML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SRC_mzML</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'none</span> <span class="pre">given'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#annotate_imzML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.annotate_imzML" title="Link to this definition"></a></dt>
 <dd><p>Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure
@@ -287,6 +300,12 @@ of msconvert.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.human_sort">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">human_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#human_sort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.human_sort" title="Link to this definition"></a></dt>
+<dd><p>Sort a list in the way that humans expect.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.utils.imzML_metadata_process">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">imzML_metadata_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#imzML_metadata_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.imzML_metadata_process" title="Link to this definition"></a></dt>
 <dd><p>Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI).</p>
@@ -339,6 +358,12 @@ aligning data based on scan time and splitting into separate imzML files for eac
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.tryint">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">tryint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#tryint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.tryint" title="Link to this definition"></a></dt>
+<dd><p>Return an int if possible, or <cite>s</cite> unchanged.</p>
 </dd></dl>
 
 <dl class="py function">

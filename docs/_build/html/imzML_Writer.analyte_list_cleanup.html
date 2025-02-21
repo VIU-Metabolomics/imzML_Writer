@@ -40,9 +40,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="imzML_Writer.html">imzML_Writer package</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GUI_Guide.html">GUI User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Function Documentation</a></li>
 </ul>
 
         </div>
@@ -74,22 +75,73 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.check_column_order">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">check_column_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#check_column_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.check_column_order" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Takes a pandas dataframe of mz and names and checks that they’re in the order assumed by imzML_Scout (name, mz). If not, reorganizes
+columns to match expected order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_data</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span>) – Pandas dataframe containing mz and names of targets</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>same dataframe with columns ordered [name, mz]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.check_headers">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">check_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#check_headers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.check_headers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Takes a pandas dataframe of mz and name and checks if the headers are missing
+- taken as a header being convertible to a integer (i.e. an mz value in header). If headers are missing, it
+rereads the sheet specified at [path] with no headers and manually inserts them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span>) – Pandas dataframe with columns of mz and names</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Absolute or relative path specified as a string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas dataframe of mz and names with header inserted, if needed</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.cleanup_table">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">cleanup_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#cleanup_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.cleanup_table" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Takes pandas dataframe of columns [mz, name] or vice versa and sanitizes it for imzML scout by:</p>
+<ol class="arabic simple">
+<li><p>Making sure headers are consistent with expected (presence) - check_headers()</p></li>
+<li><p>Makes sure orders are expected (name then mz) - check_column_order()</p></li>
+<li><p>Cleans up any incompatible characters in the same that will prevent file saving - name_cleanup()</p></li>
+</ol>
+<p>This allows users to specify ‘messy’ excel sheets for bulk export without imzML Scout failing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span>) – Pandas dataframe of input mz and name</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Path to the corresponding excel sheet, unless it needs to be reread to omit headers</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sanitized pandas dataframe of mz and names compatible with image/csv export of imzML Scout.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.analyte_list_cleanup.name_cleanup">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.analyte_list_cleanup.</span></span><span class="sig-name descname"><span class="pre">name_cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/analyte_list_cleanup.html#name_cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.analyte_list_cleanup.name_cleanup" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Takes a pandas dataframe of form name, mz and reads the first column (names) replacing ‘dangerous’ characters with ‘_’ to ensure safe storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_data</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span>) – Pandas dataframe of form [name, mz]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pandas dataframe with trouble characters removed.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

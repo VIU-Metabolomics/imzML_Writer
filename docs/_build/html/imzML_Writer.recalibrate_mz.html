@@ -40,9 +40,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="imzML_Writer.html">imzML_Writer package</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GUI_Guide.html">GUI User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Function Documentation</a></li>
 </ul>
 
         </div>
@@ -73,8 +74,26 @@
 <span id="imzml-writer-recalibrate-mz-module"></span><h1>imzML_Writer.recalibrate_mz module<a class="headerlink" href="#module-imzML_Writer.recalibrate_mz" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.recalibrate_mz.recalibrate">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.recalibrate_mz.</span></span><span class="sig-name descname"><span class="pre">recalibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppm_off</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/recalibrate_mz.html#recalibrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.recalibrate_mz.recalibrate" title="Link to this definition"></a></dt>
-<dd><p>Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift</p>
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.recalibrate_mz.</span></span><span class="sig-name descname"><span class="pre">recalibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppm_off</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/recalibrate_mz.html#recalibrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.recalibrate_mz.recalibrate" title="Link to this definition"></a></dt>
+<dd><p>Performs a coarse m/z recalibration based on shifting a lock mass back to target, and everything else by the same ppm shift. Applies correction
+based on the highest m/z peak within the search tolerance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mz</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span>) – List of mz values in the spectrum to recalibrate</p></li>
+<li><p><strong>int</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span>) – Corresponding list of intensities</p></li>
+<li><p><strong>lock_mz</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Target lock mass to calibrate to - should be in the majority/all spectra</p></li>
+<li><p><strong>search_tol</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Tolerance with which to search for the lock mass (ppm)</p></li>
+<li><p><strong>ppm_off</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Optional argument specifying the previous/typical ppm error, applied if the lock mass cannot be found (default = 0, no correction)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return recalibrated_mz<span class="colon">:</span></dt>
+<dd class="field-even"><p>Recalibrated mz if applicable, based on either the ppm error to the lock mass or optional ppm_off argument</p>
+</dd>
+<dt class="field-odd">Return ppm_off<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Applied correction in ppm</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

@@ -81,6 +81,7 @@
 <span class="kn">from</span> <span class="nn">imzML_Writer.recalibrate_mz</span> <span class="kn">import</span> <span class="n">recalibrate</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span>
 <span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 
 
@@ -207,6 +208,43 @@
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">current_dir</span><span class="p">)</span></div>
 
 
+<span class="c1">##The below three functions (tryint, alphanum_keys, human_sort) are borrowed from an excellent post by Ned Batchelder for &#39;natural sorting&#39; in Python</span>
+<span class="c1">##http://nedbatchelder.com/blog/200712/human_sorting.html</span>
+<div class="viewcode-block" id="tryint">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.tryint">[docs]</a>
+<span class="k">def</span> <span class="nf">tryint</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return an int if possible, or `s` unchanged.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="alphanum_key">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.alphanum_key">[docs]</a>
+<span class="k">def</span> <span class="nf">alphanum_key</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Turn a string into a list of string and number chunks.</span>
+
+<span class="sd">    &gt;&gt;&gt; alphanum_key(&quot;z23a&quot;)</span>
+<span class="sd">    [&quot;z&quot;, 23, &quot;a&quot;]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span> <span class="n">tryint</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;([0-9]+)&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="human_sort">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.human_sort">[docs]</a>
+<span class="k">def</span> <span class="nf">human_sort</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sort a list in the way that humans expect.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">l</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">alphanum_key</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="get_file_type">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.get_file_type">[docs]</a>
 <span class="k">def</span> <span class="nf">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
@@ -317,7 +355,7 @@
     <span class="n">LOCK_MASS</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">LOCK_MASS</span><span class="p">)</span>
     <span class="n">TOLERANCE</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">TOLERANCE</span><span class="p">)</span>
     <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">PATH</span><span class="p">)</span>
-    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">human_sort</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 
     <span class="c1">##Extracts filter strings, num pixels for each scan, etc</span>
     <span class="n">scan_filts</span><span class="o">=</span><span class="p">[]</span>

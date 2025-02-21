@@ -31,7 +31,7 @@ Launching the GUI
 ------------------
 imzML Writer
 ++++++++++++
-Once you have both, simple GUI usage is as simple as::
+Once you have both, launching the GUI is as simple as::
 
     import imzML_Writer.imzML_Writer as iw
 
