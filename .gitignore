@@ -13,4 +13,6 @@ LumList.xlsx
 /dist_PC
 /build executables/obo/
 /push_package.txt
+/imzML_Writer/msconvert_path.json
+
 

@@ -13,6 +13,7 @@ import re
 import tkinter as tk
 from tkinter import filedialog
 import time
+import json
 
 
 ##Colors and FONTS
@@ -132,8 +133,19 @@ def viaPWIZ(path:str,write_mode:str):
                             env=os.environ) 
         if res.returncode != 0:
             try:
-                #Placeholder for trying a stored path to msconvert
-                garbled = float("This is a string")
+                mod_path = os.path.dirname(os.path.abspath(__file__))
+                settings_path = os.path.join(mod_path,"msconvert_path.json")
+                with open(settings_path,'r') as file:
+                    path_data = json.load(file)
+                msconvert = path_data["msconvert_path"]
+                res = subprocess.run(msconvert, shell=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,
+                            stdin=subprocess.PIPE,
+                            cwd=os.getcwd(),
+                            env=os.environ)
+                if res.returncode != 0:
+                    raise
             except:
                 search_method = msconvert_searchUI()
                 if search_method == "manual":
@@ -148,6 +160,15 @@ def viaPWIZ(path:str,write_mode:str):
                     stdin=subprocess.PIPE,
                     cwd=os.getcwd(),
                     env=os.environ)
+                if res == 0:
+                    mod_path = os.path.dirname(os.path.abspath(__file__))
+                    settings_path = os.path.join(mod_path,"msconvert_path.json")
+                    set_path = {"msconvert_path": msconvert}
+                    with open(settings_path,'w') as file:
+                        json.dump(set_path,file)
+                else:
+                    raise
+
     except:
         raise Exception("msConvert not available, check installation and verify msConvert path is specified correctly")
 
