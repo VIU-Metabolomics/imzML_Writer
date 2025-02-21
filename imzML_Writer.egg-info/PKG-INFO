@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: imzML_Writer
 Version: 0.0.19
 Summary: User friendly writing of imzML mass spectrometry imaging files from continuous MSI data
@@ -6,6 +6,7 @@ Home-page: https://github.com/VIU-Metabolomics/imzML_Writer
 Author: Joseph Monaghan
 Author-email: Joseph.Monaghan@viu.ca
 Description-Content-Type: text/markdown
+License-File: license.txt
 Requires-Dist: beautifulsoup4==4.12.3
 Requires-Dist: docker==7.1.0
 Requires-Dist: matplotlib==3.9.2
@@ -16,6 +17,13 @@ Requires-Dist: pyimzML==1.5.4
 Requires-Dist: pymzml==2.5.10
 Requires-Dist: RangeSlider==2023.7.2
 Requires-Dist: lxml==5.3.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary
 
 [![Documentation Status](https://readthedocs.org/projects/imzml-writer/badge/?version=latest)](https://imzml-writer.readthedocs.io/en/latest/?badge=latest)
 

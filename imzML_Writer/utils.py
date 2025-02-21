@@ -10,8 +10,16 @@ from imzML_Writer.recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup, Tag
 import string
 import re
+import tkinter as tk
+from tkinter import filedialog
+import time
 
 
+##Colors and FONTS
+TEAL = "#2da7ad"
+BEIGE = "#dbc076"
+GREEN = "#22d10f"
+FONT = ("HELVETICA", 18, 'bold')
 
 def get_drives():
     """On windows machines, retrieves the accessible drives (e.g C:\, D:\, etc.) in to for automated seeking
@@ -50,11 +58,36 @@ def find_file(target:str, folder:str):
     except Exception as e:
         pass
 
-def find_msconvert():
+def msconvert_searchUI():
+    search_mode = ""
+    def set_auto():
+        nonlocal search_mode
+        search_mode = "auto"
+        msconv_finder.destroy()
+    def set_manual():
+        nonlocal search_mode
+        search_mode = "manual"
+        msconv_finder.destroy()
+
+    msconv_finder = tk.Tk()
+    msconv_finder.title("Find msconvert...")
+    msconv_finder.config(padx=5,pady=5,bg=TEAL)
+
+    autofind = tk.Button(msconv_finder,text="Auto Search...(Warning : Slow for large drives)",bg=TEAL,highlightbackground=TEAL,command=set_auto)
+    autofind.grid(row=1,column=1,padx=15,pady=15)
+
+    man_find = tk.Button(msconv_finder,text="Manual Search",bg=TEAL,highlightbackground=TEAL,command=set_manual)
+    man_find.grid(row=1,column=2,padx=15,pady=15)
+
+    while search_mode == "":
+        msconv_finder.update()
+        time.sleep(0.5)
+
+    return search_mode
+
+def autofind_msconvert():
     """Finds msconvert by searching all available drives, verifies success by calling
     info of msconvert
-    
-    TODO - Get this to save the path for future runs so it doesn't need to search every time
     
     :return: Full path to msconvert.exe"""
     drives = get_drives()
@@ -89,7 +122,7 @@ def viaPWIZ(path:str,write_mode:str):
     file_type = get_file_type(path)
     current_dir = os.getcwd()
     os.chdir(path)
-    msconvert = "msconvert"
+    msconvert = "mscnvert"
     try:
         res = subprocess.run(msconvert, shell=True,
                             stdout=subprocess.PIPE,
@@ -98,9 +131,23 @@ def viaPWIZ(path:str,write_mode:str):
                             cwd=os.getcwd(),
                             env=os.environ) 
         if res.returncode != 0:
-            print("msconvert not in PATH - searching drives for install")
-            msconvert = find_msconvert()
-            print("Found it!")
+            try:
+                #Placeholder for trying a stored path to msconvert
+                garbled = float("This is a string")
+            except:
+                search_method = msconvert_searchUI()
+                if search_method == "manual":
+                    msconvert = filedialog.askopenfilename(initialdir=os.getcwd(),title="Please select msconvert.exe",filetypes=[("msconvert.exe","msconvert.exe")])
+                    msconvert = os.path.abspath(msconvert)
+                elif search_method == "auto":
+                    msconvert = autofind_msconvert()
+                    msconvert = os.path.abspath(msconvert)
+                res = subprocess.run(msconvert, shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    stdin=subprocess.PIPE,
+                    cwd=os.getcwd(),
+                    env=os.environ)
     except:
         raise Exception("msConvert not available, check installation and verify msConvert path is specified correctly")
 
