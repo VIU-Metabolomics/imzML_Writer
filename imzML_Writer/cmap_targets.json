@@ -1,0 +1,9 @@
+{
+    "options": [
+        "viridis",
+        "plasma",
+        "cividis",
+        "hot",
+        "jet"
+    ]
+}

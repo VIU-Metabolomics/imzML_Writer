@@ -279,12 +279,23 @@ def main(tgt_file:str = ""):
         
         #Prompt the user for where to save it
         file = filedialog.asksaveasfilename(initialdir=os.getcwd(),filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")])
+        quality = qual_var.get()
+        try:
+            quality = float(quality)
+        except:
+            messagebox.showwarning(title="Invalid dpi setting...",message="dpi should be specified as a number - proceeding with default (dpi = 100)")
+            quality = 100
+        
         if file:
             #Save the file
             file_format = file.split(".")[-1]
+            if file_format not in ["tif", "jpg", "png","tiff"]:
+                file_format = "tif"
+                file = f"{file}.tif"
+            
             fig.savefig(fname=file,
                         transparent=True,
-                        #dpi=300,
+                        dpi=quality,
                         format=file_format,
                         bbox_inches="tight",
                         pad_inches=0)
@@ -487,6 +498,13 @@ def main(tgt_file:str = ""):
         #Contextual code to clean up table depending on whether headers were included, column order, etc.
         target_list=cleanup_table(target_list,target_list_file)
 
+        quality = qual_var.get()
+        try:
+            quality = float(quality)
+        except:
+            messagebox.showwarning(title="Invalid dpi setting...",message="dpi should be specified as a number - proceeding with default (dpi = 100)")
+            quality = 100
+
         ##Iterate through each target m/z, drawing and then writing the ion image
         for iter,row in target_list.iterrows():
             mz_entry.delete(0,tk.END)
@@ -512,12 +530,16 @@ def main(tgt_file:str = ""):
                 #Prompt user for file extension to use
                 file = filedialog.asksaveasfilename(initialdir=folder_name,filetypes=[("TIF", ".tif"),("PNG",".png"),("JPG", ".jpg")],initialfile=img_name_base)
                 used_extension = file.split(".")[-1]
+                if used_extension not in ["tiff, tif, png, jpg"]:
+                    used_extension='tif'
+                    file = f"{file}.tif"
+                
             else:
                 file = os.path.join(folder_name,f"{img_name_base}.{used_extension}")
             
             fig.savefig(fname=file,
                         transparent=True,
-                        #dpi=300,
+                        dpi=quality,
                         format=used_extension,
                         bbox_inches="tight",
                         pad_inches=0)
@@ -528,7 +550,7 @@ def main(tgt_file:str = ""):
             file = os.path.join(folder_name,f"TIC_Image.{used_extension}")
             fig.savefig(fname=file,
                 transparent=True,
-                #dpi=300,
+                dpi=quality,
                 format=used_extension,
                 bbox_inches="tight",
                 pad_inches=0)
@@ -645,6 +667,7 @@ def main(tgt_file:str = ""):
         ##Save button
         save_button=tk.Button(cmap_window,text="Save & Exit",bg=TEAL,highlightbackground=TEAL, command=save_exit)
         save_button.grid(row=5,column=2)
+        
         
 
 
@@ -765,6 +788,15 @@ def main(tgt_file:str = ""):
     include_TIC_var = tk.BooleanVar(window_scout)
     include_tic = tk.Checkbutton(window_scout,text="Include TIC?",bg=TEAL,font=FONT,var=include_TIC_var)
     include_tic.grid(row=9,column=0)
+
+    ##Export quality
+    quality_label = tk.Label(window_scout,text="Export quality (dpi):",bg=TEAL,font=FONT)
+    qual_var = tk.StringVar()
+    qual_var.set("100")
+    quality_entry = tk.Entry(window_scout,textvariable=qual_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
+    quality_label.grid(row=7, column=1)
+    quality_entry.grid(row=8,column=1)
+
 
 
     start_var = tk.StringVar(window_scout)

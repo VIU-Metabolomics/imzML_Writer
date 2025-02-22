@@ -16,4 +16,6 @@ TODO: Package with an official github release
     What to do with duplicated pixels
     Search tolerance for lock mass
     Zero vs. 1-indexed
+
+6. Improved colormap configuration - GUI to add/remove colormaps to imzML_Scout, saved to a config json file in python module folder
     
