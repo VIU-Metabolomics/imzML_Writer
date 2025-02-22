@@ -1,7 +1,19 @@
 New things since review:
 1. Standalone executables! - Both Mac and PC seem to be working ok, will require 2 dist for Mac (apple Silicon and intel)
-2. Dynamic msconvert mapping - still tries to call msconvert from PATH, but if that fails it searches any drives/directories it can access for msconvert and calls that instead
+TODO: Package with an official github release
 
--Improve documentation throughout - ReadTheDocs page available
--Pypi distribution for command line interface (imzML Writer)
+2. Dynamic msconvert mapping - still tries to call msconvert from PATH, but if that fails it searches any drives/directories it can access for msconvert and calls that instead
 -Save path for msconvert once found so it doesn't have to look every time
+
+3. Python Package
+-available via pip install imzML-Writer
+
+4. Documentation - available on ReadTheDocs
+-Details on using imzML_Writer from CLI
+
+5. TODO Functionality adjustments
+-Advanced options:
+    What to do with duplicated pixels
+    Search tolerance for lock mass
+    Zero vs. 1-indexed
+    

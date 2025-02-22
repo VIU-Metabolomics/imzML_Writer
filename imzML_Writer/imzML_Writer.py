@@ -3,7 +3,7 @@
 # pyinstaller --noconfirm --windowed --add-data=/Users/josephmonaghan/Documents/nanoDESI_raw_to_imzml/Images/Logo-01.png:./Images imzML_Writer.py
 
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog,messagebox
 import os
 from imzML_Writer.utils import *
 import threading
@@ -177,6 +177,16 @@ def gui(tgt_dir:str=None):
         """Run main conversion script from mzML to imzML, stop at annotation stage"""
         cur_path = CD_entry.get()
 
+        ##Retrieve settings
+        duplicate_spectra = duplicate_bool.get()
+        zero_indexed = index_bool.get()
+        search_tolerance = search_tol.get()
+        try:
+            search_tolerance = float(search_tolerance)
+        except:
+            search_tolerance = 20
+            messagebox.showwarning(title="ERROR",message="Invalid search tolerance specified - proceeding with 20 ppm")
+
         ##Start the progress bar whirling to indicate to user that things are working
         write_imzML_progress.config(mode="indeterminate")
         write_imzML_progress.start()
@@ -190,7 +200,10 @@ def gui(tgt_dir:str=None):
             target=lambda:mzML_to_imzML_convert(
                 PATH=cur_path,
                 progress_target=write_imzML_progress,
-                LOCK_MASS=lock_mass_entry.get()))
+                LOCK_MASS=lock_mass_entry.get(),
+                TOLERANCE=search_tolerance,
+                no_duplicating=duplicate_spectra,
+                zero_indexed=zero_indexed))
         thread.daemon=True
         thread.start()
 
@@ -308,6 +321,56 @@ def gui(tgt_dir:str=None):
 
         return os.path.join(base_path, relative_path)
 
+    
+    def launch_advanced():
+        def update_search_tol(*args):
+            try:
+                float(lock_mass_search_tol_entry.get())
+                search_tol.set(lock_mass_search_tol_entry.get())
+            except:
+                messagebox.showwarning(title="ERROR",message="Search tolerance must be specified as number")
+        
+        def update_index_bool(*args):
+            if not index_bool.get():
+                index_bool.set(True)
+            else:
+                index_bool.set(False)
+        
+        def update_duplicate_bool(*args):
+            if not duplicate_bool.get():
+                duplicate_bool.set(True)
+            else:
+                duplicate_bool.set(False)
+
+        advanced_window = tk.Tk()
+        advanced_window.title("Advanced Options...")
+        advanced_window.config(padx=5,pady=5,bg=TEAL)
+
+        #0 vs 1 indexed (checkbox, 1 default, 0 optional)
+        index_check = tk.Checkbutton(advanced_window,text="0-Indexed?",bg=TEAL,font=FONT,variable=index_bool,command=update_index_bool)
+        index_check.grid(row=1,column=1,columnspan=2)
+        if index_bool.get():
+            index_check.select()
+
+        #Duplicate pixels? (checkbox, duplicate default)
+        duplicate_check = tk.Checkbutton(advanced_window,text="no duplicated spectra?",bg=TEAL,font=FONT,command=update_duplicate_bool)
+        duplicate_check.grid(row=2,column=1,columnspan=2)
+        if duplicate_bool.get():
+            duplicate_check.select()
+
+        #Lock mass search tolerance (entry, 20 ppm default)
+        lock_mass_search_tol_label = tk.Label(advanced_window,text="Lock mass search tolerance (ppm):",bg=TEAL,font=FONT)
+        lock_mass_search_tol_entry = tk.Entry(advanced_window,text="Enter tolerance here",highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
+        lock_mass_search_tol_entry.insert(0,search_tol.get())
+        lock_mass_search_tol_entry.bind("<Return>",update_search_tol)
+        lock_mass_search_tol_entry.bind("<FocusOut>",update_search_tol)
+
+        lock_mass_search_tol_entry.grid(row=3,column=2)
+        lock_mass_search_tol_label.grid(row=3,column=1)
+
+
+            
+
 
     ##Build tkinter window
     window = tk.Tk()
@@ -336,8 +399,14 @@ def gui(tgt_dir:str=None):
                 window.iconbitmap(resource_path(path))
         except:
             pass
-
-
+    
+    ##Initialize defaults for advanced options
+    search_tol = tk.StringVar(window)
+    search_tol.set("20")
+    duplicate_bool = tk.BooleanVar(window)
+    duplicate_bool.set(False)
+    index_bool = tk.BooleanVar(window)
+    index_bool.set(False)
 
     ##Scan-speed entry
     speed_label=tk.Label(text="x scan speed (µm/s):",bg=TEAL,font=FONT)
@@ -407,7 +476,12 @@ def gui(tgt_dir:str=None):
     mzML_process.grid(row=2,column=5)
 
     imzML_metadata = tk.Button(text="Write imzML metadata",bg=TEAL,highlightbackground=TEAL,command=write_metadata)
-    imzML_metadata.grid(row=3,column=4,columnspan=3)
+    imzML_metadata.grid(row=3,column=4)
+
+    #Advanced option
+    adv_options = tk.Button(text="Advanced Options...",bg=TEAL,highlightbackground=TEAL,command=launch_advanced)
+    adv_options.grid(row=3,column=5)
+    
 
     ##Visualize .imzML
     visualize = tk.Button(text="View imzML",bg=TEAL,highlightbackground=TEAL,command=launch_scout)

@@ -23,7 +23,7 @@ GREEN = "#22d10f"
 FONT = ("HELVETICA", 18, 'bold')
 
 def get_drives():
-    """On windows machines, retrieves the accessible drives (e.g C:\, D:\, etc.) in to for automated seeking
+    """On windows machines, retrieves the accessible drives (e.g C:\\, D:\\, etc.) in to for automated seeking
     of msconvert.
 
     :return: Available drives, as a list of strings."""
@@ -305,14 +305,16 @@ def clean_raw_files(path:str,file_type:str):
         elif file_type in file and file != "Initial RAW files":
             shutil.move(os.path.join(path,file),os.path.join(RAW_folder,file))
 
-def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20):
+def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20,zero_indexed:bool=False,no_duplicating:bool=False):
     """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
     aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
     
     :param progress_target: tkinter progress bar object from the GUI to update as conversion progresses
     :param PATH: - Working path for source mzML files
     :param LOCK_MASS: - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration
-    :param TOLERANCE: Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm"""
+    :param TOLERANCE: Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm
+    :param zero_indexed: Specifies whether pixel dimensions should start from 1 (default - False) or 0 (True)
+    :param no_duplicating: Specifies whether spectra can be duplicated into adjacent pixels for sparsely sampled lines. Default True"""
 
     ##Ensure lock mass and tolerance are formatted as float
     LOCK_MASS = float(LOCK_MASS)
@@ -420,6 +422,8 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
             image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}")
         output_files[filt]=(fr"{OUTPUT_NAME}_{filt}")
 
+    num_duplicates = 0
+    num_total = 0
     #Build image grid, write directly to an imzML
     for y_row in range(y_pixels):
         active_file = pymzml.run.Reader(os.path.join(PATH,mzml_files[y_row]))
@@ -435,15 +439,39 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
                     spec_list.append(spectrum)
 
             pvs_ppm_off = 0
+            used_idx = []
+            
             for x_row in range(max_x_pixels[filt]):
                 align_time = time_targets[filt][x_row]
                 time_diffs = abs(tmp_times - align_time)
                 match_idx = np.where(time_diffs == min(time_diffs))[0][0]
-                match_spectra = spec_list[match_idx]
+                num_total += 1
+                if zero_indexed:
+                    x_coord = x_row
+                    y_coord = y_row
+                else:
+                    x_coord = x_row + 1
+                    y_coord = y_row + 1
+                
+                if not match_idx in used_idx:
+                    used_idx.append(match_idx)
+                    if len(used_idx) > 15:
+                        used_idx.pop(0)
 
-                [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
-                if len(recalibrated_mz) != 0:
-                    image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_row+1,y_row+1,1))
+                    match_spectra = spec_list[match_idx]
+                    [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
+                    if len(recalibrated_mz) != 0:
+                        image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_coord,y_coord,1))
+                else:
+                    num_duplicates += 1
+                    if not no_duplicating:
+                        match_spectra = spec_list[match_idx]
+                        [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
+                        if len(recalibrated_mz) != 0:
+                            image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_coord,y_coord,1),userParams=[{"name":"DuplicatedSpectrum","value":"True"}])
+
+                    # print(f"Duplicated pixel detected - {num_duplicates} / {num_total} ({num_duplicates * 100 / num_total:.2f}%)")
+
 
         ##Update progress bar in the GUI as each mzML finishes
         progress = int(y_row*100/(y_pixels-1)) 
