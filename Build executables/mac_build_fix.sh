@@ -2,7 +2,7 @@
 
 APP_NAME="imzML_Writer"
 
-cd dist/$APP_NAME.app/Contents/MacOS
+cd dist_Mac/$APP_NAME.app/Contents/MacOS
 mv $APP_NAME ${APP_NAME}_cli
 
 cat << EOF > $APP_NAME

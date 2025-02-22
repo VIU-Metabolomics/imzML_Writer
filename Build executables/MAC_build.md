@@ -1,9 +1,9 @@
 #**Steps to build mac GUI**
 
-1. Run pyinstaller to write the bulk .app file:
+1. Run pyinstaller to write the bulk .app file (from the Build executables directory):
 
 ```
-   pyinstaller imzML_Writer_Mac.spec --noconfirm
+   pyinstaller imzML_Writer_Mac.spec --noconfirm --distpath dist_Mac
 ```
 
 2. Double check that it was successful - should have a new folder dist with the .app file
@@ -22,7 +22,7 @@
 
 5. Double check that it was successful by opening the imzML_Writer.app (show package contents), there should be two executables in the Contents/MacOS/ folder - imzML_Writer (~200 bytes) and imzML_Writer_cli (~50 MB)
 
-6. Paste the obo folder into Contents/MacOS folder alongside the executables, this allows pymzml to run (not the cleanest implementation :/)
+6. Paste the obo folder into Contents/MacOS folder alongside the executables, this allows pymzml to run (not the cleanest implementation :/), additionally, in the frameworks folder add a new directory "imzML_Writer" to provide a place to save settings
 7. Exit the imzML_Writer package contents, and paste the entire .app bundle into the Applications folder - this should allow it to run normally and you're good to go!
 
 #**NOTES:**

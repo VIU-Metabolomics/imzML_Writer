@@ -1,7 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
+import sys ; sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
-datas = [('images', 'images')]
+datas = [('../imzML_Writer/images', 'images')]
 binaries = []
 hiddenimports = []
 tmp_ret = collect_all('pymzml')
@@ -11,7 +12,7 @@ datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 
 a = Analysis(
-    ['imzML_Writer.py'],
+    ['../imzML_Writer/imzML_Writer.py'],
     pathex=[],
     binaries=binaries,
     datas=datas,
@@ -54,6 +55,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='imzML_Writer.app',
-    icon="Images/imzML_Writer.ico",
+    icon="../imzML_Writer/Images/imzML_Writer.ico",
     bundle_identifier=None,
 )
