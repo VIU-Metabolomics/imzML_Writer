@@ -12,6 +12,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from imzML_Writer.analyte_list_cleanup import *
+import json
 
 def main(tgt_file:str = ""):
     """Main control loop for imzML Scout GUI. Callable either with no arguments (find file via GUI) or by passing the file path to
@@ -572,7 +573,79 @@ def main(tgt_file:str = ""):
         norm_value.set(np.percentile(raw_ion_image,v_top.get()*100))
         update_ion_image()
 
+    def more_cmaps():
+        def add_a_map():
+            try:
+                new_map = all_options.selection_get()
+            except:
+                new_map = None
+            if new_map != None and not new_map in colormap_options:
+                colormap_options.append(new_map)
+                selected_options.insert(tk.END,new_map)
 
+        def remove_a_map():
+            try:
+                remove_map = selected_options.selection_get()
+            except:
+                remove_map = None
+            
+            if remove_map != None:
+                for idx, map in enumerate(colormap_options):
+                    if remove_map == map:
+                        del_idx = idx
+                
+                colormap_options.pop(del_idx)
+                selected_options.delete(del_idx)
+
+        def save_exit():
+            mod_path = os.path.dirname(os.path.abspath(__file__))
+            config_file = os.path.join(mod_path,"cmap_targets.json")
+            json_dump = {"options":colormap_options}
+            with open(config_file,'w') as file:
+                json.dump(json_dump,file,indent=4)
+            
+            cmap_selected.set(colormap_options[0])
+            cmap_selector['menu'].delete(0,'end')
+            for map in colormap_options:
+                cmap_selector['menu'].add_command(label=map,command=tk._setit(cmap_selected,map))
+            cmap_window.destroy()
+
+        cmap_window = tk.Tk()
+        cmap_window.title("Colormap Options...")
+        cmap_window.config(padx=5,pady=5,bg=TEAL)
+
+        #Listbox for all cmap options
+        all_options = tk.Listbox(cmap_window,bg=BEIGE,fg="black",height=10,highlightcolor=TEAL,width=35,justify='center')
+        all_options.grid(row=0,column=1,rowspan=4)
+
+        cmaps = plt.colormaps()
+        for idx, map in enumerate(cmaps):
+            all_options.insert(idx,map)
+        
+        #Listbox for cmap options to choose from
+        selected_options = tk.Listbox(cmap_window,bg=BEIGE,fg="black",height=10,highlightcolor=TEAL,width=35,justify='center')
+        selected_options.grid(row=0,column=3,rowspan=4)
+
+        mod_path = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(mod_path,"cmap_targets.json")
+        with open(config_file,'r') as file:
+            cmap_options = json.load(file)
+        colormap_options = cmap_options["options"]
+        for idx, map in enumerate(colormap_options):
+            selected_options.insert(idx,map)
+
+        ##Add button
+        add_button=tk.Button(cmap_window,text=">>>",bg=TEAL,highlightbackground=TEAL, command=add_a_map)
+        add_button.grid(row=1,column=2)
+
+        ##Remove button
+        remove_button=tk.Button(cmap_window,text="<<<",bg=TEAL,highlightbackground=TEAL, command=remove_a_map)
+        remove_button.grid(row=2,column=2)
+
+        ##Save button
+        save_button=tk.Button(cmap_window,text="Save & Exit",bg=TEAL,highlightbackground=TEAL, command=save_exit)
+        save_button.grid(row=5,column=2)
+        
 
 
 
@@ -645,11 +718,23 @@ def main(tgt_file:str = ""):
 
     ##Colormap set
     try:
-        cmap_config = pd.read_excel("Scout_Config.xlsx")
-        colormap_options=cmap_config["Cmap_Options"].to_list()
+        mod_path = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(mod_path,"cmap_targets.json")
+        with open(config_file,'r') as file:
+            cmap_options = json.load(file)
+        colormap_options = cmap_options["options"]
     except:
-        print("Failed to find/read colormap options file, loading defaults")
-        colormap_options = ["viridis","plasma","cividis","hot","jet"]
+        mod_path = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(mod_path,"cmap_targets.json")
+        json_dump = {'options':["viridis","plasma","cividis","hot","jet"]}
+        with open(config_file,'w') as file:
+            json.dump(json_dump,file,indent=4)
+
+        mod_path = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(mod_path,"cmap_targets.json")
+        with open(config_file,'r') as file:
+            cmap_options = json.load(file)
+        colormap_options = cmap_options["options"]
     
     cmap_selected = tk.StringVar(window_scout)
     cmap_selected.set(colormap_options[0])
@@ -657,10 +742,14 @@ def main(tgt_file:str = ""):
     cmap_selector.grid(row=1,column=2)
     cmap_selected.trace_add('write',update_ion_image)
 
+    ##cmap options
+    cmap_options_button = tk.Button(window_scout,text="More cmaps...",bg=TEAL,font=TEAL,highlightbackground=TEAL,command=more_cmaps)
+    cmap_options_button.grid(row=2,column=2)
+
     ##View TIC image
     view_tic_option = tk.BooleanVar(window_scout)
     view_tic_check = tk.Checkbutton(window_scout,text="View TIC?",bg=TEAL,font=FONT,var=view_tic_option,command=view_tic)
-    view_tic_check.grid(row=2,column=2)
+    view_tic_check.grid(row=3,column=2)
 
     ##Export buttons
     export_button=tk.Button(window_scout,text="Export Image",bg=TEAL,highlightbackground=TEAL,command=lambda:export_image(fig))

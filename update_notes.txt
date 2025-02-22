@@ -11,7 +11,7 @@ TODO: Package with an official github release
 4. Documentation - available on ReadTheDocs
 -Details on using imzML_Writer from CLI
 
-5. TODO Functionality adjustments
+5. Functionality adjustments
 -Advanced options:
     What to do with duplicated pixels
     Search tolerance for lock mass
