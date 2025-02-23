@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup, Tag
 import string
 import re
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog,messagebox
 import time
 import json
 
@@ -253,7 +253,25 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
     else:
         ##Setup the docker image including internal file structure and command
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
-        client = docker.from_env()
+        try:
+            client = docker.from_env()
+        except:
+            messagebox.showwarning(title="No Docker",message="Docker unavailable - please launch Docker desktop before proceeding...")
+            client = docker.from_env()
+
+        try:
+            data = client.images.get(DOCKER_IMAGE)
+            if "latest" not in str(data):
+                resp = messagebox.askquestion("Newer docker image available", "A newer version of the msconvert docker image is available, would you like to update?")
+                if resp == "yes":
+                    client.images.pull(DOCKER_IMAGE)
+        except:
+            resp = messagebox.askquestion("Docker image unavailable", "No docker image for msconvert is available, would you like to download it now?")
+            if resp == "yes":
+                client.images.pull(DOCKER_IMAGE)
+            else:
+                raise
+
         client.images.pull(DOCKER_IMAGE)
 
         working_directory = path
