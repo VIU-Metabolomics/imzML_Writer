@@ -695,7 +695,6 @@ def main(tgt_file:str = ""):
     mz_var.set("104.1069")
     mz_label=tk.Label(window_scout,text="Target m/z:",bg=TEAL,font=FONT)
     mz_entry = tk.Entry(window_scout,textvariable=mz_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
-    #mz_var.trace_add('write',plot_ion_image)
     mz_entry.bind("<Return>",plot_ion_image)
     mz_entry.bind("<FocusOut>",plot_ion_image)
 
@@ -791,7 +790,7 @@ def main(tgt_file:str = ""):
 
     ##Export quality
     quality_label = tk.Label(window_scout,text="Export quality (dpi):",bg=TEAL,font=FONT)
-    qual_var = tk.StringVar()
+    qual_var = tk.StringVar(window_scout)
     qual_var.set("100")
     quality_entry = tk.Entry(window_scout,textvariable=qual_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
     quality_label.grid(row=7, column=1)

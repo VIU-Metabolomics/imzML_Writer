@@ -25,6 +25,6 @@ if build.returncode == 0:
             os.mkdir(dest_dir)
             for file in files:
                 shutil.copy(os.path.join(obo_dir,file),os.path.join(dest_dir,file))
-            print("Done!")
+            print("Done! Ready to move to applications folder")
 
 
