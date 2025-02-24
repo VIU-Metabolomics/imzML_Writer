@@ -1,0 +1,1 @@
+../../Resources/skimage/__init__.pyi

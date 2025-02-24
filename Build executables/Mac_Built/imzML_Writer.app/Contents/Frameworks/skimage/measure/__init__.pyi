@@ -1,0 +1,1 @@
+../../../Resources/skimage/measure/__init__.pyi

@@ -1,0 +1,1 @@
+../../../Resources/skimage/restoration/__init__.pyi

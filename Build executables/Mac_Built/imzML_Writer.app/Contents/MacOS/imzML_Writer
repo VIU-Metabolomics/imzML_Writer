@@ -1,0 +1,4 @@
+#!/bin/bash
+# This is the launcher for OSX, this way the app will be opened
+# when you double click it from the apps folder
+open -n /Applications/imzML_Writer.app/Contents/MacOS/imzML_Writer_cli
