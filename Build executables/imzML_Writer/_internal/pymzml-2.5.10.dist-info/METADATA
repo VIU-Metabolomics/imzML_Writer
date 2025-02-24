@@ -1,0 +1,41 @@
+Metadata-Version: 2.1
+Name: pymzml
+Version: 2.5.10
+Summary: high-throughput mzML parsing
+Home-page: http://pymzml.github.com
+Author: M. Koesters, J. Leufken, S. Schulze, K. Sugimoto, R. Zahedi, M. Hippler and C. Fufezan
+Author-email: christian@fufezan.net
+License: The MIT license
+Platform: any that supports python 3.7
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: POSIX :: SunOS/Solaris
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Requires-Python: >=3.7.0
+License-File: LICENSE.txt
+License-File: AUTHORS.txt
+Requires-Dist: numpy >=1.8.0
+Requires-Dist: regex
+Provides-Extra: deconvolution
+Requires-Dist: ms-deisotope ==0.0.14 ; extra == 'deconvolution'
+Provides-Extra: full
+Requires-Dist: plotly <5.0 ; extra == 'full'
+Requires-Dist: pynumpress >=0.0.4 ; extra == 'full'
+Requires-Dist: ms-deisotope ; extra == 'full'
+Provides-Extra: plot
+Requires-Dist: plotly <5.0 ; extra == 'plot'
+Provides-Extra: pynumpress
+Requires-Dist: pynumpress >=0.0.4 ; extra == 'pynumpress'
+
+pymzML - python module for mzML parsing
