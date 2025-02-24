@@ -1,1 +1,0 @@
-../../../Resources/skimage/feature/orb_descriptor_positions.txt

@@ -1,4 +1,6 @@
-/DataFiles/
+/Build executables/dist
+/Build executables/Mac_Built
+/Build executables/PC Built
 /__pycache__
 /launch.json
 /prof.dat
@@ -9,12 +11,18 @@
 /dist
 /sandbox.py
 LumList.xlsx
-/dist_Mac
-/dist_PC
-/build executables/obo/
+/Build executables/obo/
 /push_package.txt
-/imzML_Writer/msconvert_path.json
-/Build\ executables/build
-/Build\ executables/dist_Mac
+./imzML_Writer/msconvert_path.json
+./imzML_Writer/cmap_targets.json
+./Build\ executables/build
+./Build\ executables/dist_Mac/
+./Build\ executables/PC\ Built
+./Build\ executables/Mac_Built
+./Build executables/Mac_Built
+./Build executables/dist_Mac/
+./Build executables/dist
+Build executables/dist_Mac/
+
 
 

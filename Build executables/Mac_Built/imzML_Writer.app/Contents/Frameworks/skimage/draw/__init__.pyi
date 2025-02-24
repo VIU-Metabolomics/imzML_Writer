@@ -1,1 +1,0 @@
-../../../Resources/skimage/draw/__init__.pyi
