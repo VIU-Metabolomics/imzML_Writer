@@ -272,7 +272,7 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
             else:
                 raise
 
-        client.images.pull(DOCKER_IMAGE)
+        # client.images.pull(DOCKER_IMAGE)
 
         working_directory = path
         file_type = get_file_type(path)

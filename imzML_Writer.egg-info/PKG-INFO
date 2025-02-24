@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: imzML_Writer
-Version: 0.0.26
+Version: 0.0.27
 Summary: User friendly writing of imzML mass spectrometry imaging files from continuous MSI data
 Home-page: https://github.com/VIU-Metabolomics/imzML_Writer
 Author: Joseph Monaghan
