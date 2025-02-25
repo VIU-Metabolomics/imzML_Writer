@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 from imzML_Writer.analyte_list_cleanup import *
 import json
+from imzML_Writer import __version__
 
 def main(tgt_file:str = ""):
     """Main control loop for imzML Scout GUI. Callable either with no arguments (find file via GUI) or by passing the file path to
@@ -674,7 +675,7 @@ def main(tgt_file:str = ""):
 
     ##Build the GUI window
     window_scout = tk.Tk()
-    window_scout.title("IMZML Scout")
+    window_scout.title(f"imzML Scout v{__version__}")
     window_scout.config(padx=5,pady=5,bg=TEAL)
     style = ttk.Style()
     style.theme_use('clam')

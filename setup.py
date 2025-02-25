@@ -1,5 +1,7 @@
 from setuptools import setup, find_packages
 from os import path
+from imzML_Writer import __version__
+
 working_directory = path.abspath(path.dirname(__file__))
 
 with open(path.join(working_directory,'README.md'),encoding='UTF-8') as f:
@@ -10,7 +12,7 @@ with open('requirements.txt','r') as f:
 
 setup (
     name = "imzML_Writer",
-    version = "0.0.27",
+    version = __version__,
     url = "https://github.com/VIU-Metabolomics/imzML_Writer",
     author = "Joseph Monaghan",
     author_email = "Joseph.Monaghan@viu.ca",

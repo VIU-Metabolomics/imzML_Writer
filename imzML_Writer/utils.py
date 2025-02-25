@@ -14,6 +14,7 @@ import tkinter as tk
 from tkinter import filedialog,messagebox
 import time
 import json
+from imzML_Writer import __version__
 
 
 ##Colors and FONTS
@@ -684,6 +685,24 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
             cvParam["unitCvRef"]="UO"
             cvParam["unitAccession"]="UO:0000017"
             cvParam["unitName"]="micrometer"
+
+    ##Specify imzML writer involvement and version in the resulting imzML
+    for soft_list in data_need_annotation.select("softwareList"):
+        count = int(soft_list.attrs['count']) + 1
+        new_tag = Tag(builder=data_need_annotation.builder,
+                    name = "software",
+                    attrs = {'id':'imzML_Writer',"version":__version__})
+        descr_tag = Tag(builder=data_need_annotation.builder,
+                    name = "cvParam",
+                    attrs = {'accession':'MS:1000799',"cvRef":"MS","name":"Custom unreleased software tool","value":f"imzML Writer v{__version__}"})
+        
+
+        soft_list.append(new_tag)
+        for software in soft_list.select("software"):
+            if software.attrs["id"] == "imzML_Writer":
+                software.append(descr_tag)
+
+        soft_list.attrs['count'] = count        
 
     #Write the new file
     with open(result_file,'w') as file:

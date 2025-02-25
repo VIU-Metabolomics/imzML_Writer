@@ -11,6 +11,7 @@ import imzML_Writer.imzML_Scout as scout
 import sys
 import time
 from importlib import resources
+from imzML_Writer import __version__
 
 timing_mode = False
 PC_compiled = False
@@ -374,7 +375,7 @@ def gui(tgt_dir:str=None):
 
     ##Build tkinter window
     window = tk.Tk()
-    window.title("IMZML WRITER")
+    window.title(f"imzML Writer v{__version__}")
     window.config(padx=5,pady=5,bg=TEAL)
     style = ttk.Style()
     style.theme_use('clam')
