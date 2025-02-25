@@ -62,14 +62,15 @@
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.RAW_to_mzML"><code class="docutils literal notranslate"><span class="pre">RAW_to_mzML()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.alphanum_key"><code class="docutils literal notranslate"><span class="pre">alphanum_key()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.annotate_imzML"><code class="docutils literal notranslate"><span class="pre">annotate_imzML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.autofind_msconvert"><code class="docutils literal notranslate"><span class="pre">autofind_msconvert()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.clean_raw_files"><code class="docutils literal notranslate"><span class="pre">clean_raw_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.find_msconvert"><code class="docutils literal notranslate"><span class="pre">find_msconvert()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.get_drives"><code class="docutils literal notranslate"><span class="pre">get_drives()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.get_file_type"><code class="docutils literal notranslate"><span class="pre">get_file_type()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.human_sort"><code class="docutils literal notranslate"><span class="pre">human_sort()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.imzML_metadata_process"><code class="docutils literal notranslate"><span class="pre">imzML_metadata_process()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.move_files"><code class="docutils literal notranslate"><span class="pre">move_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.msconvert_searchUI"><code class="docutils literal notranslate"><span class="pre">msconvert_searchUI()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.mzML_to_imzML_convert"><code class="docutils literal notranslate"><span class="pre">mzML_to_imzML_convert()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.tryint"><code class="docutils literal notranslate"><span class="pre">tryint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#imzML_Writer.utils.viaPWIZ"><code class="docutils literal notranslate"><span class="pre">viaPWIZ()</span></code></a></li>
@@ -227,6 +228,18 @@ for compatibility with imzML viewers/processors.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.autofind_msconvert">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">autofind_msconvert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#autofind_msconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.autofind_msconvert" title="Link to this definition"></a></dt>
+<dd><p>Finds msconvert by searching all available drives, verifies success by calling
+info of msconvert</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Full path to msconvert.exe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.utils.clean_raw_files">
 <span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">clean_raw_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#clean_raw_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.clean_raw_files" title="Link to this definition"></a></dt>
 <dd><p>Cleans up file system after RAW_to_mzML has completed, creating two folders within the specified path:</p>
@@ -256,19 +269,6 @@ where it isn’t specified in the path.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>full path to file if found, [ ] if not present</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="imzML_Writer.utils.find_msconvert">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">find_msconvert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#find_msconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.find_msconvert" title="Link to this definition"></a></dt>
-<dd><p>Finds msconvert by searching all available drives, verifies success by calling
-info of msconvert</p>
-<p>TODO - Get this to save the path for future runs so it doesn’t need to search every time</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Full path to msconvert.exe</p>
 </dd>
 </dl>
 </dd></dl>
@@ -338,8 +338,13 @@ of msconvert.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="imzML_Writer.utils.msconvert_searchUI">
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">msconvert_searchUI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#msconvert_searchUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.msconvert_searchUI" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="imzML_Writer.utils.mzML_to_imzML_convert">
-<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">mzML_to_imzML_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PATH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">os.getcwd()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LOCK_MASS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TOLERANCE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#mzML_to_imzML_convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.mzML_to_imzML_convert" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">imzML_Writer.utils.</span></span><span class="sig-name descname"><span class="pre">mzML_to_imzML_convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PATH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">os.getcwd()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LOCK_MASS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TOLERANCE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_indexed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_duplicating</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imzML_Writer/utils.html#mzML_to_imzML_convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imzML_Writer.utils.mzML_to_imzML_convert" title="Link to this definition"></a></dt>
 <dd><p>Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
 aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.</p>
 <dl class="field-list simple">
@@ -355,6 +360,8 @@ aligning data based on scan time and splitting into separate imzML files for eac
 </ul>
 </p></li>
 <li><p><strong>TOLERANCE</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm</p></li>
+<li><p><strong>zero_indexed</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Specifies whether pixel dimensions should start from 1 (default - False) or 0 (True)</p></li>
+<li><p><strong>no_duplicating</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Specifies whether spectra can be duplicated into adjacent pixels for sparsely sampled lines. Default True</p></li>
 </ul>
 </dd>
 </dl>

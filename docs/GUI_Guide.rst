@@ -6,13 +6,13 @@ Launch imzML Writer by double clicking the ``.app`` / ``.exe``:
 
 **Mac:**
 
-.. image:: /images/Launch_apple.png
+.. image:: /images/LaunchFromFinder.png
     :width: 500
     :alt: Finder window showing imzML_Writer.app highlighted
 
 **PC**
 
-.. image:: /images/Launch_apple.png
+.. image:: /images/LaunchFromFinder.png
     :width: 500
     :alt: Finder window showing imzML_Writer.app highlighted
 
@@ -22,7 +22,7 @@ Or from python using::
 
     iw.gui()
 
-.. image:: /images/pic1.png
+.. image:: ./images/EmptyWindow.png
    :width: 500
    :alt: imzML Writer Launch Screen
 
@@ -30,19 +30,19 @@ Or from python using::
 ++++++++++++++++++++++++
 Click select Folder to choose the directory containing the ``.raw``, ``.mzML``, or ``.imzML`` data files
 
-.. image:: /images/pic1.png
+.. image:: /images/HighLightSelectFolder.png
    :width: 500
    :alt: Highlighted choose directory button
 
-.. image:: /images/pic2.png
+.. image:: /images/FileNav.png
    :width: 500
    :alt: Navigating to target directory
 
-3. Specify imaging parameters
+1. Specify imaging parameters
 ++++++++++++++++++++++++++++++
 Type in the experimental parameters (i.e., X scan speed, Y step, Lock mass) and choose the MS data mode of interest (i.e., Centroid or Profile)
  
-.. image:: /images/pic3.png
+.. image:: /images/PopulatedWindow.png
    :width: 500
    :alt: Populated user-input parameters
 
@@ -50,18 +50,28 @@ Type in the experimental parameters (i.e., X scan speed, Y step, Lock mass) and 
 
 :Y step (µm): stepping size in µm unit (the distance between two adjacent lines in the y direction)
 
-:Lock mass: m/z of a known ion (typically m/z of an internal standard). This serves as a reference point to correct any mass measurement errors that may occur due to instrumental drift or other factors.
+:Lock mass: m/z of a known ion (typically m/z of an internal standard). This serves as a reference point to correct any mass measurement errors that may occur due to instrumental drift or other factors. Leave at 0 to apply no correction.
 
 :Profile: This mode writes the continuous signal from the raw vendor data. Providing a richer dataset, but larger file sizes and longer processing times.
 
 :Centroid: Writes centroid data using msconvert's peakPicking method.
 
-4. Start the conversion
+If desired, you can also specify some advanced option by clicking the advanced options button, which will show the following page:
+
+.. image:: /images/ConfigWindow.png
+   :width: 500
+   :alt: Populated user-input parameters
+
+:0-indexed: Specifies whether coordinates (X, Y) start counting from 0 or 1. Default is 1-indexed.
+:Duplicated spectra: Specifies what to do for sparsely sampled regions. Default duplicates and flags spectra in the resulting imzML, but can also be left as an empty pixel when this is checked.
+:Lock mass tolerance: Specifies how wide the search window is to look for the lock mass.
+
+1. Start the conversion
 ++++++++++++++++++++++++
 Select one of the conversion options (i.e., Full Conversion, mzML to imzML, or Write imzML Metadata). These should appear contextually based on the
 most-abundant file type in your directory. The process will then be begin and can be monitored with the progress bars:
 
-.. image:: /images/pic4.png
+.. image:: /images/PartialimzML.png
     :width: 500
     :alt: Partially converted dataset
 
@@ -71,15 +81,11 @@ most-abundant file type in your directory. The process will then be begin and ca
 
 :Metadata: Data from the source ``.mzML`` file and user-input parameters are used to populate metadata in the ``.imzML`` file(s).
  
-.. image:: /images/pic5.png
-    :width: 500
-    :alt: Fully converted dataset
- 
-5. View the image with imzML Scout
+1. View the image with imzML Scout
 +++++++++++++++++++++++++++++++++++
 Choose an ``.imzML`` file from the file list once the process is complete. Files are split up by scan filters as specified in the mzML. You can view the selected imzML in imzML Scout by clicking ``view imzML``:
 
-.. image:: /images/pic5.png
+.. image:: /images/SelectanImzML.png
     :width: 500
     :alt: Highlighted view imzML button
  

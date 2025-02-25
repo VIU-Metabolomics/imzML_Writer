@@ -75,7 +75,7 @@
 <span class="c1"># pyinstaller --noconfirm --windowed --add-data=/Users/josephmonaghan/Documents/nanoDESI_raw_to_imzml/Images/Logo-01.png:./Images imzML_Writer.py</span>
 
 <span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
-<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span><span class="p">,</span> <span class="n">filedialog</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span><span class="p">,</span> <span class="n">filedialog</span><span class="p">,</span><span class="n">messagebox</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">imzML_Writer.utils</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">threading</span>
@@ -96,7 +96,7 @@
 <span class="n">FONT</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;HELVETICA&quot;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="s1">&#39;bold&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="gui">
-<a class="viewcode-back" href="../../imzML_Writer.imzML_Writer.html#imzML_Writer.imzML_Writer.gui">[docs]</a>
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.imzML_Writer.gui">[docs]</a>
 <span class="k">def</span> <span class="nf">gui</span><span class="p">(</span><span class="n">tgt_dir</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">_on_startup</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.</span>
@@ -251,6 +251,16 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run main conversion script from mzML to imzML, stop at annotation stage&quot;&quot;&quot;</span>
         <span class="n">cur_path</span> <span class="o">=</span> <span class="n">CD_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
+        <span class="c1">##Retrieve settings</span>
+        <span class="n">duplicate_spectra</span> <span class="o">=</span> <span class="n">duplicate_bool</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">zero_indexed</span> <span class="o">=</span> <span class="n">index_bool</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">search_tolerance</span> <span class="o">=</span> <span class="n">search_tol</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">search_tolerance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">search_tolerance</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">search_tolerance</span> <span class="o">=</span> <span class="mi">20</span>
+            <span class="n">messagebox</span><span class="o">.</span><span class="n">showwarning</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Invalid search tolerance specified - proceeding with 20 ppm&quot;</span><span class="p">)</span>
+
         <span class="c1">##Start the progress bar whirling to indicate to user that things are working</span>
         <span class="n">write_imzML_progress</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;indeterminate&quot;</span><span class="p">)</span>
         <span class="n">write_imzML_progress</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -264,7 +274,10 @@
             <span class="n">target</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">mzML_to_imzML_convert</span><span class="p">(</span>
                 <span class="n">PATH</span><span class="o">=</span><span class="n">cur_path</span><span class="p">,</span>
                 <span class="n">progress_target</span><span class="o">=</span><span class="n">write_imzML_progress</span><span class="p">,</span>
-                <span class="n">LOCK_MASS</span><span class="o">=</span><span class="n">lock_mass_entry</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
+                <span class="n">LOCK_MASS</span><span class="o">=</span><span class="n">lock_mass_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">TOLERANCE</span><span class="o">=</span><span class="n">search_tolerance</span><span class="p">,</span>
+                <span class="n">no_duplicating</span><span class="o">=</span><span class="n">duplicate_spectra</span><span class="p">,</span>
+                <span class="n">zero_indexed</span><span class="o">=</span><span class="n">zero_indexed</span><span class="p">))</span>
         <span class="n">thread</span><span class="o">.</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span>
         <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
@@ -382,6 +395,56 @@
 
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
 
+    
+    <span class="k">def</span> <span class="nf">launch_advanced</span><span class="p">():</span>
+        <span class="k">def</span> <span class="nf">update_search_tol</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">lock_mass_search_tol_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">search_tol</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lock_mass_search_tol_entry</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">messagebox</span><span class="o">.</span><span class="n">showwarning</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Search tolerance must be specified as number&quot;</span><span class="p">)</span>
+        
+        <span class="k">def</span> <span class="nf">update_index_bool</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">index_bool</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="n">index_bool</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">index_bool</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="k">def</span> <span class="nf">update_duplicate_bool</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicate_bool</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="n">duplicate_bool</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">duplicate_bool</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">advanced_window</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+        <span class="n">advanced_window</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Advanced Options...&quot;</span><span class="p">)</span>
+        <span class="n">advanced_window</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">)</span>
+
+        <span class="c1">#0 vs 1 indexed (checkbox, 1 default, 0 optional)</span>
+        <span class="n">index_check</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">advanced_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;0-Indexed?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">variable</span><span class="o">=</span><span class="n">index_bool</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">update_index_bool</span><span class="p">)</span>
+        <span class="n">index_check</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index_bool</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">index_check</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+
+        <span class="c1">#Duplicate pixels? (checkbox, duplicate default)</span>
+        <span class="n">duplicate_check</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">advanced_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;no duplicated spectra?&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">update_duplicate_bool</span><span class="p">)</span>
+        <span class="n">duplicate_check</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">duplicate_bool</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">duplicate_check</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+
+        <span class="c1">#Lock mass search tolerance (entry, 20 ppm default)</span>
+        <span class="n">lock_mass_search_tol_label</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">advanced_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Lock mass search tolerance (ppm):&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
+        <span class="n">lock_mass_search_tol_entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span><span class="n">advanced_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Enter tolerance here&quot;</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">background</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">lock_mass_search_tol_entry</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">search_tol</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">lock_mass_search_tol_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span><span class="n">update_search_tol</span><span class="p">)</span>
+        <span class="n">lock_mass_search_tol_entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span><span class="n">update_search_tol</span><span class="p">)</span>
+
+        <span class="n">lock_mass_search_tol_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">lock_mass_search_tol_label</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+            
+
 
     <span class="c1">##Build tkinter window</span>
     <span class="n">window</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
@@ -410,8 +473,14 @@
                 <span class="n">window</span><span class="o">.</span><span class="n">iconbitmap</span><span class="p">(</span><span class="n">resource_path</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
-
-
+    
+    <span class="c1">##Initialize defaults for advanced options</span>
+    <span class="n">search_tol</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">search_tol</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;20&quot;</span><span class="p">)</span>
+    <span class="n">duplicate_bool</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">duplicate_bool</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">index_bool</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">BooleanVar</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">index_bool</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1">##Scan-speed entry</span>
     <span class="n">speed_label</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;x scan speed (µm/s):&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
@@ -481,7 +550,12 @@
     <span class="n">mzML_process</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="n">imzML_metadata</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Write imzML metadata&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">write_metadata</span><span class="p">)</span>
-    <span class="n">imzML_metadata</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">columnspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">imzML_metadata</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="c1">#Advanced option</span>
+    <span class="n">adv_options</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Advanced Options...&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">launch_advanced</span><span class="p">)</span>
+    <span class="n">adv_options</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    
 
     <span class="c1">##Visualize .imzML</span>
     <span class="n">visualize</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;View imzML&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">launch_scout</span><span class="p">)</span>

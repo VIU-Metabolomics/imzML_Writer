@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: ../Images/Logo-01.png
+.. image:: ../imzML_Writer/Images/Logo-01.png
    :width: 250
    :alt: imzML Writer Logo
 
@@ -22,12 +22,14 @@ Installation
 ============
 
 .. _msconvertlabel:
+
 MS Convert
 **********
 On all three versions, imzML Writer relies on MS convert to convert raw instrument data into the open format mzML, requiring a working install.
 
 On PC, download the latest msconvert release from `ProteoWizard <https://proteowizard.sourceforge.io/download.html>`_ and navigate through the installer. Make sure that msconvert
-is added to the system PATH, either during installation or by following the instructions `here <https://www.eukhost.com/kb/how-to-add-to-the-path-on-windows-10-and-windows-11/>`_.
+is added to the system PATH, either during installation or by following the instructions `here <https://www.eukhost.com/kb/how-to-add-to-the-path-on-windows-10-and-windows-11/>`_. For the latest builds of imzML_Writer (`0.27+`), this can also be specified within imzML_Writer
+by automatically / manually searching for the msconvert installation on your PC.
 
 On Mac, download  `Docker <https://www.docker.com/products/docker-desktop/>`_ and open up the GUI dashboard. Then, you can `download the image for MSconvert <https://hub.docker.com/r/chambm/pwiz-skyline-i-agree-to-the-vendor-licenses>`_ by opening the **Terminal app** and running the command:
 
@@ -39,40 +41,10 @@ This may take a few minutes, as the image is ~5-6 GB. You can verify successful 
    :width: 600
    :alt: Docker GUI showing successful msconvert image
 
-Standalone apps
-******************
-Mac
----
-Download the `Github repository <https://github.com/VIU-Metabolomics/imzML_Writer>`_ and grab the correct distribution 
-for your machine - Apple Silicon for M-chips or Intel for older machines.
-
-
-Move the appropriate **imzML_Writer.app** file into your Applications folder. Then double-click the .app bundle to launch the application.
-Depending on your security settings, Apple may block the launch with the following pop-up:
-
-
-images - Security popup
-
-If so, click ok (***not** move to trash*), navigate to your security settings (``System Settings --> Privacy & Security``), scroll to the bottom, and click "open anyways" for imzML_Writer.
-
-
-images - Security override
-
-
-If docker was installed :ref:`as above <msconvertlabel>`, this should launch the UI and the application is ready for typical operation.
-
-PC
---
-Download the `Github repository <https://github.com/VIU-Metabolomics/imzML_Writer>`_, find the PC executable folder (**easy Filename here**) and place it in your documents folder.
-
-images - imzML file structure
-
-Then, open the folder and launch *imzML Writer* by double-clicking imzML_Writer.exe. This will launch a terminal window and the GUI. Provided msconvert is installed and added to the path, you should be good to go!
-
 
 Python package
 *****************
-Installing as a python package is the **recommended** option for most users, allowing for both stable GUI use and a command line interface (CLI) for batch processing.
+Running imzML Writer from the python package is the **recommended** option for most users, allowing for both stable GUI use and a command line interface (CLI) for batch processing.
 
 To install, make sure you have Docker (Mac) or MSconvert (PC) installed as above. Then, in your python environment run:
 
@@ -100,9 +72,49 @@ Then run the script (``python example.py``) to launch the GUI. If you already ha
 This covers the basic GUI functionality, for further details on running the CLI see the documentation pages.
 
 
+
+Standalone apps
+******************
+Mac
+---
+Download the `App Bundle from Github <https://github.com/VIU-Metabolomics/imzML_Writer/releases/tag/alpha>`_ and grab the Mac distribution.
+
+
+Move the **imzML_Writer.app** file into your Applications folder. Then double-click the .app bundle to launch the application.
+Depending on your security settings, Apple may block the launch with the following pop-up:
+
+
+.. image:: /images/SecurityPopup.png
+   :width: 300
+   :alt: Security popup for imzML_Writer.
+
+If so, click ok (***not** move to trash*), navigate to your security settings (``System Settings --> Privacy & Security``), scroll to the bottom, and click "open anyways" for imzML_Writer.
+
+
+.. image:: /images/SecurityAddPerms.png
+   :width: 300
+   :alt: Security popup for imzML_Writer.
+
+
+If docker was installed :ref:`as above <msconvertlabel>`, this should launch the UI and the application is ready for typical operation.
+
+PC
+--
+Download the `PC distribution from the Github release <https://github.com/VIU-Metabolomics/imzML_Writer/releases/tag/alpha>`_, move the entire PC executable folder (imzML_Writer.exe, obo folder, & _internal folder) and place it somewhere convenient on your PC.
+
+
+.. image:: /images/PC_InstallFileStructure.png
+   :width: 600
+   :alt: File structure for PC installation.
+
+
+Then, open the folder and launch *imzML Writer* by double-clicking imzML_Writer.exe. This will launch a terminal window and the GUI. Provided msconvert is installed and added to the path, you should be good to go!
+
 .. toctree::
    :maxdepth: 2
-   
+   :caption: Table of Contents
+
+   index
    Quick Start <QuickStart>
    GUI User Guide <GUI_Guide>
    Function Documentation <modules>

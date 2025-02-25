@@ -82,13 +82,22 @@
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">filedialog</span><span class="p">,</span><span class="n">messagebox</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 
+<span class="c1">##Colors and FONTS</span>
+<span class="n">TEAL</span> <span class="o">=</span> <span class="s2">&quot;#2da7ad&quot;</span>
+<span class="n">BEIGE</span> <span class="o">=</span> <span class="s2">&quot;#dbc076&quot;</span>
+<span class="n">GREEN</span> <span class="o">=</span> <span class="s2">&quot;#22d10f&quot;</span>
+<span class="n">FONT</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;HELVETICA&quot;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="s1">&#39;bold&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="get_drives">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.get_drives">[docs]</a>
 <span class="k">def</span> <span class="nf">get_drives</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;On windows machines, retrieves the accessible drives (e.g C:\, D:\, etc.) in to for automated seeking</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;On windows machines, retrieves the accessible drives (e.g C:\\, D:\\, etc.) in to for automated seeking</span>
 <span class="sd">    of msconvert.</span>
 
 <span class="sd">    :return: Available drives, as a list of strings.&quot;&quot;&quot;</span>
@@ -128,13 +137,41 @@
         <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="find_msconvert">
-<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.find_msconvert">[docs]</a>
-<span class="k">def</span> <span class="nf">find_msconvert</span><span class="p">():</span>
+<div class="viewcode-block" id="msconvert_searchUI">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.msconvert_searchUI">[docs]</a>
+<span class="k">def</span> <span class="nf">msconvert_searchUI</span><span class="p">():</span>
+    <span class="n">search_mode</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">set_auto</span><span class="p">():</span>
+        <span class="k">nonlocal</span> <span class="n">search_mode</span>
+        <span class="n">search_mode</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+        <span class="n">msconv_finder</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">set_manual</span><span class="p">():</span>
+        <span class="k">nonlocal</span> <span class="n">search_mode</span>
+        <span class="n">search_mode</span> <span class="o">=</span> <span class="s2">&quot;manual&quot;</span>
+        <span class="n">msconv_finder</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+
+    <span class="n">msconv_finder</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+    <span class="n">msconv_finder</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Find msconvert...&quot;</span><span class="p">)</span>
+    <span class="n">msconv_finder</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">)</span>
+
+    <span class="n">autofind</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">msconv_finder</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Auto Search...(Warning : Slow for large drives)&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">set_auto</span><span class="p">)</span>
+    <span class="n">autofind</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">padx</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+    <span class="n">man_find</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">msconv_finder</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Manual Search&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">command</span><span class="o">=</span><span class="n">set_manual</span><span class="p">)</span>
+    <span class="n">man_find</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">padx</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="n">search_mode</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">msconv_finder</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">search_mode</span></div>
+
+
+<div class="viewcode-block" id="autofind_msconvert">
+<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.autofind_msconvert">[docs]</a>
+<span class="k">def</span> <span class="nf">autofind_msconvert</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds msconvert by searching all available drives, verifies success by calling</span>
 <span class="sd">    info of msconvert</span>
-<span class="sd">    </span>
-<span class="sd">    TODO - Get this to save the path for future runs so it doesn&#39;t need to search every time</span>
 <span class="sd">    </span>
 <span class="sd">    :return: Full path to msconvert.exe&quot;&quot;&quot;</span>
     <span class="n">drives</span> <span class="o">=</span> <span class="n">get_drives</span><span class="p">()</span>
@@ -181,9 +218,42 @@
                             <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
                             <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span> 
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;msconvert not in PATH - searching drives for install&quot;</span><span class="p">)</span>
-            <span class="n">msconvert</span> <span class="o">=</span> <span class="n">find_msconvert</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found it!&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mod_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+                <span class="n">settings_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mod_path</span><span class="p">,</span><span class="s2">&quot;msconvert_path.json&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">settings_path</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">path_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="n">msconvert</span> <span class="o">=</span> <span class="n">path_data</span><span class="p">[</span><span class="s2">&quot;msconvert_path&quot;</span><span class="p">]</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">msconvert</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                            <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                            <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                            <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span>
+            <span class="k">except</span><span class="p">:</span>
+                    <span class="n">search_method</span> <span class="o">=</span> <span class="n">msconvert_searchUI</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;manual&quot;</span><span class="p">:</span>
+                        <span class="n">msconvert</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">askopenfilename</span><span class="p">(</span><span class="n">initialdir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Please select msconvert.exe&quot;</span><span class="p">,</span><span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;msconvert.exe&quot;</span><span class="p">,</span><span class="s2">&quot;msconvert.exe&quot;</span><span class="p">)])</span>
+                        <span class="n">msconvert</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">msconvert</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">search_method</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+                        <span class="n">msconvert</span> <span class="o">=</span> <span class="n">autofind_msconvert</span><span class="p">()</span>
+                        <span class="n">msconvert</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">msconvert</span><span class="p">)</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">msconvert</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                        <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">mod_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+                        <span class="n">settings_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mod_path</span><span class="p">,</span><span class="s2">&quot;msconvert_path.json&quot;</span><span class="p">)</span>
+                        <span class="n">set_path</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;msconvert_path&quot;</span><span class="p">:</span> <span class="n">msconvert</span><span class="p">}</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">settings_path</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">set_path</span><span class="p">,</span><span class="n">file</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;msConvert not available, check installation and verify msConvert path is specified correctly&quot;</span><span class="p">)</span>
 
@@ -284,8 +354,26 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1">##Setup the docker image including internal file structure and command</span>
         <span class="n">DOCKER_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;chambm/pwiz-skyline-i-agree-to-the-vendor-licenses&quot;</span>
-        <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
-        <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">messagebox</span><span class="o">.</span><span class="n">showwarning</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;No Docker&quot;</span><span class="p">,</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Docker unavailable - please launch Docker desktop before proceeding...&quot;</span><span class="p">)</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;latest&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">resp</span> <span class="o">=</span> <span class="n">messagebox</span><span class="o">.</span><span class="n">askquestion</span><span class="p">(</span><span class="s2">&quot;Newer docker image available&quot;</span><span class="p">,</span> <span class="s2">&quot;A newer version of the msconvert docker image is available, would you like to update?&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">resp</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
+                    <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">messagebox</span><span class="o">.</span><span class="n">askquestion</span><span class="p">(</span><span class="s2">&quot;Docker image unavailable&quot;</span><span class="p">,</span> <span class="s2">&quot;No docker image for msconvert is available, would you like to download it now?&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">resp</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+        <span class="c1"># client.images.pull(DOCKER_IMAGE)</span>
 
         <span class="n">working_directory</span> <span class="o">=</span> <span class="n">path</span>
         <span class="n">file_type</span> <span class="o">=</span> <span class="n">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -342,14 +430,16 @@
 
 <div class="viewcode-block" id="mzML_to_imzML_convert">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.utils.mzML_to_imzML_convert">[docs]</a>
-<span class="k">def</span> <span class="nf">mzML_to_imzML_convert</span><span class="p">(</span><span class="n">progress_target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">PATH</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">LOCK_MASS</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">TOLERANCE</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">mzML_to_imzML_convert</span><span class="p">(</span><span class="n">progress_target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">PATH</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">LOCK_MASS</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">TOLERANCE</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">zero_indexed</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">no_duplicating</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),</span>
 <span class="sd">    aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.</span>
 <span class="sd">    </span>
 <span class="sd">    :param progress_target: tkinter progress bar object from the GUI to update as conversion progresses</span>
 <span class="sd">    :param PATH: - Working path for source mzML files</span>
 <span class="sd">    :param LOCK_MASS: - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration</span>
-<span class="sd">    :param TOLERANCE: Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm&quot;&quot;&quot;</span>
+<span class="sd">    :param TOLERANCE: Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm</span>
+<span class="sd">    :param zero_indexed: Specifies whether pixel dimensions should start from 1 (default - False) or 0 (True)</span>
+<span class="sd">    :param no_duplicating: Specifies whether spectra can be duplicated into adjacent pixels for sparsely sampled lines. Default True&quot;&quot;&quot;</span>
 
     <span class="c1">##Ensure lock mass and tolerance are formatted as float</span>
     <span class="n">LOCK_MASS</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">LOCK_MASS</span><span class="p">)</span>
@@ -457,6 +547,8 @@
             <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span> <span class="o">=</span> <span class="n">imzmlw</span><span class="o">.</span><span class="n">ImzMLWriter</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">output_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+    <span class="n">num_duplicates</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">num_total</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1">#Build image grid, write directly to an imzML</span>
     <span class="k">for</span> <span class="n">y_row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_pixels</span><span class="p">):</span>
         <span class="n">active_file</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span><span class="n">mzml_files</span><span class="p">[</span><span class="n">y_row</span><span class="p">]))</span>
@@ -472,15 +564,39 @@
                     <span class="n">spec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="p">)</span>
 
             <span class="n">pvs_ppm_off</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">used_idx</span> <span class="o">=</span> <span class="p">[]</span>
+            
             <span class="k">for</span> <span class="n">x_row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_x_pixels</span><span class="p">[</span><span class="n">filt</span><span class="p">]):</span>
                 <span class="n">align_time</span> <span class="o">=</span> <span class="n">time_targets</span><span class="p">[</span><span class="n">filt</span><span class="p">][</span><span class="n">x_row</span><span class="p">]</span>
                 <span class="n">time_diffs</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmp_times</span> <span class="o">-</span> <span class="n">align_time</span><span class="p">)</span>
                 <span class="n">match_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">time_diffs</span> <span class="o">==</span> <span class="nb">min</span><span class="p">(</span><span class="n">time_diffs</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">match_spectra</span> <span class="o">=</span> <span class="n">spec_list</span><span class="p">[</span><span class="n">match_idx</span><span class="p">]</span>
+                <span class="n">num_total</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">zero_indexed</span><span class="p">:</span>
+                    <span class="n">x_coord</span> <span class="o">=</span> <span class="n">x_row</span>
+                    <span class="n">y_coord</span> <span class="o">=</span> <span class="n">y_row</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x_coord</span> <span class="o">=</span> <span class="n">x_row</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">y_coord</span> <span class="o">=</span> <span class="n">y_row</span> <span class="o">+</span> <span class="mi">1</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">match_idx</span> <span class="ow">in</span> <span class="n">used_idx</span><span class="p">:</span>
+                    <span class="n">used_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_idx</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">used_idx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+                        <span class="n">used_idx</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-                <span class="p">[</span><span class="n">recalibrated_mz</span><span class="p">,</span> <span class="n">pvs_ppm_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">recalibrate</span><span class="p">(</span><span class="n">mz</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">mz</span><span class="p">,</span> <span class="nb">int</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,</span><span class="n">lock_mz</span><span class="o">=</span><span class="n">LOCK_MASS</span><span class="p">,</span><span class="n">search_tol</span><span class="o">=</span><span class="n">TOLERANCE</span><span class="p">,</span><span class="n">ppm_off</span><span class="o">=</span><span class="n">pvs_ppm_off</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">addSpectrum</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">,</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,(</span><span class="n">x_row</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">y_row</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">match_spectra</span> <span class="o">=</span> <span class="n">spec_list</span><span class="p">[</span><span class="n">match_idx</span><span class="p">]</span>
+                    <span class="p">[</span><span class="n">recalibrated_mz</span><span class="p">,</span> <span class="n">pvs_ppm_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">recalibrate</span><span class="p">(</span><span class="n">mz</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">mz</span><span class="p">,</span> <span class="nb">int</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,</span><span class="n">lock_mz</span><span class="o">=</span><span class="n">LOCK_MASS</span><span class="p">,</span><span class="n">search_tol</span><span class="o">=</span><span class="n">TOLERANCE</span><span class="p">,</span><span class="n">ppm_off</span><span class="o">=</span><span class="n">pvs_ppm_off</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">addSpectrum</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">,</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,(</span><span class="n">x_coord</span><span class="p">,</span><span class="n">y_coord</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">num_duplicates</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">no_duplicating</span><span class="p">:</span>
+                        <span class="n">match_spectra</span> <span class="o">=</span> <span class="n">spec_list</span><span class="p">[</span><span class="n">match_idx</span><span class="p">]</span>
+                        <span class="p">[</span><span class="n">recalibrated_mz</span><span class="p">,</span> <span class="n">pvs_ppm_off</span><span class="p">]</span> <span class="o">=</span> <span class="n">recalibrate</span><span class="p">(</span><span class="n">mz</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">mz</span><span class="p">,</span> <span class="nb">int</span><span class="o">=</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,</span><span class="n">lock_mz</span><span class="o">=</span><span class="n">LOCK_MASS</span><span class="p">,</span><span class="n">search_tol</span><span class="o">=</span><span class="n">TOLERANCE</span><span class="p">,</span><span class="n">ppm_off</span><span class="o">=</span><span class="n">pvs_ppm_off</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">addSpectrum</span><span class="p">(</span><span class="n">recalibrated_mz</span><span class="p">,</span><span class="n">match_spectra</span><span class="o">.</span><span class="n">i</span><span class="p">,(</span><span class="n">x_coord</span><span class="p">,</span><span class="n">y_coord</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">userParams</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;DuplicatedSpectrum&quot;</span><span class="p">,</span><span class="s2">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;True&quot;</span><span class="p">}])</span>
+
+                    <span class="c1"># print(f&quot;Duplicated pixel detected - {num_duplicates} / {num_total} ({num_duplicates * 100 / num_total:.2f}%)&quot;)</span>
+
 
         <span class="c1">##Update progress bar in the GUI as each mzML finishes</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_row</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="p">(</span><span class="n">y_pixels</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> 
