@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: imzML_Writer
-Version: 0.0.28
+Version: 0.0.30
 Summary: User friendly writing of imzML mass spectrometry imaging files from continuous MSI data
 Home-page: https://github.com/VIU-Metabolomics/imzML_Writer
 Author: Joseph Monaghan
@@ -31,24 +31,22 @@ pip install imzml-writer
 
 2. (**Experimental**) Standalone app bundles / executables for Mac and PC in the builds folder of the Github.
 
-3. (**Developer mode**) By cloning the Github repo for direct usage.
-
 # **Installation:**
 
 Using imzML Writer depends on msconvert for conversion of raw vendor files to the open format mzML. On PC, this can be installed normally
 from Proteowizard:
 https://proteowizard.sourceforge.io/download.html
 
+imzML Writer will prompt you for the path to msconvert the first time you try to convert raw files (see Docs), or you can add msconvert to the system path if you'd like to run msconvert from the command line.
+
 On Mac, you can still run msconvert via a docker image. First, install Docker:
 https://www.docker.com/products/docker-desktop/
 
-Then, open `Terminal.app` and run the command:
+Similarly, imzML Writer will prompt you to download the docker image the first time you try to call it. If you'd like to do this in advance you can open `Terminal.app` and run the command:
 
 ```
 docker pull chambm/pwiz-skyline-i-agree-to-the-vendor-licenses
 ```
-
-Once complete, you should be good to go.
 
 # **Quickstart**
 

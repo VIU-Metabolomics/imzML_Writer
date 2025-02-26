@@ -258,7 +258,7 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
             client = docker.from_env()
         except:
             res = subprocess.run(["open", "--background", "-a", "Docker"])
-            if res.returncode == 1:
+            if res.returncode == 0:
                 time.sleep(2.5)
                 client = docker.from_env()
             else:
