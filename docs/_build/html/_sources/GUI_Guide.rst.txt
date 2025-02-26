@@ -92,7 +92,7 @@ Choose an ``.imzML`` file from the file list once the process is complete. Files
 
 6. Explore the data
 +++++++++++++++++++
-.. image:: /images/pic6.png
+.. image:: /images/ExploreTheData.png
     :width: 500
     :alt: Basic imzML Scout view
 
@@ -100,14 +100,14 @@ View, explore, and/or export the ion images of all m/z features in the chosen sc
  
 Click on any pixel on the ion image, the pixel will turn red and the corresponding mass spectrum will be shown on the right.
  
-.. image:: /images/pic7.png
+.. image:: /images/mzAndTolerance.png
     :width: 500
     :alt: Clicked pixel and corresponding mass spectrum shown.
 
 Within imzML Scout, you can select a new m/z to view in two ways:
 
-:Target m/z: Type in the mass-to-charge (m/z) in the input field (e.g., 187.0794 is the red peak on the spectrum)
-:Mass spectrum: Hover the cursor over the mass spectrum and click on the desired m/z (e.g., 762.0759 – black peak). 
+:Target m/z: Type in the mass-to-charge (m/z) in the input field (red label)
+:Mass spectrum: Hover the cursor over the mass spectrum and click on the desired m/z (black label). 
 
 The mass spectrum can be zoomed in by punching in the Start *m/z* and End *m/z* to able to click on the low abundant peaks.
  
@@ -118,17 +118,24 @@ Additional parameters can be specified as well:
  
 If desired, a custom normalization can be applied (e.g. to compare absolute abundances across images):
 
-.. image:: /images/pic7.png
+.. image:: /images/CustomNorm.png
     :width: 500
     :alt: Highlight box for custom normalization
 
-You can also generate the TIC image by checking the ``View TIC image`` button:
+You can also generate the TIC image by checking the ``View TIC image`` button.
 
-.. image:: /images/pic7.png
+Colormaps are drawn from matplotlib's `standard colormaps <https://matplotlib.org/stable/users/explain/colors/colormaps.html>`_, with several common ones included in the base install. Additional
+colormaps can be added by clicking `more cmaps`:
+
+.. image:: /images/MoreCmaps.png
     :width: 500
-    :alt: Show TIC image
+    :alt: Cmap config display
 
-Colormaps can be specified from matplotlib's `standard colormaps<https://matplotlib.org/stable/users/explain/colors/colormaps.html>`_, with several common maps included in the base install:
+This calls a popup where you can easily add/remove colormaps from the selection window (settings will be saved for the next time you launch imzML Scout):
+
+.. image:: /images/cmaps.png
+    :width: 500
+    :alt: Cmap config display
 
 .. image:: /images/pic8.jpg
     :width: 500
@@ -136,16 +143,21 @@ Colormaps can be specified from matplotlib's `standard colormaps<https://matplot
 
 You can adjust the contrast settings by sliding the bars to right of the image:
 
-.. image:: /images/pic9.png
-    :width: 500
+.. image:: /images/ContrastHigh.png
+    :width: 250
     :alt: Narrow contrast
 
-.. image:: /images/pic10.png
-    :width: 500
+.. image:: /images/ContrastLow.png
+    :width: 250
     :alt: Wide contrast
   
 imzML Scout also supports batch export of images in several image formats (``TIF``, ``png``, ``jpg``) or as a numeric matrix (``csv``). To batch
 export, click the ``Bulk export`` or ``Bulk CSV export`` button and navigate to the target spreadsheet (``.xlsx``) specifying which images to export in the form:
+
+.. image:: /images/ExportImage.png
+    :width: 500
+    :alt: Example spreadsheet layout
+
 
 .. image:: /images/pic11.png
     :width: 250

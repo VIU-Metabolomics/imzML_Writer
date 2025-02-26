@@ -42,7 +42,8 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="QuickStart.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GUI User Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#launch">1. Launch</a></li>
@@ -171,19 +172,19 @@ most-abundant file type in your directory. The process will then be begin and ca
 </section>
 <section id="explore-the-data">
 <h2>6. Explore the data<a class="headerlink" href="#explore-the-data" title="Link to this heading"></a></h2>
-<a class="reference internal image-reference" href="_images/pic6.png"><img alt="Basic imzML Scout view" src="_images/pic6.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/ExploreTheData.png"><img alt="Basic imzML Scout view" src="_images/ExploreTheData.png" style="width: 500px;" />
 </a>
 <p>View, explore, and/or export the ion images of all m/z features in the chosen scan filter using imzML Scout.</p>
 <p>Click on any pixel on the ion image, the pixel will turn red and the corresponding mass spectrum will be shown on the right.</p>
-<a class="reference internal image-reference" href="_images/pic7.png"><img alt="Clicked pixel and corresponding mass spectrum shown." src="_images/pic7.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/mzAndTolerance.png"><img alt="Clicked pixel and corresponding mass spectrum shown." src="_images/mzAndTolerance.png" style="width: 500px;" />
 </a>
 <p>Within imzML Scout, you can select a new m/z to view in two ways:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Target m/z<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Type in the mass-to-charge (m/z) in the input field (e.g., 187.0794 is the red peak on the spectrum)</p>
+<dd class="field-odd"><p>Type in the mass-to-charge (m/z) in the input field (red label)</p>
 </dd>
 <dt class="field-even">Mass spectrum<span class="colon">:</span></dt>
-<dd class="field-even"><p>Hover the cursor over the mass spectrum and click on the desired m/z (e.g., 762.0759 – black peak).</p>
+<dd class="field-even"><p>Hover the cursor over the mass spectrum and click on the desired m/z (black label).</p>
 </dd>
 </dl>
 <p>The mass spectrum can be zoomed in by punching in the Start <em>m/z</em> and End <em>m/z</em> to able to click on the low abundant peaks.</p>
@@ -197,21 +198,27 @@ most-abundant file type in your directory. The process will then be begin and ca
 </dd>
 </dl>
 <p>If desired, a custom normalization can be applied (e.g. to compare absolute abundances across images):</p>
-<a class="reference internal image-reference" href="_images/pic7.png"><img alt="Highlight box for custom normalization" src="_images/pic7.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/CustomNorm.png"><img alt="Highlight box for custom normalization" src="_images/CustomNorm.png" style="width: 500px;" />
 </a>
-<p>You can also generate the TIC image by checking the <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">TIC</span> <span class="pre">image</span></code> button:</p>
-<a class="reference internal image-reference" href="_images/pic7.png"><img alt="Show TIC image" src="_images/pic7.png" style="width: 500px;" />
+<p>You can also generate the TIC image by checking the <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">TIC</span> <span class="pre">image</span></code> button.</p>
+<p>Colormaps are drawn from matplotlib’s <a class="reference external" href="https://matplotlib.org/stable/users/explain/colors/colormaps.html">standard colormaps</a>, with several common ones included in the base install. Additional
+colormaps can be added by clicking <cite>more cmaps</cite>:</p>
+<a class="reference internal image-reference" href="_images/MoreCmaps.png"><img alt="Cmap config display" src="_images/MoreCmaps.png" style="width: 500px;" />
 </a>
-<p>Colormaps can be specified from matplotlib’s <a href="#id1"><span class="problematic" id="id2">`standard colormaps&lt;https://matplotlib.org/stable/users/explain/colors/colormaps.html&gt;`_</span></a>, with several common maps included in the base install:</p>
-<a class="reference internal image-reference" href="_images/pic8.jpg"><img alt="Various colormaps of the same sample." src="_images/pic8.jpg" style="width: 500px;" />
+<p>This calls a popup where you can easily add/remove colormaps from the selection window (settings will be saved for the next time you launch imzML Scout):</p>
+<a class="reference internal image-reference" href="_images/cmaps.png"><img alt="Cmap config display" src="_images/cmaps.png" style="width: 500px;" />
+</a>
+<a class="reference internal image-reference" href="images/pic8.jpg"><img alt="Various colormaps of the same sample." src="images/pic8.jpg" style="width: 500px;" />
 </a>
 <p>You can adjust the contrast settings by sliding the bars to right of the image:</p>
-<a class="reference internal image-reference" href="_images/pic9.png"><img alt="Narrow contrast" src="_images/pic9.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/ContrastHigh.png"><img alt="Narrow contrast" src="_images/ContrastHigh.png" style="width: 250px;" />
 </a>
-<a class="reference internal image-reference" href="_images/pic10.png"><img alt="Wide contrast" src="_images/pic10.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/ContrastLow.png"><img alt="Wide contrast" src="_images/ContrastLow.png" style="width: 250px;" />
 </a>
 <p>imzML Scout also supports batch export of images in several image formats (<code class="docutils literal notranslate"><span class="pre">TIF</span></code>, <code class="docutils literal notranslate"><span class="pre">png</span></code>, <code class="docutils literal notranslate"><span class="pre">jpg</span></code>) or as a numeric matrix (<code class="docutils literal notranslate"><span class="pre">csv</span></code>). To batch
 export, click the <code class="docutils literal notranslate"><span class="pre">Bulk</span> <span class="pre">export</span></code> or <code class="docutils literal notranslate"><span class="pre">Bulk</span> <span class="pre">CSV</span> <span class="pre">export</span></code> button and navigate to the target spreadsheet (<code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>) specifying which images to export in the form:</p>
+<a class="reference internal image-reference" href="_images/ExportImage.png"><img alt="Example spreadsheet layout" src="_images/ExportImage.png" style="width: 500px;" />
+</a>
 <a class="reference internal image-reference" href="_images/pic11.png"><img alt="Example spreadsheet layout" src="_images/pic11.png" style="width: 250px;" />
 </a>
 <p>The <code class="docutils literal notranslate"><span class="pre">include</span> <span class="pre">TIC?</span></code> checkbox specifies whether the TIC image / TIC array should be included in the bulk export.</p>

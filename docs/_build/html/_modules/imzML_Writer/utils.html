@@ -39,7 +39,8 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../QuickStart.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../GUI_Guide.html">GUI User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">Function Documentation</a></li>
@@ -86,6 +87,7 @@
 <span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">filedialog</span><span class="p">,</span><span class="n">messagebox</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">imzML_Writer</span> <span class="kn">import</span> <span class="n">__version__</span>
 
 
 <span class="c1">##Colors and FONTS</span>
@@ -357,8 +359,13 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">messagebox</span><span class="o">.</span><span class="n">showwarning</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;No Docker&quot;</span><span class="p">,</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Docker unavailable - please launch Docker desktop before proceeding...&quot;</span><span class="p">)</span>
-            <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;--background&quot;</span><span class="p">,</span> <span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;Docker&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+                <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">messagebox</span><span class="o">.</span><span class="n">showwarning</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;No Docker&quot;</span><span class="p">,</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Docker unavailable - please launch/install Docker desktop before proceeding...&quot;</span><span class="p">)</span>
+                <span class="n">client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
@@ -367,7 +374,7 @@
                 <span class="k">if</span> <span class="n">resp</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
                     <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">resp</span> <span class="o">=</span> <span class="n">messagebox</span><span class="o">.</span><span class="n">askquestion</span><span class="p">(</span><span class="s2">&quot;Docker image unavailable&quot;</span><span class="p">,</span> <span class="s2">&quot;No docker image for msconvert is available, would you like to download it now?&quot;</span><span class="p">)</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">messagebox</span><span class="o">.</span><span class="n">askquestion</span><span class="p">(</span><span class="s2">&quot;Docker image unavailable&quot;</span><span class="p">,</span> <span class="s2">&quot;No docker image for msconvert is available, would you like to download it now? (WARNING: May take several minutes)&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">resp</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
                 <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">DOCKER_IMAGE</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -800,6 +807,24 @@
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitCvRef&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;UO&quot;</span>
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitAccession&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;UO:0000017&quot;</span>
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitName&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;micrometer&quot;</span>
+
+    <span class="c1">##Specify imzML writer involvement and version in the resulting imzML</span>
+    <span class="k">for</span> <span class="n">soft_list</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;softwareList&quot;</span><span class="p">):</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">soft_list</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">new_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">builder</span><span class="o">=</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">builder</span><span class="p">,</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;software&quot;</span><span class="p">,</span>
+                    <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="s1">&#39;imzML_Writer&#39;</span><span class="p">,</span><span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="n">__version__</span><span class="p">})</span>
+        <span class="n">descr_tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">builder</span><span class="o">=</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">builder</span><span class="p">,</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;cvParam&quot;</span><span class="p">,</span>
+                    <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accession&#39;</span><span class="p">:</span><span class="s1">&#39;MS:1000799&#39;</span><span class="p">,</span><span class="s2">&quot;cvRef&quot;</span><span class="p">:</span><span class="s2">&quot;MS&quot;</span><span class="p">,</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Custom unreleased software tool&quot;</span><span class="p">,</span><span class="s2">&quot;value&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;imzML Writer v</span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+        
+
+        <span class="n">soft_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_tag</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">software</span> <span class="ow">in</span> <span class="n">soft_list</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;software&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">software</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;imzML_Writer&quot;</span><span class="p">:</span>
+                <span class="n">software</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">descr_tag</span><span class="p">)</span>
+
+        <span class="n">soft_list</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>        
 
     <span class="c1">#Write the new file</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">result_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>

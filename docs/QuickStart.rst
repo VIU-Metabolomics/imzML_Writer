@@ -14,16 +14,29 @@ MS Convert
 **********
 You also need msconvert in order to run imzML Writer. imzML Writer relies on MS convert to convert raw instrument data into the open format mzML.
 
-On PC, download the latest msconvert release from `ProteoWizard <https://proteowizard.sourceforge.io/download.html>`_ and navigate through the installer. Make sure that msconvert
-is added to the system PATH, either during installation or by following the instructions `here <https://www.eukhost.com/kb/how-to-add-to-the-path-on-windows-10-and-windows-11/>`_.
+**On PC**, download the latest msconvert release from `ProteoWizard <https://proteowizard.sourceforge.io/download.html>`_ and navigate through the installer. If you want to run
+msconvert from the command line, make sure that msconvert is added to the system PATH, either during installation or by following the instructions `here <https://www.eukhost.com/kb/how-to-add-to-the-path-on-windows-10-and-windows-11/>`_. 
 
-On Mac, download  `Docker <https://www.docker.com/products/docker-desktop/>`_ and open up the GUI dashboard. Then, you can `download the image for MSconvert <https://hub.docker.com/r/chambm/pwiz-skyline-i-agree-to-the-vendor-licenses>`_ by opening the **Terminal app** and running the command:
+If you only want to run msconvert using imzML_Writer, a context menu will appear the first time you start a conversion where you can search (automatically [slow] or manually) for msconvert's install location:
+
+.. image:: /images/MSConvert_popup.png
+   :width: 300
+   :alt: msconvert popup when it isn't in the path
+
+**On Mac**, download  `Docker <https://www.docker.com/products/docker-desktop/>`_ and open up the GUI dashboard: The first time you go to convert raw files, it will prompt you to download
+the `docker image for msconvert <https://hub.docker.com/r/chambm/pwiz-skyline-i-agree-to-the-vendor-licenses>`_:
+
+.. image:: /images/DockerImagePrompt.png
+   :width: 250
+   :alt: Docker image install/update
+
+If this fails, you can manually install the docker image by opening the **Terminal app** and running the command:
 
 ``docker pull chambm/pwiz-skyline-i-agree-to-the-vendor-licenses``
 
 This may take a few minutes, as the image is ~5-6 GB. You can verify successful install in the Docker dashboard under the images tab:
 
-.. image:: /images/Docker_pwiz_install.png
+.. image:: /images/DockerImage.png
    :width: 600
    :alt: Docker GUI showing successful msconvert image
 
@@ -31,7 +44,7 @@ Launching the GUI
 ------------------
 imzML Writer
 ++++++++++++
-Once you have both, launching the GUI is as simple as::
+Once you have both imzML Writer and msconvert (or the docker image) installed, launching the GUI is as simple as::
 
     import imzML_Writer.imzML_Writer as iw
 
@@ -57,7 +70,7 @@ Or, if you're only interested in viewing images you can launch scout directly on
 
 Command Line Interface
 -----------------------
-The utilities for imzML Writer are also available under ``imzML_Writer.utils``, allowing you to build command-line converters for your images::
+The utilities for imzML Writer are also available under ``imzML_Writer.utils``, allowing you to build a converter from the command-line interface for your automated/bulk processing::
 
     import os
     import imzML_Writer.utils as iw_utils

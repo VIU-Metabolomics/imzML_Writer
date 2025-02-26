@@ -42,7 +42,8 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#imzml-writer">imzML Writer</a><ul>
@@ -98,12 +99,19 @@
 <section id="ms-convert">
 <h4>MS Convert<a class="headerlink" href="#ms-convert" title="Link to this heading"></a></h4>
 <p>You also need msconvert in order to run imzML Writer. imzML Writer relies on MS convert to convert raw instrument data into the open format mzML.</p>
-<p>On PC, download the latest msconvert release from <a class="reference external" href="https://proteowizard.sourceforge.io/download.html">ProteoWizard</a> and navigate through the installer. Make sure that msconvert
-is added to the system PATH, either during installation or by following the instructions <a class="reference external" href="https://www.eukhost.com/kb/how-to-add-to-the-path-on-windows-10-and-windows-11/">here</a>.</p>
-<p>On Mac, download  <a class="reference external" href="https://www.docker.com/products/docker-desktop/">Docker</a> and open up the GUI dashboard. Then, you can <a class="reference external" href="https://hub.docker.com/r/chambm/pwiz-skyline-i-agree-to-the-vendor-licenses">download the image for MSconvert</a> by opening the <strong>Terminal app</strong> and running the command:</p>
+<p><strong>On PC</strong>, download the latest msconvert release from <a class="reference external" href="https://proteowizard.sourceforge.io/download.html">ProteoWizard</a> and navigate through the installer. If you want to run
+msconvert from the command line, make sure that msconvert is added to the system PATH, either during installation or by following the instructions <a class="reference external" href="https://www.eukhost.com/kb/how-to-add-to-the-path-on-windows-10-and-windows-11/">here</a>.</p>
+<p>If you only want to run msconvert using imzML_Writer, a context menu will appear the first time you start a conversion where you can search (automatically [slow] or manually) for msconvert’s install location:</p>
+<a class="reference internal image-reference" href="_images/MSConvert_popup.png"><img alt="msconvert popup when it isn't in the path" src="_images/MSConvert_popup.png" style="width: 300px;" />
+</a>
+<p><strong>On Mac</strong>, download  <a class="reference external" href="https://www.docker.com/products/docker-desktop/">Docker</a> and open up the GUI dashboard: The first time you go to convert raw files, it will prompt you to download
+the <a class="reference external" href="https://hub.docker.com/r/chambm/pwiz-skyline-i-agree-to-the-vendor-licenses">docker image for msconvert</a>:</p>
+<a class="reference internal image-reference" href="_images/DockerImagePrompt.png"><img alt="Docker image install/update" src="_images/DockerImagePrompt.png" style="width: 250px;" />
+</a>
+<p>If this fails, you can manually install the docker image by opening the <strong>Terminal app</strong> and running the command:</p>
 <p><code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span> <span class="pre">chambm/pwiz-skyline-i-agree-to-the-vendor-licenses</span></code></p>
 <p>This may take a few minutes, as the image is ~5-6 GB. You can verify successful install in the Docker dashboard under the images tab:</p>
-<a class="reference internal image-reference" href="_images/Docker_pwiz_install.png"><img alt="Docker GUI showing successful msconvert image" src="_images/Docker_pwiz_install.png" style="width: 600px;" />
+<a class="reference internal image-reference" href="_images/DockerImage.png"><img alt="Docker GUI showing successful msconvert image" src="_images/DockerImage.png" style="width: 600px;" />
 </a>
 </section>
 </section>
@@ -112,7 +120,7 @@ is added to the system PATH, either during installation or by following the inst
 <h2>Launching the GUI<a class="headerlink" href="#launching-the-gui" title="Link to this heading"></a></h2>
 <section id="id1">
 <h3>imzML Writer<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<p>Once you have both, launching the GUI is as simple as:</p>
+<p>Once you have both imzML Writer and msconvert (or the docker image) installed, launching the GUI is as simple as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
 
 <span class="c1">##Launch the imzML Writer in the current directory</span>
@@ -141,7 +149,7 @@ is added to the system PATH, either during installation or by following the inst
 </section>
 <section id="command-line-interface">
 <h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Link to this heading"></a></h2>
-<p>The utilities for imzML Writer are also available under <code class="docutils literal notranslate"><span class="pre">imzML_Writer.utils</span></code>, allowing you to build command-line converters for your images:</p>
+<p>The utilities for imzML Writer are also available under <code class="docutils literal notranslate"><span class="pre">imzML_Writer.utils</span></code>, allowing you to build a converter from the command-line interface for your automated/bulk processing:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">imzML_Writer.utils</span> <span class="k">as</span> <span class="nn">iw_utils</span>
 <span class="kn">import</span> <span class="nn">time</span>

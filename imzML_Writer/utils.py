@@ -257,8 +257,13 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
         try:
             client = docker.from_env()
         except:
-            messagebox.showwarning(title="No Docker",message="Docker unavailable - please launch Docker desktop before proceeding...")
-            client = docker.from_env()
+            res = subprocess.run(["open", "--background", "-a", "Docker"])
+            if res.returncode == 1:
+                time.sleep(2.5)
+                client = docker.from_env()
+            else:
+                messagebox.showwarning(title="No Docker",message="Docker unavailable - please launch/install Docker desktop before proceeding...")
+                client = docker.from_env()
 
         try:
             data = client.images.get(DOCKER_IMAGE)
@@ -267,7 +272,7 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
                 if resp == "yes":
                     client.images.pull(DOCKER_IMAGE)
         except:
-            resp = messagebox.askquestion("Docker image unavailable", "No docker image for msconvert is available, would you like to download it now?")
+            resp = messagebox.askquestion("Docker image unavailable", "No docker image for msconvert is available, would you like to download it now? (WARNING: May take several minutes)")
             if resp == "yes":
                 client.images.pull(DOCKER_IMAGE)
             else:
