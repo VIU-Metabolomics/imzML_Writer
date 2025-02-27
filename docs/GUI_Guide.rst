@@ -92,7 +92,7 @@ Choose an ``.imzML`` file from the file list once the process is complete. Files
 
 6. Explore the data
 +++++++++++++++++++
-.. image:: /images/ExploreTheData.png
+.. image:: /images/exploreTheData.png
     :width: 500
     :alt: Basic imzML Scout view
 
