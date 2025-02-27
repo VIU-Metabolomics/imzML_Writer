@@ -40,6 +40,18 @@ import imzML_Writer.imzML_Writer as iw
 iw.gui()
 ```
 
+# **Compatibility**
+
+| Software                                                               | Functioning? | Comments                      |
+| ---------------------------------------------------------------------- | ------------ | ----------------------------- |
+| [Cardinal MSI](https://cardinalmsi.org)                                | Yes          |                               |
+| [METASPACE](https://metaspace2020.org)                                 | Yes          |                               |
+| [M2aia](https://m2aia.de)                                              | Yes          |                               |
+| [MSIReader](https://msireader.com)                                     | Yes          |                               |
+| [Julia mzML_imzML](https://github.com/CINVESTAV-LABI/julia_mzML_imzML) | Yes          |                               |
+| [SCiLS Lab](https://www.bruker.com/en.html)                            | Yes          | Must specify pixel dimensions |
+| [Mozaic](https://spectroswiss.ch/software/)                            | No           | Work in Progress              |
+
 # **Documentation**
 
 Detailed installation instructions, quickstart guides, and documentation are available on the ReadTheDocs page:

@@ -1,0 +1,8 @@
+﻿Software,Functioning,Comments
+`Cardinal MSI <https://cardinalmsi.org>`_,**Yes**,
+`METASPACE <https://metaspace2020.org>`_,**Yes**,
+`M2aia <https://m2aia.de>`_,**Yes**,
+`MSIReader <https://msireader.com>`_,**Yes**,
+`Julia_mzML_imzML <https://github.com/CINVESTAV-LABI/julia_mzML_imzML>`_,**Yes**,
+`SCiLS Lab <https://www.bruker.com/en.html>`_,**Yes**,Must specify pixel dimensions
+`Mozaic <https://spectroswiss.ch/software/>`_,No,In progress

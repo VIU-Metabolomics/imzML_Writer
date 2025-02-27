@@ -2,6 +2,8 @@
    sphinx-quickstart on Thu Feb 13 08:52:30 2025.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
+.. include:: .special.rst
+
 
 .. image:: ../imzML_Writer/Images/Logo-01.png
    :width: 250
@@ -18,6 +20,16 @@ imzML_Writer is available as:
 
 *: Both imzML Writer and Scout are available on Mac, but only Writer is available on PC at this time.
 
+Compatibility
+==============
+Many imzML file readers are available both commercially and as open-source software. Of the popular software we've tested, file compatible
+for imzML's generated with imzML_Writer are:
+
+.. csv-table:: Compatibility with imzML Processing software
+   :file: ./tables/Compatibility.csv
+   :header-rows: 1
+
+If you find need files to work with a particular software, or if you'd like to report additional software that imzML_Writer is compatible with please don't hesitate to reach out.
 
 Installation
 ============
@@ -127,7 +139,6 @@ Then, open the folder and launch *imzML Writer* by double-clicking imzML_Writer.
    :maxdepth: 3
    :caption: Table of Contents
 
-   index
    Quick Start <QuickStart>
    GUI User Guide <GUI_Guide>
    Function Documentation <modules>
