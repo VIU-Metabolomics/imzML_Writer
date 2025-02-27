@@ -61,7 +61,10 @@ def find_file(target:str, folder:str):
     except Exception as e:
         pass
 
-def msconvert_searchUI():
+def msconvert_searchUI() -> str:
+    """Launches a dialog window to ask the user whether to search manually or automatically for msconvert install path
+    
+    :return: Specified mode to search for msconvert ("auto" or "manual")"""
     search_mode = ""
     def set_auto():
         nonlocal search_mode
@@ -197,26 +200,31 @@ def viaPWIZ(path:str,write_mode:str):
 ##http://nedbatchelder.com/blog/200712/human_sorting.html
 def tryint(s):
     """
-    Return an int if possible, or `s` unchanged.
+    Part of the human sorting collection of functions borrowed from http://nedbatchelder.com/blog/200712/human_sorting.html. Returns an int if possible, or `s` unchanged.
+
+    :param s: Trial variable to test if it can be converted to an integer
+    :return: integer if convertible, s if not.
     """
     try:
         return int(s)
     except ValueError:
         return s
 
-def alphanum_key(s):
+def alphanum_key(s:str) -> list:
     """
-    Turn a string into a list of string and number chunks.
+    Part of the human sortable collection of functions borrowed from http://nedbatchelder.com/blog/200712/human_sorting.html. Turn a string into a list of string and number chunks.
 
-    >>> alphanum_key("z23a")
-    ["z", 23, "a"]
-
+    :param s: String to be chunked out
+    :return: List of string/number chunks
     """
     return [ tryint(c) for c in re.split('([0-9]+)', s) ]
 
-def human_sort(l):
+def human_sort(l:list) -> list:
     """
-    Sort a list in the way that humans expect.
+    Part of the human sortable collection of functions borrowed from http://nedbatchelder.com/blog/200712/human_sorting.html. Sorts a list in the way that humans expect.
+
+    param l: List to be sorted in a human-intuitive wave.
+    :return: Sorted list.
     """
     return l.sort(key=alphanum_key)
 

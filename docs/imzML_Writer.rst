@@ -1,17 +1,17 @@
-imzML\_Writer
+imzml\_writer
 =====================
 
-imzML\_Writer.imzML\_Writer
+imzml\_writer.imzML\_Writer
 ----------------------------------
 
-.. automodule:: imzML_Writer.imzML_Writer
+.. automodule:: imzml_writer.imzML_Writer
    :members:
    :undoc-members:
    :show-inheritance:
 
 Typical launch will appear as::
 
-   import imzML_Writer.imzML_Writer as iw
+   import imzml_writer.imzML_Writer as iw
 
    ##Launch with no target directory - navigate with UI
    iw.gui()
@@ -22,17 +22,17 @@ Typical launch will appear as::
 
 For detailed instructions on navigating the GUI, see the user guide.
 
-imzML\_Writer.imzML\_Scout
+imzml\_writer.imzML\_Scout
 ---------------------------------
 
-.. automodule:: imzML_Writer.imzML_Scout
+.. automodule:: imzml_writer.imzML_Scout
    :members:
    :undoc-members:
    :show-inheritance:
 
 Typically called during normal operation of imzML_Writer, but call also be called directly::
 
-   import imzML_Writer.imzML_Scout as scout
+   import imzml_writer.imzML_Scout as scout
 
    ##Call with no arguments opens it empty and you can use the GUI to search for your file
    scout.main()
@@ -43,34 +43,34 @@ Typically called during normal operation of imzML_Writer, but call also be calle
 
 For detailed instructions on navigating the GUI, see the user guide.
 
-imzML\_Writer.ms\_convert\_gui
+imzml\_writer.ms\_convert\_gui
 -------------------------------------
 
-.. automodule:: imzML_Writer.ms_convert_gui
+.. automodule:: imzml_writer.ms_convert_gui
    :members:
    :undoc-members:
    :show-inheritance:
 
-imzML\_Writer.utils
+imzml\_writer.utils
 -----------------------------------
 
-.. automodule:: imzML_Writer.utils
+.. automodule:: imzml_writer.utils
    :members:
    :undoc-members:
    :show-inheritance:
 
-imzML\_Writer.recalibrate\_mz
+imzml\_writer.recalibrate\_mz
 ------------------------------------
 
-.. automodule:: imzML_Writer.recalibrate_mz
+.. automodule:: imzml_writer.recalibrate_mz
    :members:
    :undoc-members:
    :show-inheritance:
 
-imzML\_Writer.analyte\_list\_cleanup
+imzml\_writer.analyte\_list\_cleanup
 -------------------------------------------
 
-.. automodule:: imzML_Writer.analyte_list_cleanup
+.. automodule:: imzml_writer.analyte_list_cleanup
    :members:
    :undoc-members:
    :show-inheritance:

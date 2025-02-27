@@ -121,7 +121,7 @@ the <a class="reference external" href="https://hub.docker.com/r/chambm/pwiz-sky
 <section id="id1">
 <h3>imzML Writer<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>Once you have both imzML Writer and msconvert (or the docker image) installed, launching the GUI is as simple as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzml_writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
 
 <span class="c1">##Launch the imzML Writer in the current directory</span>
 <span class="n">iw</span><span class="o">.</span><span class="n">gui</span><span class="p">()</span>
@@ -135,7 +135,7 @@ the <a class="reference external" href="https://hub.docker.com/r/chambm/pwiz-sky
 <section id="imzml-scout">
 <h3>imzML Scout<a class="headerlink" href="#imzml-scout" title="Link to this heading"></a></h3>
 <p>Or, if you’re only interested in viewing images you can launch scout directly on an imzML:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Scout</span> <span class="k">as</span> <span class="nn">scout</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzml_writer.imzML_Scout</span> <span class="k">as</span> <span class="nn">scout</span>
 
 <span class="c1">#Direct launch and find files via GUI</span>
 <span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
@@ -151,7 +151,7 @@ the <a class="reference external" href="https://hub.docker.com/r/chambm/pwiz-sky
 <h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Link to this heading"></a></h2>
 <p>The utilities for imzML Writer are also available under <code class="docutils literal notranslate"><span class="pre">imzML_Writer.utils</span></code>, allowing you to build a converter from the command-line interface for your automated/bulk processing:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">imzML_Writer.utils</span> <span class="k">as</span> <span class="nn">iw_utils</span>
+<span class="kn">import</span> <span class="nn">imzml_writer.utils</span> <span class="k">as</span> <span class="nn">iw_utils</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 

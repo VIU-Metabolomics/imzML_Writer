@@ -46,7 +46,7 @@ imzML Writer
 ++++++++++++
 Once you have both imzML Writer and msconvert (or the docker image) installed, launching the GUI is as simple as::
 
-    import imzML_Writer.imzML_Writer as iw
+    import imzml_writer.imzML_Writer as iw
 
     ##Launch the imzML Writer in the current directory
     iw.gui()
@@ -59,7 +59,7 @@ imzML Scout
 ++++++++++++
 Or, if you're only interested in viewing images you can launch scout directly on an imzML::
 
-    import imzML_Writer.imzML_Scout as scout
+    import imzml_writer.imzML_Scout as scout
 
     #Direct launch and find files via GUI
     scout.main()
@@ -73,7 +73,7 @@ Command Line Interface
 The utilities for imzML Writer are also available under ``imzML_Writer.utils``, allowing you to build a converter from the command-line interface for your automated/bulk processing::
 
     import os
-    import imzML_Writer.utils as iw_utils
+    import imzml_writer.utils as iw_utils
     import time
 
 

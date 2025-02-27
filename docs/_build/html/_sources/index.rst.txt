@@ -65,14 +65,14 @@ To install, make sure you have Docker (Mac) or MSconvert (PC) installed as above
 
 Once active, you can easily launch the GUI by creating a python ``example.py`` with contents::
 
-   import imzML_Writer.imzML_Writer as iw
+   import imzml_writer.imzML_Writer as iw
 
    iw.gui()
 
 
 Then run the script (``python example.py``) to launch the GUI. If you already have some imzML files and just want to view them with the scout, restructure ``example.py``::
 
-   import imzML_Writer.imzML_Scout as scout
+   import imzml_writer.imzML_Scout as scout
 
    ##Call with no arguments opens it empty and you can use the GUI to search for your file
    scout.main()

@@ -18,7 +18,7 @@ Launch imzML Writer by double clicking the ``.app`` / ``.exe``:
 
 Or from python using::
    
-    import imzML_Writer.imzML_Writer as iw
+    import imzml_writer.imzML_Writer as iw
 
     iw.gui()
 

@@ -109,13 +109,13 @@ If you want to run msconvert from the command line, make sure that msconvert is 
 <p>To install, make sure you have Docker (Mac) or MSconvert (PC) installed as above. Then, in your python environment run:</p>
 <p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">imzML-Writer</span></code></p>
 <p>Once active, you can easily launch the GUI by creating a python <code class="docutils literal notranslate"><span class="pre">example.py</span></code> with contents:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzml_writer.imzML_Writer</span> <span class="k">as</span> <span class="nn">iw</span>
 
 <span class="n">iw</span><span class="o">.</span><span class="n">gui</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Then run the script (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">example.py</span></code>) to launch the GUI. If you already have some imzML files and just want to view them with the scout, restructure <code class="docutils literal notranslate"><span class="pre">example.py</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzML_Writer.imzML_Scout</span> <span class="k">as</span> <span class="nn">scout</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imzml_writer.imzML_Scout</span> <span class="k">as</span> <span class="nn">scout</span>
 
 <span class="c1">##Call with no arguments opens it empty and you can use the GUI to search for your file</span>
 <span class="n">scout</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
@@ -173,13 +173,13 @@ Depending on your security settings, Apple may block the launch with the followi
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Function Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="imzML_Writer.html">imzML_Writer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzML_Writer.imzML_Writer">imzML_Writer.imzML_Writer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzML_Writer.imzML_Scout">imzML_Writer.imzML_Scout</a></li>
-<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzML_Writer.ms_convert_gui">imzML_Writer.ms_convert_gui</a></li>
-<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzML_Writer.utils">imzML_Writer.utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzML_Writer.recalibrate_mz">imzML_Writer.recalibrate_mz</a></li>
-<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzML_Writer.analyte_list_cleanup">imzML_Writer.analyte_list_cleanup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imzML_Writer.html">imzml_writer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzml_writer.imzML_Writer">imzml_writer.imzML_Writer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzml_writer.imzML_Scout">imzml_writer.imzML_Scout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzml_writer.ms_convert_gui">imzml_writer.ms_convert_gui</a></li>
+<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzml_writer.utils">imzml_writer.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzml_writer.recalibrate_mz">imzml_writer.recalibrate_mz</a></li>
+<li class="toctree-l3"><a class="reference internal" href="imzML_Writer.html#module-imzml_writer.analyte_list_cleanup">imzml_writer.analyte_list_cleanup</a></li>
 </ul>
 </li>
 </ul>
