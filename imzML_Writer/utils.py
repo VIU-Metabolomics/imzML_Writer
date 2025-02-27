@@ -441,9 +441,9 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     output_files ={}
     for filt in scan_filts:
         if filt == None:
-            image_files[filt]=imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_None")
+            image_files[filt]=imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_None",mode="processed")
         else:
-            image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}")
+            image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}",mode="processed")
         output_files[filt]=(fr"{OUTPUT_NAME}_{filt}")
 
     num_duplicates = 0
