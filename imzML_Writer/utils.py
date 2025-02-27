@@ -6,7 +6,6 @@ import sys
 import pymzml
 import numpy as np
 import pyimzml.ImzMLWriter as imzmlw
-from imzML_Writer.recalibrate_mz import recalibrate
 from bs4 import BeautifulSoup, Tag
 import string
 import re
@@ -14,7 +13,9 @@ import tkinter as tk
 from tkinter import filedialog,messagebox
 import time
 import json
-from imzML_Writer import __version__
+
+from imzml_writer.recalibrate_mz import recalibrate
+from imzml_writer import __version__
 
 
 ##Colors and FONTS

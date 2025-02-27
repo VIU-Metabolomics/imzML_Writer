@@ -4,7 +4,9 @@ import os
 import threading
 import sys
 import docker
-from imzML_Writer.utils import get_file_type
+
+
+from imzml_writer.utils import get_file_type
 
 ##Colors and FONTS
 TEAL = "#2da7ad"

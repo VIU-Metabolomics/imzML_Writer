@@ -1,17 +1,14 @@
-##Standalone notes - Runs ok with no gui_functions
-##Compile with: 
-# pyinstaller --noconfirm --windowed --add-data=/Users/josephmonaghan/Documents/nanoDESI_raw_to_imzml/Images/Logo-01.png:./Images imzML_Writer.py
-
 import tkinter as tk
 from tkinter import ttk, filedialog,messagebox
 import os
-from imzML_Writer.utils import *
 import threading
-import imzML_Writer.imzML_Scout as scout
 import sys
 import time
 from importlib import resources
-from imzML_Writer import __version__
+
+import imzml_writer.imzML_Scout as scout
+from imzml_writer.utils import *
+from imzml_writer import __version__
 
 timing_mode = False
 PC_compiled = False
@@ -385,18 +382,18 @@ def gui(tgt_dir:str=None):
     ##Logo
     try:
         canvas = tk.Canvas(width = 313,height=205,bg=TEAL,highlightthickness=0)
-        img = tk.PhotoImage(file=resource_path("./Images/Logo-01.png"))
-        window.iconbitmap(resource_path("./Images/imzML_Writer.ico"))
+        img = tk.PhotoImage(file=resource_path("Images/Logo-01.png"))
+        window.iconbitmap(resource_path("Images/imzML_Writer.ico"))
         canvas.create_image(313/2, 205/2,image=img)
         canvas.grid(column=0,row=0,columnspan=2)
     except:
         try:
             canvas = tk.Canvas(width = 313,height=205,bg=TEAL,highlightthickness=0)
-            with resources.path('imzML_Writer.Images','Logo-01.png') as path:
+            with resources.path('imzml_writer.Images','Logo-01.png') as path:
                 img=tk.PhotoImage(file=resource_path(path))
                 canvas.create_image(313/2, 205/2,image=img)
                 canvas.grid(column=0,row=0,columnspan=2)
-            with resources.path('imzML_Writer.Images','imzML_Writer.ico') as path:
+            with resources.path('imzml_writer.Images','imzML_Writer.ico') as path:
                 window.iconbitmap(resource_path(path))
         except:
             pass

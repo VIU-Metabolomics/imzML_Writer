@@ -11,9 +11,11 @@ from matplotlib.backend_tools import ToolBase, ToolToggleBase
 import warnings
 import numpy as np
 import pandas as pd
-from imzML_Writer.analyte_list_cleanup import *
 import json
-from imzML_Writer import __version__
+
+
+from imzml_writer.analyte_list_cleanup import *
+from imzml_writer import __version__
 
 def main(tgt_file:str = ""):
     """Main control loop for imzML Scout GUI. Callable either with no arguments (find file via GUI) or by passing the file path to
