@@ -1,6 +1,6 @@
 [project]
 name = "imzML-Writer"
-version = "0.0.31"
+version = "0.0.32"
 description = "\"User friendly writing of imzML mass spectrometry imaging files from continuous MSI data\""
 authors = [
     {name = "Joseph Monaghan",email = "Joseph_Monaghan@outlook.com"}
@@ -8,6 +8,7 @@ authors = [
 readme = "README.md"
 include = ["imzml_writer/Images/*"]
 requires-python = ">=3.10"
+license = "MIT"
 dependencies = [
     "beautifulsoup4 (>=4.13.3,<5.0.0)",
     "docker (>=7.1.0,<8.0.0)",

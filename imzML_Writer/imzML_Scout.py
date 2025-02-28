@@ -640,16 +640,20 @@ def main(tgt_file:str = ""):
         cmap_window.config(padx=5,pady=5,bg=TEAL)
 
         #Listbox for all cmap options
+        avail_colmaps = tk.Label(cmap_window,text="Available Colormaps",bg=TEAL,font=FONT)
         all_options = tk.Listbox(cmap_window,bg=BEIGE,fg="black",height=10,highlightcolor=TEAL,width=35,justify='center')
-        all_options.grid(row=0,column=1,rowspan=4)
+        avail_colmaps.grid(row=0,column=1)
+        all_options.grid(row=1,column=1,rowspan=4)
 
         cmaps = plt.colormaps()
         for idx, map in enumerate(cmaps):
             all_options.insert(idx,map)
         
         #Listbox for cmap options to choose from
+        selected_colmaps = tk.Label(cmap_window,text="Selected Colormaps",bg=TEAL,font=FONT)
         selected_options = tk.Listbox(cmap_window,bg=BEIGE,fg="black",height=10,highlightcolor=TEAL,width=35,justify='center')
-        selected_options.grid(row=0,column=3,rowspan=4)
+        selected_colmaps.grid(row=0,column=3)
+        selected_options.grid(row=1,column=3,rowspan=4)
 
         mod_path = os.path.dirname(os.path.abspath(__file__))
         config_file = os.path.join(mod_path,"cmap_targets.json")
@@ -661,11 +665,11 @@ def main(tgt_file:str = ""):
 
         ##Add button
         add_button=tk.Button(cmap_window,text=">>>",bg=TEAL,highlightbackground=TEAL, command=add_a_map)
-        add_button.grid(row=1,column=2)
+        add_button.grid(row=2,column=2)
 
         ##Remove button
         remove_button=tk.Button(cmap_window,text="<<<",bg=TEAL,highlightbackground=TEAL, command=remove_a_map)
-        remove_button.grid(row=2,column=2)
+        remove_button.grid(row=3,column=2)
 
         ##Save button
         save_button=tk.Button(cmap_window,text="Save & Exit",bg=TEAL,highlightbackground=TEAL, command=save_exit)
