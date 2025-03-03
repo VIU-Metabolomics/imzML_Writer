@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('../imzML_Writer/Images', 'images')]
+datas = [('../imzml_writer/Images', 'images')]
 binaries = []
 hiddenimports = ['_socket']
 tmp_ret = collect_all('pymzml')
@@ -11,7 +11,7 @@ datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 datas += [("./imzML_Writer","./imzML_Writer")]
 
 a = Analysis(
-    ['..\\imzML_Writer\\imzML_Writer.py'],
+    ['..\\imzml_writer\\imzML_Writer.py'],
     pathex=[],
     binaries=binaries,
     datas=datas,
