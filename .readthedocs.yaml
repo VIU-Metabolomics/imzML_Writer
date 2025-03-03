@@ -17,7 +17,6 @@ build:
 
 python:
   install:
-    - requirements: requirements.txt
     - path: .
     - requirements: docs/requirements.txt
 
