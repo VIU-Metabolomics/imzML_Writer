@@ -290,23 +290,15 @@ def gui(tgt_dir:str=None):
 
     def launch_scout():
         """Launches imzML_Scout.py when the user selects an imzML file on the indicated file"""
-        tgt_file = file_list.selection_get()
-        if tgt_file.split(".")[-1]=="ibd":
-            file_start = tgt_file.split("ibd")[0]
-            tgt_file = file_start+"imzML"
-        path = CD_entry.get()
-        file_path = f"{path}/{tgt_file}"
         if PC_compiled:
-            print(f"Attempting to open imzML - attempt #{1}")
-            res = subprocess.run(["imzML_Scout",file_path])
-            i = 1
-            while res.returncode != 0:
-                print(f"Return code: {res.returncode}")
-                print(res)
-                i+=1
-                print(f"Attempting to open imzML - attempt #{i}")
-                res = subprocess.run(["imzML_Scout",file_path])
+            messagebox.showwarning(title="imzML Scout Unavailable...",message="On PC, imzML Scout is only available using the python distributable from pypi. See the Github page for installation instructions.")
         else:
+            tgt_file = file_list.selection_get()
+            if tgt_file.split(".")[-1]=="ibd":
+                file_start = tgt_file.split("ibd")[0]
+                tgt_file = file_start+"imzML"
+            path = CD_entry.get()
+            file_path = f"{path}/{tgt_file}"
             scout.main(tgt_file=file_path)
         
 
