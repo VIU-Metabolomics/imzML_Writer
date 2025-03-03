@@ -1,0 +1,1 @@
+pixel size (x) --> pixel size x for compatibility with SCiLS lab pixel read in

@@ -1,6 +1,6 @@
 [project]
 name = "imzML-Writer"
-version = "0.0.32"
+version = "0.0.33"
 description = "\"User friendly writing of imzML mass spectrometry imaging files from continuous MSI data\""
 authors = [
     {name = "Joseph Monaghan",email = "Joseph_Monaghan@outlook.com"}

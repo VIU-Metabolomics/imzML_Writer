@@ -86,9 +86,14 @@
 <span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">filedialog</span><span class="p">,</span><span class="n">messagebox</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">imzml_writer.recalibrate_mz</span> <span class="kn">import</span> <span class="n">recalibrate</span>
 <span class="kn">from</span> <span class="nn">imzml_writer</span> <span class="kn">import</span> <span class="n">__version__</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;LOGFILE_imzML_Writer.log&quot;</span><span class="p">,</span><span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;NEW INSTANCE STARTING...&quot;</span><span class="p">)</span>
 
 
 <span class="c1">##Colors and FONTS</span>
@@ -389,7 +394,6 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span>
 
-        <span class="c1"># client.images.pull(DOCKER_IMAGE)</span>
 
         <span class="n">working_directory</span> <span class="o">=</span> <span class="n">path</span>
         <span class="n">file_type</span> <span class="o">=</span> <span class="n">get_file_type</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -465,6 +469,8 @@
 
     <span class="c1">##Extracts filter strings, num pixels for each scan, etc</span>
     <span class="n">scan_filts</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">polarities</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ms_levels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">file_iter</span><span class="o">=-</span><span class="mi">1</span>
     <span class="n">spectrum_counts</span><span class="o">=</span><span class="p">[]</span>
     <span class="n">mzml_files</span><span class="o">=</span><span class="p">[]</span>
@@ -475,7 +481,7 @@
             <span class="n">file_iter</span><span class="o">+=</span><span class="mi">1</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span><span class="n">file</span><span class="p">))</span>
             <span class="n">spec_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_spectrum_count</span><span class="p">())</span>
-            <span class="c1">##Ignore partially collected datafiles that were cut-short (threshold of &lt;85% the scans of the mean datafile)</span>
+            <span class="c1">##Ignore partially collected datafiles that were cut-short (threshold of &lt;50% the scans of the mean datafile)</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">spec_counts</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">&gt;</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_spectrum_count</span><span class="p">():</span>
                 <span class="k">break</span>
             
@@ -489,10 +495,22 @@
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
                             <span class="n">list_type</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">if</span> <span class="n">list_type</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LIST TYPE filter strings detected&quot;</span><span class="p">)</span>
                         <span class="n">scan_filts</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">ms_levels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s1">&#39;MS:1000511&#39;</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;MS:1000129&quot;</span><span class="p">]:</span>
+                            <span class="n">polarities</span> <span class="o">=</span> <span class="s2">&quot;negative&quot;</span>
+                        <span class="k">elif</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;MS:1000130&quot;</span><span class="p">]:</span>
+                            <span class="n">polarities</span> <span class="o">=</span> <span class="s2">&quot;positive&quot;</span>
                     <span class="k">else</span><span class="p">:</span> 
                         <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
                             <span class="n">scan_filts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">])</span>
+                            <span class="n">ms_levels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s1">&#39;MS:1000511&#39;</span><span class="p">]))</span>
+                            <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;MS:1000129&quot;</span><span class="p">]:</span>
+                                <span class="n">polarities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;negative&quot;</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;MS:1000130&quot;</span><span class="p">]:</span>
+                                <span class="n">polarities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;positive&quot;</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="ow">not</span> <span class="n">list_type</span><span class="p">:</span>
                 <span class="n">tmp_spectrum_counts</span> <span class="o">=</span> <span class="p">{</span><span class="n">filt_name</span><span class="p">:</span><span class="mi">0</span> <span class="k">for</span> <span class="n">filt_name</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
@@ -541,9 +559,7 @@
     <span class="n">max_times</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">contender_idx</span><span class="p">:</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">pymzml</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span><span class="n">mzml_files</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
-        <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
-            <span class="c1"># scan_time = spectrum[&quot;scan time&quot;]</span>
-            <span class="n">scan_time</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span>
+        <span class="n">scan_time</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">tmp</span><span class="o">.</span><span class="n">get_spectrum_count</span><span class="p">()]</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span>
         <span class="n">max_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scan_time</span><span class="p">)</span>
 
     <span class="n">time_targets</span><span class="o">=</span><span class="p">{}</span>
@@ -556,11 +572,11 @@
     <span class="c1">#Initiate imzmL objects</span>
     <span class="n">image_files</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">output_files</span> <span class="o">=</span><span class="p">{}</span>
-    <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">filt_idx</span><span class="p">,</span> <span class="n">filt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scan_filts</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">filt</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">=</span><span class="n">imzmlw</span><span class="o">.</span><span class="n">ImzMLWriter</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_None&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;processed&quot;</span><span class="p">)</span>
+            <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">=</span><span class="n">imzmlw</span><span class="o">.</span><span class="n">ImzMLWriter</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_None&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;processed&quot;</span><span class="p">,</span><span class="n">polarity</span><span class="o">=</span><span class="n">polarities</span><span class="p">[</span><span class="n">filt_idx</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span> <span class="o">=</span> <span class="n">imzmlw</span><span class="o">.</span><span class="n">ImzMLWriter</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;processed&quot;</span><span class="p">)</span>
+            <span class="n">image_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span> <span class="o">=</span> <span class="n">imzmlw</span><span class="o">.</span><span class="n">ImzMLWriter</span><span class="p">(</span><span class="n">output_filename</span><span class="o">=</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;processed&quot;</span><span class="p">,</span><span class="n">polarity</span><span class="o">=</span><span class="n">polarities</span><span class="p">[</span><span class="n">filt_idx</span><span class="p">])</span>
         <span class="n">output_files</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="sa">fr</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">OUTPUT_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">filt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">num_duplicates</span> <span class="o">=</span> <span class="mi">0</span>
@@ -647,6 +663,8 @@
     <span class="n">update_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 
     <span class="n">scan_filts</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">polarities</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ms_levels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">model_file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">model_files</span><span class="p">)</span>
     <span class="n">model_file_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 
@@ -659,6 +677,11 @@
     <span class="k">for</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
             <span class="n">scan_filts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;filter string&quot;</span><span class="p">])</span>
+            <span class="n">ms_levels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="s1">&#39;MS:1000511&#39;</span><span class="p">]))</span> <span class="c1">#record ms_level</span>
+            <span class="k">if</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;MS:1000129&quot;</span><span class="p">]:</span> <span class="c1">#record polarities</span>
+                <span class="n">polarities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;negative&quot;</span><span class="p">)</span> 
+            <span class="k">elif</span> <span class="n">spectrum</span><span class="p">[</span><span class="s2">&quot;MS:1000130&quot;</span><span class="p">]:</span>
+                <span class="n">polarities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;positive&quot;</span><span class="p">)</span>
     
         <span class="c1"># final_time_point = spectrum[&quot;scan time&quot;]</span>
         <span class="n">final_time_point</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">scan_time_in_minutes</span><span class="p">()</span>
@@ -673,7 +696,7 @@
 
     <span class="c1">##Loop to annotate each imzML file</span>
     <span class="nb">iter</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">scan_filts</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">filt_idx</span><span class="p">,</span> <span class="n">filt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scan_filts</span><span class="p">):</span>
         <span class="c1">#Find the target file based on a filter string match</span>
         <span class="nb">iter</span><span class="o">+=</span><span class="mi">1</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">update_files</span><span class="p">:</span>
@@ -685,7 +708,7 @@
                     <span class="n">target_file</span> <span class="o">=</span> <span class="n">file</span>
 
         <span class="c1">##Calls the actual annotation function</span>
-        <span class="n">annotate_imzML</span><span class="p">(</span><span class="n">target_file</span><span class="p">,</span><span class="n">model_files</span><span class="o">+</span><span class="n">sl</span><span class="o">+</span><span class="n">model_file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">final_time_point</span><span class="p">,</span><span class="n">filt</span><span class="p">,</span><span class="n">x_speed</span><span class="o">=</span><span class="n">x_speed</span><span class="p">,</span><span class="n">y_step</span><span class="o">=</span><span class="n">y_step</span><span class="p">)</span>
+        <span class="n">annotate_imzML</span><span class="p">(</span><span class="n">target_file</span><span class="p">,</span><span class="n">model_files</span><span class="o">+</span><span class="n">sl</span><span class="o">+</span><span class="n">model_file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">final_time_point</span><span class="p">,</span><span class="n">filt</span><span class="p">,</span><span class="n">x_speed</span><span class="o">=</span><span class="n">x_speed</span><span class="p">,</span><span class="n">y_step</span><span class="o">=</span><span class="n">y_step</span><span class="p">,</span><span class="n">ms_level</span> <span class="o">=</span> <span class="n">ms_levels</span><span class="p">[</span><span class="n">filt_idx</span><span class="p">],</span><span class="n">polarity</span> <span class="o">=</span> <span class="n">polarities</span><span class="p">[</span><span class="n">filt_idx</span><span class="p">])</span>
 
         <span class="c1">##Update progress bar in the GUI</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">iter</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">scan_filts</span><span class="p">))</span>
@@ -718,7 +741,7 @@
 
 <div class="viewcode-block" id="annotate_imzML">
 <a class="viewcode-back" href="../../imzML_Writer.html#imzml_writer.utils.annotate_imzML">[docs]</a>
-<span class="k">def</span> <span class="nf">annotate_imzML</span><span class="p">(</span><span class="n">annotate_file</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">SRC_mzML</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">scan_time</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span><span class="n">filter_string</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;none given&quot;</span><span class="p">,</span><span class="n">x_speed</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">y_step</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">annotate_imzML</span><span class="p">(</span><span class="n">annotate_file</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">SRC_mzML</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">scan_time</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span><span class="n">filter_string</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;none given&quot;</span><span class="p">,</span><span class="n">x_speed</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">y_step</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">polarity</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;positive&quot;</span><span class="p">,</span><span class="n">ms_level</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure</span>
 <span class="sd">    for compatibility with imzML viewers/processors.</span>
 
@@ -800,8 +823,9 @@
     <span class="n">y_pix_size</span> <span class="o">=</span> <span class="n">y_step</span>
     <span class="n">max_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_pix_size</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">y_pixels</span><span class="p">))</span>
 
+    <span class="c1">##TODO - Test changing this into &#39;pixel size x&#39; instead for compatibility with all, if everyone still works will leave as default. Otherwise another advanced tab for mutually exclusive compatibility?</span>
     <span class="n">accessions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;IMS:1000046&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000047&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000044&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000045&quot;</span><span class="p">]</span>
-    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pixel size (x)&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel size y&quot;</span><span class="p">,</span> <span class="s2">&quot;max dimension x&quot;</span><span class="p">,</span> <span class="s2">&quot;max dimension y&quot;</span><span class="p">]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pixel size x&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel size y&quot;</span><span class="p">,</span> <span class="s2">&quot;max dimension x&quot;</span><span class="p">,</span> <span class="s2">&quot;max dimension y&quot;</span><span class="p">]</span>
     <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_pix_size</span><span class="p">,</span> <span class="n">y_pix_size</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">]</span>
 
     <span class="c1">#Actual insertion of data - need to write string into a beautiful soup object with NO FORMATTING to append it</span>
@@ -816,6 +840,34 @@
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitCvRef&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;UO&quot;</span>
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitAccession&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;UO:0000017&quot;</span>
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitName&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;micrometer&quot;</span>
+
+    <span class="c1"># params_to_grab = data_need_annotation.select_one(&quot;referenceableParamGroupList&quot;)</span>
+    <span class="c1"># for param_group in params_to_grab.select(&quot;referenceableParamGroup&quot;):</span>
+    <span class="c1">#     if param_group.attrs[&quot;id&quot;]==&quot;spectrum1&quot;:</span>
+    <span class="c1">#         params_available = param_group</span>
+    
+    <span class="c1"># for param in params_available.select(&quot;cvParam&quot;):</span>
+    <span class="c1">#     if param.attrs[&quot;accession&quot;]==&quot;MS:1000511&quot;:</span>
+    <span class="c1">#         param.attrs[&#39;value&#39;]=ms_level</span>
+
+
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;spectrum&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ref_param</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;referenceableParamGroupRef&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ref_param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;spectrum1&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">polarity</span> <span class="o">==</span> <span class="s1">&#39;negative&#39;</span><span class="p">:</span>
+                    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">builder</span><span class="o">=</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">builder</span><span class="p">,</span>
+                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cvParam&quot;</span><span class="p">,</span>
+                            <span class="n">attrs</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accession&#39;</span><span class="p">:</span> <span class="s2">&quot;MS:1000129&quot;</span><span class="p">,</span><span class="s1">&#39;cvRef&#39;</span><span class="p">:</span><span class="s1">&#39;MS&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;negative scan&#39;</span><span class="p">})</span>
+                <span class="k">elif</span> <span class="n">polarity</span> <span class="o">==</span> <span class="s2">&quot;positive&quot;</span><span class="p">:</span>
+                    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">builder</span><span class="o">=</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">builder</span><span class="p">,</span>
+                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cvParam&quot;</span><span class="p">,</span>
+                            <span class="n">attrs</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accession&#39;</span><span class="p">:</span> <span class="s2">&quot;MS:1000130&quot;</span><span class="p">,</span><span class="s1">&#39;cvRef&#39;</span><span class="p">:</span><span class="s1">&#39;MS&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;positive scan&#39;</span><span class="p">})</span>
+                <span class="n">ref_param</span><span class="o">.</span><span class="n">insert_after</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+                <span class="c1"># ref_param.extract()</span>
+                    
+
+
+
 
     <span class="c1">##Specify imzML writer involvement and version in the resulting imzML</span>
     <span class="k">for</span> <span class="n">soft_list</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;softwareList&quot;</span><span class="p">):</span>

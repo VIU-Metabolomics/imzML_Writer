@@ -13,9 +13,14 @@ import tkinter as tk
 from tkinter import filedialog,messagebox
 import time
 import json
+import logging
 
 from imzml_writer.recalibrate_mz import recalibrate
 from imzml_writer import __version__
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename = "LOGFILE_imzML_Writer.log",level = logging.INFO)
+logger.info("NEW INSTANCE STARTING...")
 
 
 ##Colors and FONTS
@@ -287,7 +292,6 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
             else:
                 raise
 
-        # client.images.pull(DOCKER_IMAGE)
 
         working_directory = path
         file_type = get_file_type(path)
@@ -357,6 +361,8 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
 
     ##Extracts filter strings, num pixels for each scan, etc
     scan_filts=[]
+    polarities = []
+    ms_levels = []
     file_iter=-1
     spectrum_counts=[]
     mzml_files=[]
@@ -367,7 +373,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
             file_iter+=1
             tmp = pymzml.run.Reader(os.path.join(PATH,file))
             spec_counts.append(tmp.get_spectrum_count())
-            ##Ignore partially collected datafiles that were cut-short (threshold of <85% the scans of the mean datafile)
+            ##Ignore partially collected datafiles that were cut-short (threshold of <50% the scans of the mean datafile)
             if np.mean(spec_counts)*0.5 > tmp.get_spectrum_count():
                 break
             
@@ -381,10 +387,22 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
                     if isinstance(spectrum["filter string"],list):
                             list_type = True
                     if list_type:
+                        logger.warning(f"LIST TYPE filter strings detected")
                         scan_filts = spectrum["filter string"][0]
+                        ms_levels = int(spectrum['MS:1000511'])
+                        if spectrum["MS:1000129"]:
+                            polarities = "negative"
+                        elif spectrum["MS:1000130"]:
+                            polarities = "positive"
                     else: 
                         if spectrum["filter string"] not in scan_filts:
                             scan_filts.append(spectrum["filter string"])
+                            ms_levels.append(int(spectrum['MS:1000511']))
+                            if spectrum["MS:1000129"]:
+                                polarities.append("negative")
+                            elif spectrum["MS:1000130"]:
+                                polarities.append("positive")
+
             if not list_type:
                 tmp_spectrum_counts = {filt_name:0 for filt_name in scan_filts}
             else:
@@ -433,9 +451,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     max_times = []
     for idx in contender_idx:
         tmp = pymzml.run.Reader(os.path.join(PATH,mzml_files[idx]))
-        for spectrum in tmp:
-            # scan_time = spectrum["scan time"]
-            scan_time = spectrum.scan_time_in_minutes()
+        scan_time = tmp[tmp.get_spectrum_count()].scan_time_in_minutes()
         max_times.append(scan_time)
 
     time_targets={}
@@ -448,11 +464,11 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     #Initiate imzmL objects
     image_files = {}
     output_files ={}
-    for filt in scan_filts:
+    for filt_idx, filt in enumerate(scan_filts):
         if filt == None:
-            image_files[filt]=imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_None",mode="processed")
+            image_files[filt]=imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_None",mode="processed",polarity=polarities[filt_idx])
         else:
-            image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}",mode="processed")
+            image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}",mode="processed",polarity=polarities[filt_idx])
         output_files[filt]=(fr"{OUTPUT_NAME}_{filt}")
 
     num_duplicates = 0
@@ -536,6 +552,8 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
     update_files.sort()
 
     scan_filts=[]
+    polarities = []
+    ms_levels = []
     model_file_list = os.listdir(model_files)
     model_file_list.sort()
 
@@ -548,6 +566,11 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
     for spectrum in tmp:
         if spectrum["filter string"] not in scan_filts:
             scan_filts.append(spectrum["filter string"])
+            ms_levels.append(int(spectrum['MS:1000511'])) #record ms_level
+            if spectrum["MS:1000129"]: #record polarities
+                polarities.append("negative") 
+            elif spectrum["MS:1000130"]:
+                polarities.append("positive")
     
         # final_time_point = spectrum["scan time"]
         final_time_point = spectrum.scan_time_in_minutes()
@@ -562,7 +585,7 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
 
     ##Loop to annotate each imzML file
     iter = 0
-    for filt in scan_filts:
+    for filt_idx, filt in enumerate(scan_filts):
         #Find the target file based on a filter string match
         iter+=1
         for file in update_files:
@@ -574,7 +597,7 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
                     target_file = file
 
         ##Calls the actual annotation function
-        annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step)
+        annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step,ms_level = ms_levels[filt_idx],polarity = polarities[filt_idx])
 
         ##Update progress bar in the GUI
         progress = int(iter*100/len(scan_filts))
@@ -601,7 +624,7 @@ def move_files(probe_txt:str,path:str):
         if probe_txt in file:
             shutil.move(file,f"{path}/{probe_txt}/{file}")
 
-def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1):
+def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1,polarity:str="positive",ms_level:int=1):
     """Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure
     for compatibility with imzML viewers/processors.
 
@@ -683,8 +706,9 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
     y_pix_size = y_step
     max_y = int(y_pix_size * float(y_pixels))
 
+    ##TODO - Test changing this into 'pixel size x' instead for compatibility with all, if everyone still works will leave as default. Otherwise another advanced tab for mutually exclusive compatibility?
     accessions = ["IMS:1000046", "IMS:1000047", "IMS:1000044", "IMS:1000045"]
-    names = ["pixel size (x)", "pixel size y", "max dimension x", "max dimension y"]
+    names = ["pixel size x", "pixel size y", "max dimension x", "max dimension y"]
     values = [x_pix_size, y_pix_size, max_x, max_y]
 
     #Actual insertion of data - need to write string into a beautiful soup object with NO FORMATTING to append it
@@ -699,6 +723,35 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
             cvParam["unitCvRef"]="UO"
             cvParam["unitAccession"]="UO:0000017"
             cvParam["unitName"]="micrometer"
+
+    ##Placeholder block for writing spectral metadata to every spectrum - may help compatibility w/ Mozaic
+    # params_to_grab = data_need_annotation.select_one("referenceableParamGroupList")
+    # for param_group in params_to_grab.select("referenceableParamGroup"):
+    #     if param_group.attrs["id"]=="spectrum1":
+    #         params_available = param_group
+    
+    # for param in params_available.select("cvParam"):
+    #     if param.attrs["accession"]=="MS:1000511":
+    #         param.attrs['value']=ms_level
+
+
+    # for spec in data_need_annotation.select('spectrum'):
+    #     for ref_param in spec.select("referenceableParamGroupRef"):
+    #         if ref_param.attrs['ref']=="spectrum1":
+    #             if polarity == 'negative':
+    #                 tag = Tag(builder=data_need_annotation.builder,
+    #                         name="cvParam",
+    #                         attrs= {'accession': "MS:1000129",'cvRef':'MS','name':'negative scan'})
+    #             elif polarity == "positive":
+    #                 tag = Tag(builder=data_need_annotation.builder,
+    #                         name="cvParam",
+    #                         attrs= {'accession': "MS:1000130",'cvRef':'MS','name':'positive scan'})
+    #             ref_param.insert_after(tag)
+    #             # ref_param.extract()
+                    
+
+
+
 
     ##Specify imzML writer involvement and version in the resulting imzML
     for soft_list in data_need_annotation.select("softwareList"):

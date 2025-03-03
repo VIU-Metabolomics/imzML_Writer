@@ -12,7 +12,7 @@ Launch imzML Writer by double clicking the ``.app`` / ``.exe``:
 
 **PC**
 
-.. image:: /images/LaunchFromFinder.png
+.. image:: /images/PC_InstallFileStructure.png
     :width: 500
     :alt: Finder window showing imzML_Writer.app highlighted
 

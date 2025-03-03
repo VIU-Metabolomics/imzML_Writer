@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>imzML_Writer.imzML_Scout &mdash; imzML Writer  documentation</title>
+  <title>imzml_writer.imzML_Scout &mdash; imzML Writer  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
@@ -61,7 +61,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">imzML_Writer.imzML_Scout</li>
+      <li class="breadcrumb-item active">imzml_writer.imzML_Scout</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -70,7 +70,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for imzML_Writer.imzML_Scout</h1><div class="highlight"><pre>
+  <h1>Source code for imzml_writer.imzML_Scout</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pyimzml.ImzMLParser</span> <span class="k">as</span> <span class="nn">imzmlp</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
@@ -84,12 +84,14 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">imzML_Writer.analyte_list_cleanup</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">imzML_Writer</span> <span class="kn">import</span> <span class="n">__version__</span>
+
+
+<span class="kn">from</span> <span class="nn">imzml_writer.analyte_list_cleanup</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">imzml_writer</span> <span class="kn">import</span> <span class="n">__version__</span>
 
 <div class="viewcode-block" id="main">
-<a class="viewcode-back" href="../../imzML_Writer.html#imzML_Writer.imzML_Scout.main">[docs]</a>
+<a class="viewcode-back" href="../../imzML_Writer.html#imzml_writer.imzML_Scout.main">[docs]</a>
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">tgt_file</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Main control loop for imzML Scout GUI. Callable either with no arguments (find file via GUI) or by passing the file path to</span>
 <span class="sd">    the target imzML.</span>
@@ -713,16 +715,20 @@
         <span class="n">cmap_window</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">)</span>
 
         <span class="c1">#Listbox for all cmap options</span>
+        <span class="n">avail_colmaps</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">cmap_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Available Colormaps&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
         <span class="n">all_options</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Listbox</span><span class="p">(</span><span class="n">cmap_window</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">highlightcolor</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
-        <span class="n">all_options</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rowspan</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">avail_colmaps</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_options</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rowspan</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
         <span class="n">cmaps</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colormaps</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="nb">map</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cmaps</span><span class="p">):</span>
             <span class="n">all_options</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="nb">map</span><span class="p">)</span>
         
         <span class="c1">#Listbox for cmap options to choose from</span>
+        <span class="n">selected_colmaps</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">cmap_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Selected Colormaps&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">FONT</span><span class="p">)</span>
         <span class="n">selected_options</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Listbox</span><span class="p">(</span><span class="n">cmap_window</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">BEIGE</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">highlightcolor</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span><span class="n">justify</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
-        <span class="n">selected_options</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">rowspan</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">selected_colmaps</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">selected_options</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">rowspan</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
         <span class="n">mod_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mod_path</span><span class="p">,</span><span class="s2">&quot;cmap_targets.json&quot;</span><span class="p">)</span>
@@ -734,11 +740,11 @@
 
         <span class="c1">##Add button</span>
         <span class="n">add_button</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">cmap_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;&gt;&gt;&gt;&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">add_a_map</span><span class="p">)</span>
-        <span class="n">add_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">add_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1">##Remove button</span>
         <span class="n">remove_button</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">cmap_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;&lt;&lt;&lt;&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">remove_a_map</span><span class="p">)</span>
-        <span class="n">remove_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">remove_button</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1">##Save button</span>
         <span class="n">save_button</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">cmap_window</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Save &amp; Exit&quot;</span><span class="p">,</span><span class="n">bg</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span><span class="n">highlightbackground</span><span class="o">=</span><span class="n">TEAL</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">save_exit</span><span class="p">)</span>

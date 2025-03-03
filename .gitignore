@@ -24,6 +24,6 @@ LumList.xlsx
 ./Build executables/dist
 Build executables/dist_Mac/
 env
-
+LOGFILE_imzML_Writer.log
 
 
