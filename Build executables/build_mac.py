@@ -3,6 +3,8 @@ import os
 import shutil
 
 #Run pyinstaller
+##Note: To get version # right, install latest version via pip during build
+##Note: Make sure obo file is up to date when building
 build = subprocess.run(["pyinstaller","imzML_Writer_Mac.spec", "--noconfirm", "--distpath", "dist_Mac"])
 
 if build.returncode == 0:

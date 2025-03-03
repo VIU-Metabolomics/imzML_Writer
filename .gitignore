@@ -15,7 +15,7 @@ LumList.xlsx
 /push_package.txt
 ./imzML_Writer/msconvert_path.json
 ./imzML_Writer/cmap_targets.json
-./Build\ executables/build
+./Build\ executables/build/
 ./Build\ executables/dist_Mac/
 ./Build\ executables/PC\ Built
 ./Build\ executables/Mac_Built
