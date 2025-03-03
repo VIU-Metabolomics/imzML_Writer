@@ -841,6 +841,7 @@
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitAccession&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;UO:0000017&quot;</span>
             <span class="n">cvParam</span><span class="p">[</span><span class="s2">&quot;unitName&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;micrometer&quot;</span>
 
+    <span class="c1">##Placeholder block for writing spectral metadata to every spectrum - may help compatibility w/ Mozaic</span>
     <span class="c1"># params_to_grab = data_need_annotation.select_one(&quot;referenceableParamGroupList&quot;)</span>
     <span class="c1"># for param_group in params_to_grab.select(&quot;referenceableParamGroup&quot;):</span>
     <span class="c1">#     if param_group.attrs[&quot;id&quot;]==&quot;spectrum1&quot;:</span>
@@ -851,19 +852,19 @@
     <span class="c1">#         param.attrs[&#39;value&#39;]=ms_level</span>
 
 
-    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">data_need_annotation</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;spectrum&#39;</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">ref_param</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;referenceableParamGroupRef&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">ref_param</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;spectrum1&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">polarity</span> <span class="o">==</span> <span class="s1">&#39;negative&#39;</span><span class="p">:</span>
-                    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">builder</span><span class="o">=</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">builder</span><span class="p">,</span>
-                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cvParam&quot;</span><span class="p">,</span>
-                            <span class="n">attrs</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accession&#39;</span><span class="p">:</span> <span class="s2">&quot;MS:1000129&quot;</span><span class="p">,</span><span class="s1">&#39;cvRef&#39;</span><span class="p">:</span><span class="s1">&#39;MS&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;negative scan&#39;</span><span class="p">})</span>
-                <span class="k">elif</span> <span class="n">polarity</span> <span class="o">==</span> <span class="s2">&quot;positive&quot;</span><span class="p">:</span>
-                    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">builder</span><span class="o">=</span><span class="n">data_need_annotation</span><span class="o">.</span><span class="n">builder</span><span class="p">,</span>
-                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cvParam&quot;</span><span class="p">,</span>
-                            <span class="n">attrs</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accession&#39;</span><span class="p">:</span> <span class="s2">&quot;MS:1000130&quot;</span><span class="p">,</span><span class="s1">&#39;cvRef&#39;</span><span class="p">:</span><span class="s1">&#39;MS&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;positive scan&#39;</span><span class="p">})</span>
-                <span class="n">ref_param</span><span class="o">.</span><span class="n">insert_after</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
-                <span class="c1"># ref_param.extract()</span>
+    <span class="c1"># for spec in data_need_annotation.select(&#39;spectrum&#39;):</span>
+    <span class="c1">#     for ref_param in spec.select(&quot;referenceableParamGroupRef&quot;):</span>
+    <span class="c1">#         if ref_param.attrs[&#39;ref&#39;]==&quot;spectrum1&quot;:</span>
+    <span class="c1">#             if polarity == &#39;negative&#39;:</span>
+    <span class="c1">#                 tag = Tag(builder=data_need_annotation.builder,</span>
+    <span class="c1">#                         name=&quot;cvParam&quot;,</span>
+    <span class="c1">#                         attrs= {&#39;accession&#39;: &quot;MS:1000129&quot;,&#39;cvRef&#39;:&#39;MS&#39;,&#39;name&#39;:&#39;negative scan&#39;})</span>
+    <span class="c1">#             elif polarity == &quot;positive&quot;:</span>
+    <span class="c1">#                 tag = Tag(builder=data_need_annotation.builder,</span>
+    <span class="c1">#                         name=&quot;cvParam&quot;,</span>
+    <span class="c1">#                         attrs= {&#39;accession&#39;: &quot;MS:1000130&quot;,&#39;cvRef&#39;:&#39;MS&#39;,&#39;name&#39;:&#39;positive scan&#39;})</span>
+    <span class="c1">#             ref_param.insert_after(tag)</span>
+    <span class="c1">#             # ref_param.extract()</span>
                     
 
 

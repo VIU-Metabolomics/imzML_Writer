@@ -4,7 +4,7 @@ imzml\_writer
 imzml\_writer.imzML\_Writer
 ----------------------------------
 
-.. automodule:: imzml_writer.imzML_Writer
+.. automodule:: imzML_Writer.imzML_Writer
    :members:
    :undoc-members:
    :show-inheritance:
