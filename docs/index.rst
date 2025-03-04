@@ -102,7 +102,7 @@ Standalone apps
 ******************
 Mac
 ---
-Download the `App Bundle from Github <https://github.com/VIU-Metabolomics/imzML_Writer/releases/tag/alpha>`_ and grab the Mac distribution.
+Download the `App Bundle from Github <https://github.com/VIU-Metabolomics/imzML_Writer/releases>`_ and grab the Mac distribution.
 
 
 Move the **imzML_Writer.app** file into your Applications folder (**Note**: This step is required). Then double-click the .app bundle to launch the application.
@@ -125,7 +125,7 @@ This should launch the UI and the application is ready for typical operation.
 
 PC
 --
-Download the `PC distribution from the Github release <https://github.com/VIU-Metabolomics/imzML_Writer/releases/tag/alpha>`_, move the entire PC executable folder (imzML_Writer.exe, obo folder, & _internal folder) and place it somewhere convenient on your PC.
+Download the `PC distribution from the Github release <https://github.com/VIU-Metabolomics/imzML_Writer/releases>`_, move the entire PC executable folder (imzML_Writer.exe, obo folder, & _internal folder) and place it somewhere convenient on your PC.
 
 
 .. image:: /images/PC_InstallFileStructure.png
