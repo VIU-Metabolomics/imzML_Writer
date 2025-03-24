@@ -1,1 +1,5 @@
-pixel size (x) --> pixel size x for compatibility with SCiLS lab pixel read in
+Since 1.0.0:
+-Added optional scanning direction argument to writer/annotator to reflect actual dimensions when image was collected in x-scanning vs. y-scanning mode
+TODO:
+    -Reflect those changes in the other cvParam of the resulting imzML (top-down, etc.)
+    
