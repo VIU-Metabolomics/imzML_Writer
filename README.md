@@ -50,7 +50,7 @@ iw.gui()
 | [MSIReader](https://msireader.com)                                     | Yes          |                                                                    |
 | [Julia mzML_imzML](https://github.com/CINVESTAV-LABI/julia_mzML_imzML) | Yes          |                                                                    |
 | [SCiLS Lab](https://www.bruker.com/en.html)                            | Yes          | Pixel dimensions must be written as an integer to be read properly |
-| [Mozaic](https://spectroswiss.ch/software/)                            | Yes          | May require up-to-date version                                     |
+| [Mozaic](https://spectroswiss.ch/software/)                            | Yes          |
 
 # **Documentation**
 

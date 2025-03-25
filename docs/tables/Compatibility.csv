@@ -5,4 +5,4 @@
 `MSIReader <https://msireader.com>`_,**Yes**,
 `Julia_mzML_imzML <https://github.com/CINVESTAV-LABI/julia_mzML_imzML>`_,**Yes**,
 `SCiLS Lab <https://www.bruker.com/en.html>`_,**Yes**, Pixels must be written as integers for automatic read-in (can specify manually)
-`Mozaic <https://spectroswiss.ch/software/>`_,**Yes**,May require up-to-date version
+`Mozaic <https://spectroswiss.ch/software/>`_,**Yes**,
