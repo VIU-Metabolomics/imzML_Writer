@@ -4,5 +4,5 @@
 `M2aia <https://m2aia.de>`_,**Yes**,
 `MSIReader <https://msireader.com>`_,**Yes**,
 `Julia_mzML_imzML <https://github.com/CINVESTAV-LABI/julia_mzML_imzML>`_,**Yes**,
-`SCiLS Lab <https://www.bruker.com/en.html>`_,**Yes**,
-`Mozaic <https://spectroswiss.ch/software/>`_,No,In progress
+`SCiLS Lab <https://www.bruker.com/en.html>`_,**Yes**, Pixels must be written as integers for automatic read-in (can specify manually)
+`Mozaic <https://spectroswiss.ch/software/>`_,**Yes**,

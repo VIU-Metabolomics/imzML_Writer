@@ -257,7 +257,7 @@ def get_file_type(path:str):
     
     return extension
 
-def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
+def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid", blocking:bool=False):
     """Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path
 
     :param path: path to files containing raw instrument data.
@@ -308,6 +308,7 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
 
         env_vars = {"WINEDEBUG": "-all"}
         
+        
         ##Call/run the docker container
         client.containers.run(
             image=DOCKER_IMAGE,
@@ -315,9 +316,10 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid"):
             volumes = vol,
             command=comm,
             working_dir=working_directory,
-            auto_remove=True,
-            detach=True
+            auto_remove= True,
+            detach=not blocking
             )
+        
         
 
 def clean_raw_files(path:str,file_type:str):
@@ -342,7 +344,7 @@ def clean_raw_files(path:str,file_type:str):
         elif file_type in file and file != "Initial RAW files":
             shutil.move(os.path.join(path,file),os.path.join(RAW_folder,file))
 
-def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20,zero_indexed:bool=False,no_duplicating:bool=False):
+def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20,zero_indexed:bool=False,no_duplicating:bool=False,scan_mode:str = "x-scan"):
     """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
     aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
     
@@ -351,7 +353,8 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     :param LOCK_MASS: - m/z to use for coarse m/z recalibration if desired. 0 = No recalibration
     :param TOLERANCE: Search tolerance (in ppm) with which to correct m/z based on the specified lock mass. Default 20 ppm
     :param zero_indexed: Specifies whether pixel dimensions should start from 1 (default - False) or 0 (True)
-    :param no_duplicating: Specifies whether spectra can be duplicated into adjacent pixels for sparsely sampled lines. Default True"""
+    :param no_duplicating: Specifies whether spectra can be duplicated into adjacent pixels for sparsely sampled lines. Default True
+    :param scan_mode: Whether the data was acquired in 'x-scan' or 'y-scan' mode."""
 
     ##Ensure lock mass and tolerance are formatted as float
     LOCK_MASS = float(LOCK_MASS)
@@ -502,6 +505,11 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
                     x_coord = x_row + 1
                     y_coord = y_row + 1
                 
+                if scan_mode == "x-scan":
+                    coords = (x_coord, y_coord, 1)
+                elif scan_mode == 'y-scan':
+                    coords = (y_coord, x_coord, 1)
+                
                 if not match_idx in used_idx:
                     used_idx.append(match_idx)
                     if len(used_idx) > 15:
@@ -510,14 +518,14 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
                     match_spectra = spec_list[match_idx]
                     [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
                     if len(recalibrated_mz) != 0:
-                        image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_coord,y_coord,1))
+                        image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,coords)
                 else:
                     num_duplicates += 1
                     if not no_duplicating:
                         match_spectra = spec_list[match_idx]
                         [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
                         if len(recalibrated_mz) != 0:
-                            image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,(x_coord,y_coord,1),userParams=[{"name":"DuplicatedSpectrum","value":"True"}])
+                            image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,coords,userParams=[{"name":"DuplicatedSpectrum","value":"True"}])
 
                     # print(f"Duplicated pixel detected - {num_duplicates} / {num_total} ({num_duplicates * 100 / num_total:.2f}%)")
 
@@ -536,7 +544,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     for filt in scan_filts:
         image_files[filt].close()
 
-def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,tgt_progress=None,sl:str="/"):
+def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,tgt_progress=None,sl:str="/", scan_mode:str = "x-scan"):
     """Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). 
     
     :param model_files: Directory to the folder containing mzML files
@@ -544,7 +552,9 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
     :param y_step: step between strip lines, µm
     :param path: path to the directory where imzML files should be stored after annotation
     :param tgt_progress: Tkinter progress bar object to update as the process continues
-    :param sl: legacy, use '/'"""
+    :param sl: legacy, use '/'
+    :param scan_mode: Whether the data was acquired in 'x-scan' or 'y-scan' mode."""
+    
     global OUTPUT_NAME, time_targets
 
     ##Retrieve and sort files from the working directory (imzML) and model file directory (mzML)
@@ -597,7 +607,7 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
                     target_file = file
 
         ##Calls the actual annotation function
-        annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step,ms_level = ms_levels[filt_idx],polarity = polarities[filt_idx])
+        annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step,ms_level = ms_levels[filt_idx],polarity = polarities[filt_idx],scan_mode = scan_mode)
 
         ##Update progress bar in the GUI
         progress = int(iter*100/len(scan_filts))
@@ -624,7 +634,7 @@ def move_files(probe_txt:str,path:str):
         if probe_txt in file:
             shutil.move(file,f"{path}/{probe_txt}/{file}")
 
-def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1,polarity:str="positive",ms_level:int=1):
+def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1,polarity:str="positive",ms_level:int=1, scan_mode:str = 'x-scan'):
     """Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure
     for compatibility with imzML viewers/processors.
 
@@ -634,6 +644,7 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
     :param filter_string: what scan filter is actually captured  (default = "none given")
     :param x_speed: The scan speed across the imaging area during linescans (µm/s)
     :param y_step: The distance between adjacent strip lines across the imaging area (µm/s)
+    :param scan_mode: Whether the data was acquired in 'x-scan' or 'y-scan' mode.
     """
 
     #Error handling for when scan filter extraction fails
@@ -681,6 +692,12 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
         if cvParam["accession"]=="IMS:1000411":
             cvParam["accession"]="IMS:1000413"
             cvParam["name"]="flyback"
+        ##Future y-scan mode - accession:
+#         [Term]
+# id: IMS:1000481
+# name: vertical line scan
+# def: "The scanning line is a vertical one." [COMPUTIS:IMS]
+# is_a: IMS:1000048 ! Scan Type
 
 
 
@@ -701,10 +718,17 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
                 y_pixels = tag.get("value")
 
     #Calculate pixel sizes and overall dimensions from size of pixel grid, scan speed, step sizes
-    x_pix_size = float(x_speed * scan_time * 60 / float(x_pixels))
+    if scan_mode == "x-scan":
+        x_pix_size = float(x_speed * scan_time * 60 / float(x_pixels))
+        y_pix_size = y_step
+    elif scan_mode == "y-scan":
+        y_pix_size = float(x_speed * scan_time * 60 / float(y_pixels))
+        x_pix_size = y_step
+    
     max_x = int(x_pix_size * float(x_pixels))
-    y_pix_size = y_step
     max_y = int(y_pix_size * float(y_pixels))
+
+
 
     ##TODO - Test changing this into 'pixel size x' instead for compatibility with all, if everyone still works will leave as default. Otherwise another advanced tab for mutually exclusive compatibility?
     accessions = ["IMS:1000046", "IMS:1000047", "IMS:1000044", "IMS:1000045"]
@@ -724,35 +748,7 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
             cvParam["unitAccession"]="UO:0000017"
             cvParam["unitName"]="micrometer"
 
-    ##Placeholder block for writing spectral metadata to every spectrum - may help compatibility w/ Mozaic
-    # params_to_grab = data_need_annotation.select_one("referenceableParamGroupList")
-    # for param_group in params_to_grab.select("referenceableParamGroup"):
-    #     if param_group.attrs["id"]=="spectrum1":
-    #         params_available = param_group
-    
-    # for param in params_available.select("cvParam"):
-    #     if param.attrs["accession"]=="MS:1000511":
-    #         param.attrs['value']=ms_level
-
-
-    # for spec in data_need_annotation.select('spectrum'):
-    #     for ref_param in spec.select("referenceableParamGroupRef"):
-    #         if ref_param.attrs['ref']=="spectrum1":
-    #             if polarity == 'negative':
-    #                 tag = Tag(builder=data_need_annotation.builder,
-    #                         name="cvParam",
-    #                         attrs= {'accession': "MS:1000129",'cvRef':'MS','name':'negative scan'})
-    #             elif polarity == "positive":
-    #                 tag = Tag(builder=data_need_annotation.builder,
-    #                         name="cvParam",
-    #                         attrs= {'accession': "MS:1000130",'cvRef':'MS','name':'positive scan'})
-    #             ref_param.insert_after(tag)
-    #             # ref_param.extract()
                     
-
-
-
-
     ##Specify imzML writer involvement and version in the resulting imzML
     for soft_list in data_need_annotation.select("softwareList"):
         count = int(soft_list.attrs['count']) + 1

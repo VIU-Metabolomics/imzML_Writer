@@ -25,5 +25,6 @@ LumList.xlsx
 Build executables/dist_Mac/
 env
 LOGFILE_imzML_Writer.log
+/sandbox
 
 
