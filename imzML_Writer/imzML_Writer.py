@@ -6,6 +6,7 @@ import sys
 import time
 from importlib import resources
 
+import viu_chem.MSI_process
 import imzml_writer.imzML_Scout as scout
 from imzml_writer.utils import *
 from imzml_writer import __version__
