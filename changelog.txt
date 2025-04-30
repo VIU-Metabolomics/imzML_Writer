@@ -2,4 +2,12 @@ Since 1.0.0:
 -Added optional scanning direction argument to writer/annotator to reflect actual dimensions when image was collected in x-scanning vs. y-scanning mode
 TODO:
     -Reflect those changes in the other cvParam of the resulting imzML (top-down, etc.)
-    
+
+-Added blocking option to Raw_to_mzML for mac - prevents further execution so you don't need a waiting loop for compatibility in CLI
+TODO:
+    -Expand to PC
+
+-Added image viewing option 'smooth', which uses scipy.nkimage's zoom option to interpolate between pixels and smooth out the square edges
+-Fixed coordinate selection for spectrum viewing to match, now actually searches imzML object for matching coordinates rather than inferring by length (which broke for imzML without all data written)
+-Added ROI selection tool - saves/loads ROI mask (vertices & mask) as a npy file
+-Minor bug fix for compatibility with Agilent files (pymzml wants spec ID's and not indices)

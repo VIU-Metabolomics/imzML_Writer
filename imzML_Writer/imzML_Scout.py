@@ -13,11 +13,13 @@ import numpy as np
 import pandas as pd
 import json
 
-
+from imzml_writer import scout_utils
 from imzml_writer.analyte_list_cleanup import *
 from imzml_writer import __version__
 
-def main(tgt_file:str = ""):
+
+
+def main(tgt_file:str = "",initial_mz:float=104.1070):
     """Main control loop for imzML Scout GUI. Callable either with no arguments (find file via GUI) or by passing the file path to
     the target imzML.
     
@@ -103,6 +105,12 @@ def main(tgt_file:str = ""):
         tolerance = float(tolerance_entry.get())
 
         ion_image = raw_ion_image
+        if apply_ROI_mask.get():
+            ion_image = ion_image * scout_utils.roi_mask
+        
+        #Check is smoothing is to be applied, if so do it
+        if smooth_state.get():
+            ion_image = scout_utils.smooth_image(ion_image, aspect_ratio)
 
         ##Apply the cutoffs, setting those below to 0 and those above to high_cutoff value
         low_cutoff = np.percentile(ion_image,low_thres*100)
@@ -116,6 +124,9 @@ def main(tgt_file:str = ""):
             color_NL = norm_value.get()
         else:
             color_NL= up_cutoff
+
+        
+
 
         ##Initiate and raw ion image
         fig = Figure(dpi=100,facecolor=TEAL,layout='tight')
@@ -263,10 +274,21 @@ def main(tgt_file:str = ""):
 
     def find_scan_idx(event):
         """Based on where the user clicks, find the corresponding scan index in the imzML file"""
-        scans_per_line = int(max_x_dimension / x_pix)
-        line_scan_num = int(round(event.ydata,0))+1
-        scan_along_line = int(round(event.xdata,0))+1
-        return line_scan_num*scans_per_line + scan_along_line
+        factor = 3
+        if smooth_state.get():
+            x_coord = int(event.xdata / factor) + 1
+            y_coord = int(event.ydata / factor) + 1
+        else:
+            x_coord = int(event.xdata) + 1
+            y_coord = int(event.ydata) + 1
+        
+        search_coords = (x_coord, y_coord, 1)
+        if search_coords in imzML_object.coordinates:
+            return imzML_object.coordinates.index(search_coords)
+        else:
+            return None
+
+
 
 
     def export_image(fig):
@@ -326,9 +348,10 @@ def main(tgt_file:str = ""):
         global scan_idx, last_selected_pixel
         if event.xdata != None:
             scan_idx = find_scan_idx(event)
-            last_selected_pixel = (event.xdata, event.ydata)
-            update_plot_for_selected_pixel()
-            plot_mass_spectrum(scan_idx)
+            if scan_idx != None:
+                last_selected_pixel = (event.xdata, event.ydata)
+                update_plot_for_selected_pixel()
+                plot_mass_spectrum(scan_idx)
         
     def update_plot_for_selected_pixel():
         """Update the plot with the new selected pixel and draw the previous selection in red."""
@@ -565,6 +588,7 @@ def main(tgt_file:str = ""):
         else:
             plot_ion_image()        
 
+
     def draw_tic_image():
         plot_ion_image()
 
@@ -677,8 +701,6 @@ def main(tgt_file:str = ""):
         
         
 
-
-
     ##Build the GUI window
     window_scout = tk.Tk()
     window_scout.title(f"imzML Scout v{__version__}")
@@ -699,7 +721,7 @@ def main(tgt_file:str = ""):
 
     ##mz entry
     mz_var = tk.StringVar(window_scout)
-    mz_var.set("104.1069")
+    mz_var.set(initial_mz)
     mz_label=tk.Label(window_scout,text="Target m/z:",bg=TEAL,font=FONT)
     mz_entry = tk.Entry(window_scout,textvariable=mz_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
     mz_entry.bind("<Return>",plot_ion_image)
@@ -731,6 +753,11 @@ def main(tgt_file:str = ""):
     custom_method.grid(row=2,column=4)
     tic_method = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",text="TIC Normalize",variable=normalization_method,value="TIC")
     tic_method.grid(row=3,column=4)
+
+    #Smooth button
+    smooth_state = tk.BooleanVar(window_scout)
+    smooth_button = tk.Checkbutton(window_scout,text="Smooth Image?", bg=TEAL, font=FONT, variable=smooth_state, command=plot_ion_image)
+    smooth_button.grid(row=4, column=4)
 
     ##Slider
     v_top = tk.DoubleVar(window_scout,value=0.9)
@@ -802,6 +829,20 @@ def main(tgt_file:str = ""):
     quality_entry = tk.Entry(window_scout,textvariable=qual_var,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
     quality_label.grid(row=7, column=1)
     quality_entry.grid(row=8,column=1)
+
+    #ROI Select
+    load_ROI = tk.Button(window_scout, text="load ROI mask", bg=TEAL, highlightbackground=TEAL, command=scout_utils.load_ROI)
+    load_ROI.grid(row=7,column=3)
+
+    save_ROI = tk.Button(window_scout, text="save ROI mask", bg=TEAL, highlightbackground=TEAL, command=scout_utils.save_ROI)
+    save_ROI.grid(row=8,column=3)
+
+    ROI_select = tk.Button(window_scout, text="ROI Select", bg=TEAL, highlightbackground=TEAL, command=lambda:scout_utils.ROI_select(ROI_select,ion_image,aspect_ratio,color_NL))
+    ROI_select.grid(row=7, column = 4)
+
+    apply_ROI_mask = tk.BooleanVar(window_scout)
+    apply_ROI = tk.Checkbutton(window_scout, text="Apply ROI mask?", bg=TEAL, font=FONT, var=apply_ROI_mask, command=update_ion_image)
+    apply_ROI.grid(row=8, column=4)
 
 
 

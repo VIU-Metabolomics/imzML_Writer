@@ -344,6 +344,15 @@ def clean_raw_files(path:str,file_type:str):
         elif file_type in file and file != "Initial RAW files":
             shutil.move(os.path.join(path,file),os.path.join(RAW_folder,file))
 
+def get_final_scan_time(run:pymzml.run.Reader):
+    """Returns the final scan time from the specified mzML
+    :param run: pymzml reader object
+    :return scan_time: Scan time in minutes (float)"""
+    for spec in run:
+        scan_time = spec.scan_time_in_minutes()
+    
+    return scan_time
+
 def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20,zero_indexed:bool=False,no_duplicating:bool=False,scan_mode:str = "x-scan"):
     """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
     aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
@@ -454,7 +463,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     max_times = []
     for idx in contender_idx:
         tmp = pymzml.run.Reader(os.path.join(PATH,mzml_files[idx]))
-        scan_time = tmp[tmp.get_spectrum_count()].scan_time_in_minutes()
+        scan_time = get_final_scan_time(tmp)
         max_times.append(scan_time)
 
     time_targets={}
