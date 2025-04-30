@@ -228,7 +228,7 @@ def human_sort(l:list) -> list:
     """
     Part of the human sortable collection of functions borrowed from http://nedbatchelder.com/blog/200712/human_sorting.html. Sorts a list in the way that humans expect.
 
-    param l: List to be sorted in a human-intuitive wave.
+    :param l: List to be sorted in a human-intuitive wave.
     :return: Sorted list.
     """
     return l.sort(key=alphanum_key)
@@ -346,6 +346,7 @@ def clean_raw_files(path:str,file_type:str):
 
 def get_final_scan_time(run:pymzml.run.Reader):
     """Returns the final scan time from the specified mzML
+
     :param run: pymzml reader object
     :return scan_time: Scan time in minutes (float)"""
     for spec in run:
