@@ -257,10 +257,13 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
                     messagebox.showwarning(title="Folder already exists!",message="You already have an ion image folder here, please rename, move, or delete it")
                     break
                 os.mkdir(folder_name)
-                file = filedialog.asksaveasfilename(initialdir=folder_name,filetypes=[("CSV", ".csv")],initialfile=img_name_base)
-                used_extension = file.split(".")[-1]
-            else:
-                file = os.path.join(folder_name,f"{img_name_base}.{used_extension}")
+                # file = filedialog.asksaveasfilename(initialdir=folder_name,filetypes=[("CSV", ".csv")],initialfile=img_name_base)
+                used_extension="csv"
+                # used_extension = file.split(".")[-1]
+                # if file.endswith("csv") or file.endswith("CSV"):
+                #     file = file + ".csv"
+
+            file = os.path.join(folder_name,f"{img_name_base}.{used_extension}")
             
             dataframe = pd.DataFrame(raw_ion_image)
             dataframe.to_csv(path_or_buf=file,header=False,index=False)
