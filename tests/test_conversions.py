@@ -64,7 +64,7 @@ def test_overall_conversion():
     """Runs the overall conversion on default settings for each file type and ensures you get the expected # of imzML files out (not nec. right yet - RE: scan filter problem for Agilent)"""
     #Thermo
     path = "tests/test_files/Thermo"
-    imzml_utils.RAW_to_mzML(path=os.path.abspath(path),blocking=True)
+    imzml_utils.RAW_to_mzML(path=os.path.abspath(path))
     imzml_utils.clean_raw_files(path,".raw")
     imzml_utils.mzML_to_imzML_convert(PATH=os.path.join(path,"Output mzML Files"))
     imzml_utils.imzML_metadata_process(os.path.join(path,"Output mzML Files"),x_speed=40,y_step=150,path=path)
@@ -74,7 +74,7 @@ def test_overall_conversion():
 
     #Agilent
     path = "tests/test_files/Agilent"
-    imzml_utils.RAW_to_mzML(path=os.path.abspath(path),blocking=True)
+    imzml_utils.RAW_to_mzML(path=os.path.abspath(path))
     imzml_utils.clean_raw_files(path,".D")
     imzml_utils.mzML_to_imzML_convert(PATH=os.path.join(path,"Output mzML Files"))
     imzml_utils.imzML_metadata_process(os.path.join(path,"Output mzML Files"),x_speed=40,y_step=150,path=path)
@@ -84,7 +84,7 @@ def test_overall_conversion():
 
     #Waters
     path = "tests/test_files/Waters"
-    imzml_utils.RAW_to_mzML(path=os.path.abspath(path),blocking=True)
+    imzml_utils.RAW_to_mzML(path=os.path.abspath(path))
     imzml_utils.clean_raw_files(path,".raw")
     imzml_utils.mzML_to_imzML_convert(PATH=os.path.join(path,"Output mzML Files"))
     imzml_utils.imzML_metadata_process(os.path.join(path,"Output mzML Files"),x_speed=40,y_step=150,path=path)
