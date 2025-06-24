@@ -133,7 +133,11 @@ def check_msconvert():
                             stdin=subprocess.PIPE,
                             cwd=os.getcwd(),
                             env=os.environ) 
-        if res.returncode != 0:
+        if res.returncode == 0:
+            # Found as default
+            return msconvert
+            
+        elif res.returncode != 0:
             try:
                 mod_path = os.path.dirname(os.path.abspath(__file__))
                 settings_path = os.path.join(mod_path,"msconvert_path.json")
@@ -149,7 +153,7 @@ def check_msconvert():
                 
                 if res.returncode != 0:
                     raise
-
+                # Found in saved config
                 return msconvert
             except:
                     search_method = msconvert_searchUI()
@@ -166,6 +170,7 @@ def check_msconvert():
                         cwd=os.getcwd(),
                         env=os.environ)
                     if res.returncode == 0:
+                        # Found by manual/autosearch, saving to config
                         mod_path = os.path.dirname(os.path.abspath(__file__))
                         settings_path = os.path.join(mod_path,"msconvert_path.json")
                         set_path = {"msconvert_path": msconvert}
@@ -193,18 +198,20 @@ def viaPWIZ(path:str,write_mode:str,combine_ion_mobility:bool):
 
     
     msconvert = check_msconvert()
-    ms_convert_args = [msconvert, fr"{path}\*.{file_type}", "--mzML", "--64"]
+
+    ms_convert_args = [msconvert,fr"{path}\*.{file_type}", "--mzML", "--64"]
     if write_mode=="Centroid":
         ms_convert_args.append("--filter")
         ms_convert_args.append("peakPicking true 1-")
     
     ms_convert_args.append("--simAsSpectra")
-    ms_convert_args.append("srmAsSpectra")
+    ms_convert_args.append("--srmAsSpectra")
     if combine_ion_mobility:
         ms_convert_args.append("--combineIonMobility")
+    
 
-    convert_process = subprocess.run(msconvert,
-                                       ms_convert_args,
+
+    convert_process = subprocess.run(ms_convert_args,
                                        stdout=subprocess.DEVNULL,
                                        shell=True,
                                        stderr=subprocess.STDOUT,

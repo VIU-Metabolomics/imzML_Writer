@@ -503,9 +503,11 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
             # Get index of the maximum intensity value
             if len(filt_int) > 0:
                 max_idx = [idx for idx, val in enumerate(filt_int) if val == max(filt_int)]
+                if len(max_idx) > 1:
+                    max_idx = max_idx[0]
                 new_target = filt_mz[max_idx]
 
-        return new_target.item()  # Return the found target m/z value
+                return new_target.item()  # Return the found target m/z value
 
     def change_target_mz(event):
         """Update ion image with the newly selected m/z"""
@@ -749,12 +751,12 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
     normalize_custom_entry=tk.Entry(window_scout,highlightbackground=TEAL,background=BEIGE,fg="black",justify='center')
 
     normalization_method = tk.StringVar(window_scout)
-    no_normalization = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",text="No Normalization",variable=normalization_method,value="none")
+    no_normalization = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",selectcolor=TEAL,text="No Normalization",variable=normalization_method,value="none")
     no_normalization.grid(row=1,column=4)
     no_normalization.select()
-    custom_method = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",text="Custom Normalize",variable=normalization_method,value="custom")
+    custom_method = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",selectcolor=TEAL,text="Custom Normalize",variable=normalization_method,value="custom")
     custom_method.grid(row=2,column=4)
-    tic_method = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",text="TIC Normalize",variable=normalization_method,value="TIC")
+    tic_method = tk.Radiobutton(window_scout,bg=TEAL,command=check_normalization,fg="white",selectcolor=TEAL,text="TIC Normalize",variable=normalization_method,value="TIC")
     tic_method.grid(row=3,column=4)
 
     #Smooth button
@@ -763,7 +765,7 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
     smooth_button.grid(row=4, column=4)
 
     ##Slider
-    v_top = tk.DoubleVar(window_scout,value=0.95)
+    v_top = tk.DoubleVar(window_scout,value=0.96)
     v_bottom = tk.DoubleVar(window_scout,value=0.05)
     v_slider = RangeSliderV(window_scout,[v_bottom,v_top],padY=12,bgColor=TEAL,valueSide="RIGHT",font_color='#ffffff',font_family="Helvetica",line_s_color=BEIGE,digit_precision='.2f',step_size=0.01)
     v_slider.grid(row=4,column=4,rowspan=4)
