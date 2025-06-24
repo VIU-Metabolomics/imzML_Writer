@@ -14,6 +14,9 @@ from tkinter import filedialog,messagebox
 import time
 import json
 import logging
+import warnings
+import pyimzml.ImzMLParser as imzmlp
+from pathlib import Path
 
 from imzml_writer.recalibrate_mz import recalibrate
 from imzml_writer import __version__
@@ -815,6 +818,133 @@ def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_s
     #Write the new file
     with open(result_file,'w') as file:
         file.write(str(data_need_annotation.prettify()))
+
+
+def annotate_from_model_imzML(model:str, to_annotate:str):
+    """Annotates an imzML file based on an example file - intended for conjunction with write_masked_imzML to preserve metadata"""
+
+    with open(model) as file:
+        data = file.read()
+    source_imzML = BeautifulSoup(data,'xml')
+
+    with open(to_annotate) as file:
+        data = file.read()
+    needs_annotation_imzML = BeautifulSoup(data,'xml')
+
+    try:
+        instrument_model = source_imzML.instrumentConfigurationList.instrumentConfiguration.attrs['id']
+    except:
+        instrument_model = "Not found"
+    finally:
+        needs_annotation_imzML.instrumentConfigurationList.instrumentConfiguration.attrs['id'] = instrument_model
+
+    replace = 'instrumentConfigurationList'
+    needs_annotation_imzML.find(replace).replace_with(source_imzML.find(replace))
+
+
+    new_tag = Tag(builder=needs_annotation_imzML.builder,
+                  name="cvParam",
+                  attrs={'accession':'MS:1000031',"cvRef":"MS","name":instrument_model})
+    needs_annotation_imzML.instrumentConfigurationList.instrumentConfiguration.append(new_tag)
+
+    #Remove empty instrument ref from imzML template
+    for paramgroup in needs_annotation_imzML.select("referenceableParamGroupRef"):
+        if paramgroup['ref']=="CommonInstrumentParams":
+            paramgroup.extract()
+    
+    for cvParam in needs_annotation_imzML.select("cvParam"):
+        if cvParam["accession"]=="MS:1000530":
+            del cvParam["value"]
+        if cvParam["accession"]=="IMS:1000411":
+            cvParam["accession"]="IMS:1000413"
+            cvParam["name"]="flyback"
+    
+    filter_string = source_imzML.find("cvParam", accession="MS:1000512")['value']
+    for tag in needs_annotation_imzML.referenceableParamGroupList:
+        if "scan1" in str(tag):
+            for tag2 in tag:
+                if "MS:1000512" in str(tag2):
+                    tag2["value"] = filter_string
+    
+    x_pix_size = source_imzML.find("cvParam", accession="IMS:1000046")['value']
+    y_pix_size = source_imzML.find("cvParam", accession="IMS:1000047")['value']
+    max_x = source_imzML.find("cvParam", accession="IMS:1000044")['value']
+    max_y = source_imzML.find("cvParam", accession="IMS:1000045")['value']
+
+    accessions = ["IMS:1000046", "IMS:1000047", "IMS:1000044", "IMS:1000045"]
+    names = ["pixel size x", "pixel size y", "max dimension x", "max dimension y"]
+    values = [x_pix_size, y_pix_size, max_x, max_y]
+
+    for i in range(4):
+        append_item = f'<cvParam cvRef="IMS" accession="{accessions[i]}" name="{names[i]}" value="{values[i]}"/>\n'
+        append_item = BeautifulSoup(append_item,'xml')
+        needs_annotation_imzML.scanSettingsList.scanSettings.append(append_item)
+
+
+    for cvParam in needs_annotation_imzML.select("cvParam"):
+        if cvParam["accession"] in accessions:
+            cvParam["unitCvRef"]="UO"
+            cvParam["unitAccession"]="UO:0000017"
+            cvParam["unitName"]="micrometer"
+
+    for soft_list in needs_annotation_imzML.select("softwareList"):
+        count = int(soft_list.attrs['count']) + 1
+        new_tag = Tag(builder=needs_annotation_imzML.builder,
+                    name = "software",
+                    attrs = {'id':'imzML_Writer',"version":__version__})
+        descr_tag = Tag(builder=needs_annotation_imzML.builder,
+                    name = "cvParam",
+                    attrs = {'accession':'MS:1000799',"cvRef":"MS","name":"Custom unreleased software tool","value":f"imzML Writer v{__version__}"})
+
+        soft_list.append(new_tag)
+        for software in soft_list.select("software"):
+            if software.attrs["id"] == "imzML_Writer":
+                software.append(descr_tag)
+
+        soft_list.attrs['count'] = count
+
+    #Write the new file
+    with open(to_annotate,'w') as file:
+        file.write(str(needs_annotation_imzML.prettify())) 
+    
+    
+
+
+
+def write_masked_imzML(source_file:str,roi_mask:np.array,save_dir:str=None) -> str:
+    """Rewrites the specified imzML file as masked by the ROI, useful to truncate out only the tissue for reduced file sizes
+    
+    :param source_file: path to the source imzML
+    :param roi_mask: numpy array matching dimensions of source file, where 0 indicates an excluded pixel and 1 is an included pixel
+    :param save_dir: Where to save the resulting imzML, defaults to the same directory as the source file
+    
+    :return: Full file path to the resulting imzML"""
+
+    if not save_dir:
+        save_dir = os.path.dirname(source_file)
+
+    filename = Path(source_file).stem
+    new_filename = f"{filename}-masked.imzML"
+    new_filepath = os.path.join(save_dir,new_filename)
+
+    with warnings.catch_warnings(action='ignore'):
+        with imzmlp.ImzMLParser(filename=source_file,parse_lib='lxml') as img:
+            with imzmlw.ImzMLWriter(new_filepath, mode='processed') as new_imzml:
+                zero_offset = 1
+                for idx, (x,y,z) in enumerate(img.coordinates):
+                    if x == 0 or y == 0:
+                        zero_offset = 0
+
+                    if roi_mask[y-zero_offset,x-zero_offset] == 1:
+                        mzs, ints = img.getspectrum(idx)
+                        new_imzml.addSpectrum(mzs,ints,(x,y,z))
+    
+    annotate_from_model_imzML(source_file, new_filepath)
+
+    
+    
+
+    
 
 
 
