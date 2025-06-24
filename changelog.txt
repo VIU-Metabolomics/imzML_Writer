@@ -5,7 +5,7 @@ TODO:
 
 -Added blocking option to Raw_to_mzML for mac - prevents further execution so you don't need a waiting loop for compatibility in CLI
 TODO:
-    -Expand to PC
+    -Expand to PC --> Implemented, need to test and verify functional
 
 -Added simple test suite for Agilent/Thermo/Waters to ensure basic functionality is working
 

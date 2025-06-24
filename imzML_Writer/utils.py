@@ -302,7 +302,7 @@ def RAW_to_mzML(path:str,write_mode:str="Centroid", blocking:bool=False):
     :param path: path to files containing raw instrument data.
     :param write_mode: Write mode for msconvert - 'Profile' or 'Centroid'."""
     if "win" in sys.platform and sys.platform != "darwin":
-        viaPWIZ(path,write_mode,blocking=blocking)
+        viaPWIZ(path,write_mode)
     else:
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
         client = Check_Docker_Image()

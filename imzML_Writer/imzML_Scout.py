@@ -763,7 +763,7 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
     smooth_button.grid(row=4, column=4)
 
     ##Slider
-    v_top = tk.DoubleVar(window_scout,value=0.9)
+    v_top = tk.DoubleVar(window_scout,value=0.95)
     v_bottom = tk.DoubleVar(window_scout,value=0.05)
     v_slider = RangeSliderV(window_scout,[v_bottom,v_top],padY=12,bgColor=TEAL,valueSide="RIGHT",font_color='#ffffff',font_family="Helvetica",line_s_color=BEIGE,digit_precision='.2f',step_size=0.01)
     v_slider.grid(row=4,column=4,rowspan=4)
