@@ -124,7 +124,7 @@ def autofind_msconvert():
 
 
 def check_msconvert():
-    """Checks that msconvert is available for the current python environment"""
+    """Checks that msconvert is available for the current python environment - returns msconvert path/callable"""
     msconvert = "msconvert"
     try:
         res = subprocess.run(msconvert, shell=True,
@@ -146,8 +146,11 @@ def check_msconvert():
                             stdin=subprocess.PIPE,
                             cwd=os.getcwd(),
                             env=os.environ)
+                
                 if res.returncode != 0:
                     raise
+
+                return msconvert
             except:
                     search_method = msconvert_searchUI()
                     if search_method == "manual":
@@ -168,45 +171,48 @@ def check_msconvert():
                         set_path = {"msconvert_path": msconvert}
                         with open(settings_path,'w') as file:
                             json.dump(set_path,file)
+                        
+                        return msconvert
                     else:
                         raise
     except:
         raise Exception("msConvert not available, check installation and verify msConvert path is specified correctly")
 
 
-def viaPWIZ(path:str,write_mode:str):
+def viaPWIZ(path:str,write_mode:str,combine_ion_mobility:bool):
     """Method to call msconvert directly if the detected platform is on windows. Converts all target files in the path to mzML in the specified mode.
 
     :param path: path to the target files
     :param write_mode: "Centroid" or "Profile" modes
+    :param combine_ion_mobility: Whether or not --combineIonMobility flag is passed to msconvert
     :return: None"""
     ##check pwiz availability:
     file_type = get_file_type(path)
     current_dir = os.getcwd()
     os.chdir(path)
-    check_msconvert()
 
     
-    ##Call the actual conversion
-    msconvert = "msconvert"
+    msconvert = check_msconvert()
+    ms_convert_args = [msconvert, fr"{path}\*.{file_type}", "--mzML", "--64"]
     if write_mode=="Centroid":
-        convert_process = subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
-                    shell=True,
-                        stderr=subprocess.STDOUT,
-                        stdin=subprocess.PIPE,
-                        cwd=os.getcwd(),
-                        env=os.environ)
-    elif write_mode=="Profile":
-        convert_process = subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
-                    shell=True,
-                        stderr=subprocess.STDOUT,
-                        stdin=subprocess.PIPE,
-                        cwd=os.getcwd(),
-                        env=os.environ)
-    else:
-        raise("Invalid data write mode!")
+        ms_convert_args.append("--filter")
+        ms_convert_args.append("peakPicking true 1-")
     
-    convert_process.wait()
+    ms_convert_args.append("--simAsSpectra")
+    ms_convert_args.append("srmAsSpectra")
+    if combine_ion_mobility:
+        ms_convert_args.append("--combineIonMobility")
+
+    convert_process = subprocess.run(msconvert,
+                                       ms_convert_args,
+                                       stdout=subprocess.DEVNULL,
+                                       shell=True,
+                                       stderr=subprocess.STDOUT,
+                                       stdin=subprocess.PIPE,
+                                       cwd=os.getcwd(),
+                                       env=os.environ)
+
+
     os.chdir(current_dir)
 
 ##The below three functions (tryint, alphanum_keys, human_sort) are borrowed from an excellent post by Ned Batchelder for 'natural sorting' in Python
@@ -296,13 +302,14 @@ def Check_Docker_Image():
 
 
 
-def RAW_to_mzML(path:str,write_mode:str="Centroid", blocking:bool=False):
+def RAW_to_mzML(path:str,write_mode:str="Centroid", combine_ion_mobility:bool=False):
     """Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path
 
     :param path: path to files containing raw instrument data.
-    :param write_mode: Write mode for msconvert - 'Profile' or 'Centroid'."""
+    :param write_mode: Write mode for msconvert - 'Profile' or 'Centroid'.
+    :param combine_ion_mobility: Whether or not to hand --combineIonMobilitySpectra flag to msconvert (default false)"""
     if "win" in sys.platform and sys.platform != "darwin":
-        viaPWIZ(path,write_mode)
+        viaPWIZ(path,write_mode, combine_ion_mobility)
     else:
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
         client = Check_Docker_Image()
@@ -310,13 +317,15 @@ def RAW_to_mzML(path:str,write_mode:str="Centroid", blocking:bool=False):
 
         vol = {path: {'bind': fr"/{DOCKER_IMAGE}/data", 'mode': 'rw'}}
 
+
+        comm = fr"wine msconvert /{DOCKER_IMAGE}/data/*.{file_type} --zlib=off --mzML --64 --outdir /{DOCKER_IMAGE}/data"
+
         if write_mode=="Centroid":
-            comm = fr"wine msconvert /{DOCKER_IMAGE}/data/*.{file_type} --zlib=off --mzML --64 --outdir /{DOCKER_IMAGE}/data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
-        elif write_mode=="Profile":
-            comm = fr"wine msconvert /{DOCKER_IMAGE}/data/*.{file_type} --zlib=off --mzML --64 --outdir /{DOCKER_IMAGE}/data --simAsSpectra --srmAsSpectra"
-        else:
-            raise("Invalid data write mode!")
-            
+            comm += fr" --filter '"'peakPicking true 1-'"'"
+
+        comm+= " --simAsSpectra --srmAsSpectra"
+        if combine_ion_mobility:
+            comm += " --combineIonMobilitySpectra"
 
         env_vars = {"WINEDEBUG": "-all"}
         
@@ -328,7 +337,6 @@ def RAW_to_mzML(path:str,write_mode:str="Centroid", blocking:bool=False):
             command=comm,
             working_dir=path,
             auto_remove= True,
-            # detach=not blocking
             detach=False
             )
         

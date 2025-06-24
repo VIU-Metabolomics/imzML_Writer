@@ -91,7 +91,7 @@ def gui(tgt_dir:str=None):
             tic = time.time()
         #RAW to mzML conversion, then call mzML to imzML function
         file_type = get_file_type(CD_entry.get())
-        msconvert_call = threading.Thread(target=RAW_to_mzML,kwargs={"path":CD_entry.get(),"write_mode":write_option_var.get()})
+        msconvert_call = threading.Thread(target=RAW_to_mzML,kwargs={"path":CD_entry.get(),"write_mode":write_option_var.get(), "combine_ion_mobility": combine_ion_mobility.get()})
         msconvert_call.start()
 
         RAW_progress.config(mode="indeterminate")
@@ -315,6 +315,12 @@ def gui(tgt_dir:str=None):
                 duplicate_bool.set(True)
             else:
                 duplicate_bool.set(False)
+        
+        def update_mobility_bool(*args):
+            if not combine_ion_mobility.get():
+                combine_ion_mobility.set(True)
+            else:
+                combine_ion_mobility.set(False)
 
         advanced_window = tk.Tk()
         advanced_window.title("Advanced Options...")
@@ -331,6 +337,13 @@ def gui(tgt_dir:str=None):
         duplicate_check.grid(row=2,column=1,columnspan=2)
         if duplicate_bool.get():
             duplicate_check.select()
+        
+        #Combine ion mobility spectra
+        combine_ion_mob_entry = tk.Checkbutton(advanced_window,text="Combine ion mobility spectra?", bg=TEAL, font=FONT,command=update_mobility_bool)
+        combine_ion_mob_entry.grid(row=3,column=1,columnspan=2)
+        if combine_ion_mobility.get():
+            combine_ion_mob_entry.select()
+
 
         #Lock mass search tolerance (entry, 20 ppm default)
         lock_mass_search_tol_label = tk.Label(advanced_window,text="Lock mass search tolerance (ppm):",bg=TEAL,font=FONT)
@@ -339,8 +352,8 @@ def gui(tgt_dir:str=None):
         lock_mass_search_tol_entry.bind("<Return>",update_search_tol)
         lock_mass_search_tol_entry.bind("<FocusOut>",update_search_tol)
 
-        lock_mass_search_tol_entry.grid(row=3,column=2)
-        lock_mass_search_tol_label.grid(row=3,column=1)
+        lock_mass_search_tol_entry.grid(row=4,column=2)
+        lock_mass_search_tol_label.grid(row=4,column=1)
 
 
             
@@ -381,6 +394,8 @@ def gui(tgt_dir:str=None):
     duplicate_bool.set(False)
     index_bool = tk.BooleanVar(window)
     index_bool.set(False)
+    combine_ion_mobility = tk.BooleanVar(window)
+    combine_ion_mobility.set(False)
 
     ##Scan-speed entry
     speed_label=tk.Label(text="x scan speed (µm/s):",bg=TEAL,font=FONT)

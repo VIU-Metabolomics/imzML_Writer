@@ -3,9 +3,9 @@ Since 1.0.0:
 TODO:
     -Reflect those changes in the other cvParam of the resulting imzML (top-down, etc.)
 
--Added blocking option to Raw_to_mzML for mac - prevents further execution so you don't need a waiting loop for compatibility in CLI
-TODO:
-    -Expand to PC --> Implemented, need to test and verify functional
+-Added blocking option to Raw_to_mzML for Mac & PC - prevents further execution so you don't need a waiting loop for compatibility in CLI
+-Added optional '--combineIonMobility' flag to advanced options, passed to msconvert during mzML writing
+
 
 -Added simple test suite for Agilent/Thermo/Waters to ensure basic functionality is working
 
