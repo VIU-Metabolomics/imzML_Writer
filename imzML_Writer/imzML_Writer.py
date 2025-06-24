@@ -83,9 +83,6 @@ def gui(tgt_dir:str=None):
         file_type_label.grid(row=1,column=3,columnspan=3)
         return file_type
 
-    def get_os() -> str:
-        """Legacy code - returns "/" """
-        return "/"
 
     def full_convert():
         """Initiates file conversion from vendor format in the current directory"""
@@ -94,16 +91,20 @@ def gui(tgt_dir:str=None):
             tic = time.time()
         #RAW to mzML conversion, then call mzML to imzML function
         file_type = get_file_type(CD_entry.get())
-        RAW_to_mzML(path=CD_entry.get(),sl=get_os(),write_mode=write_option_var.get())
+        msconvert_call = threading.Thread(target=RAW_to_mzML,kwargs={"path":CD_entry.get(),"write_mode":write_option_var.get()})
+        msconvert_call.start()
+
         RAW_progress.config(mode="indeterminate")
         RAW_progress.start()
-        follow_raw_progress(file_type)
+        follow_raw_progress(file_type,msconvert_call)
 
-    def follow_raw_progress(raw_filetype:str):
+    def follow_raw_progress(raw_filetype:str,convert_thread:threading.Thread):
         """Monitors progress of raw file conversion to mzML by comparing the number of raw vendor files to mzML files in the working directory
         Input:
         raw_filetype: string specifying the file extension of the raw files"""
-        global tic, tries
+        global tic
+
+        still_active = convert_thread.is_alive()
 
         #Retrieve list of files in working directory
         files = os.listdir(CD_entry.get())
@@ -123,20 +124,6 @@ def gui(tgt_dir:str=None):
         #Calculate progress based on number of each
         progress = int(num_mzML_files * 100 / num_raw_files)
         
-        #Check that the mzML files are all roughly the same size (smallest at least >75% the size of the mean) to ensure
-        #last file actually finished
-        sizes = []
-        for file in mzML_files:
-            file_size = os.path.getsize(f"{CD_entry.get()}/{file}")
-            sizes.append(file_size)
-        
-        last_one_ready=False
-        tries_threshold = 3
-        if progress >= 100:
-            if len(sizes) > 0:
-                tries+=1
-                if not np.min(sizes) < np.mean(sizes)*0.85 or tries > tries_threshold:
-                    last_one_ready = True
                 
         #Update progress bar to show how many mzML files are finished compared to total
         if progress > 0:
@@ -144,25 +131,23 @@ def gui(tgt_dir:str=None):
             RAW_progress.config(mode="determinate",value=progress)
 
         #If not finished, start this function over again after waiting 3 seconds for more progress to be made
-        if progress < 100 or not last_one_ready:
-            window.after(3000,lambda:follow_raw_progress(raw_filetype))
+        if progress < 100 or still_active:
+            window.after(3000,lambda:follow_raw_progress(raw_filetype, convert_thread))
         #If finished, move on to the next stage in the process
-        elif progress >= 100 and last_one_ready:
+        elif progress >= 100 and not still_active:
 
             
             if timing_mode:
                 global tic
                 toc = time.time()
                 print(f"RAW to mzML: {round(toc - tic,1)}s")
-            slashes = get_os()
             #Clean up file structure by placing mzML and raw files in separate folders
             clean_raw_files(path=CD_entry.get(),file_type=raw_filetype)
             #Make it obvious the process is complete by changing the label to green
             RAW_label.config(fg=GREEN)
 
-            slashes = get_os()
             ##Change the directory to the new mzML folder
-            new_path = fr"{CD_entry.get()}{slashes}Output mzML Files"
+            new_path = os.path.join(CD_entry.get(),"Output mzML Files")
             CD_entry.delete(0,tk.END)
             CD_entry.insert(0,new_path)
             populate_list(CD_entry.get())
@@ -222,8 +207,7 @@ def gui(tgt_dir:str=None):
 
             ##Update folder to directory where the intermediate imzML files are saved (directory w/ the python code)
             full_path = CD_entry.get()
-            slash = get_os()
-            new_path = full_path.split(fr"{slash}Output mzML Files")[0]
+            new_path = os.path.dirname(full_path)
             CD_entry.delete(0,tk.END)
             CD_entry.insert(0,new_path)
             populate_list(os.getcwd())
@@ -238,12 +222,12 @@ def gui(tgt_dir:str=None):
         #Start progress bar whirring to indicate process has started to user
         Annotate_progress.config(mode="indeterminate")
         Annotate_progress.start()
-        slashes = get_os()
         #If conversion was called directly, prompt user for source mzml files to retrieve metadata from
         if path_in == "direct":
             path_to_models = filedialog.askdirectory(initialdir=os.getcwd())
         else:
-            path_to_models = fr"{CD_entry.get()}{slashes}Output mzML Files"
+            path_to_models = os.path.join(CD_entry.get(),"Output mzML Files")
+
         
         #Start the annotation in a new thread
         thread = threading.Thread(

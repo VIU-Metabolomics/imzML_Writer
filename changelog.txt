@@ -7,7 +7,11 @@ TODO:
 TODO:
     -Expand to PC
 
+-Added simple test suite for Agilent/Thermo/Waters to ensure basic functionality is working
+
 -Added image viewing option 'smooth', which uses scipy.nkimage's zoom option to interpolate between pixels and smooth out the square edges
 -Fixed coordinate selection for spectrum viewing to match, now actually searches imzML object for matching coordinates rather than inferring by length (which broke for imzML without all data written)
 -Added ROI selection tool - saves/loads ROI mask (vertices & mask) as a npy file
+TODO: Allow re-write of imzML with only those pixels
+
 -Minor bug fix for compatibility with Agilent files (pymzml wants spec ID's and not indices)

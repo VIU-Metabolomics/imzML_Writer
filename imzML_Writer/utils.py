@@ -123,16 +123,8 @@ def autofind_msconvert():
                     return candidate
 
 
-def viaPWIZ(path:str,write_mode:str):
-    """Method to call msconvert directly if the detected platform is on windows. Converts all target files in the path to mzML in the specified mode.
-
-    :param path: path to the target files
-    :param write_mode: "Centroid" or "Profile" modes
-    :return: None"""
-    ##check pwiz availability:
-    file_type = get_file_type(path)
-    current_dir = os.getcwd()
-    os.chdir(path)
+def check_msconvert():
+    """Checks that msconvert is available for the current python environment"""
     msconvert = "msconvert"
     try:
         res = subprocess.run(msconvert, shell=True,
@@ -181,16 +173,31 @@ def viaPWIZ(path:str,write_mode:str):
     except:
         raise Exception("msConvert not available, check installation and verify msConvert path is specified correctly")
 
+
+def viaPWIZ(path:str,write_mode:str):
+    """Method to call msconvert directly if the detected platform is on windows. Converts all target files in the path to mzML in the specified mode.
+
+    :param path: path to the target files
+    :param write_mode: "Centroid" or "Profile" modes
+    :return: None"""
+    ##check pwiz availability:
+    file_type = get_file_type(path)
+    current_dir = os.getcwd()
+    os.chdir(path)
+    check_msconvert()
+
+    
     ##Call the actual conversion
+    msconvert = "msconvert"
     if write_mode=="Centroid":
-        subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+        convert_process = subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--filter", "peakPicking true 1-", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                     shell=True,
                         stderr=subprocess.STDOUT,
                         stdin=subprocess.PIPE,
                         cwd=os.getcwd(),
                         env=os.environ)
     elif write_mode=="Profile":
-                subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
+        convert_process = subprocess.Popen([msconvert, fr"{path}\*.{file_type}", "--mzML", "--64", "--simAsSpectra", "--srmAsSpectra"],stdout=subprocess.DEVNULL,
                     shell=True,
                         stderr=subprocess.STDOUT,
                         stdin=subprocess.PIPE,
@@ -199,6 +206,7 @@ def viaPWIZ(path:str,write_mode:str):
     else:
         raise("Invalid data write mode!")
     
+    convert_process.wait()
     os.chdir(current_dir)
 
 ##The below three functions (tryint, alphanum_keys, human_sort) are borrowed from an excellent post by Ned Batchelder for 'natural sorting' in Python
@@ -257,57 +265,60 @@ def get_file_type(path:str):
     
     return extension
 
-def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid", blocking:bool=False):
+def Check_Docker_Image():
+    """Tests that docker is available, prompts the user to update/install if available"""
+    DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
+    try:
+        client = docker.from_env()
+    except:
+        res = subprocess.run(["open", "--background", "-a", "Docker"])
+        if res.returncode == 0:
+            time.sleep(2.5)
+            client = docker.from_env()
+        else:
+            messagebox.showwarning(title="No Docker",message="Docker unavailable - please launch/install Docker desktop before proceeding...")
+            client = docker.from_env()
+
+    try:
+        data = client.images.get(DOCKER_IMAGE)
+        if "latest" not in str(data):
+            resp = messagebox.askquestion("Newer docker image available", "A newer version of the msconvert docker image is available, would you like to update?")
+            if resp == "yes":
+                client.images.pull(DOCKER_IMAGE)
+    except:
+        resp = messagebox.askquestion("Docker image unavailable", "No docker image for msconvert is available, would you like to download it now? (WARNING: May take several minutes)")
+        if resp == "yes":
+            client.images.pull(DOCKER_IMAGE)
+        else:
+            raise
+    
+    return client
+
+
+
+def RAW_to_mzML(path:str,write_mode:str="Centroid", blocking:bool=False):
     """Calls msConvert via docker on linux and Mac, or calls viaPwiz method on PC to manage conversion of raw vendor files to mzML format within the specified path
 
     :param path: path to files containing raw instrument data.
-    :param sl: Legacy code - string "/" to deal with pathing.
     :param write_mode: Write mode for msconvert - 'Profile' or 'Centroid'."""
     if "win" in sys.platform and sys.platform != "darwin":
-        viaPWIZ(path,write_mode)
+        viaPWIZ(path,write_mode,blocking=blocking)
     else:
-        ##Setup the docker image including internal file structure and command
         DOCKER_IMAGE = "chambm/pwiz-skyline-i-agree-to-the-vendor-licenses"
-        try:
-            client = docker.from_env()
-        except:
-            res = subprocess.run(["open", "--background", "-a", "Docker"])
-            if res.returncode == 0:
-                time.sleep(2.5)
-                client = docker.from_env()
-            else:
-                messagebox.showwarning(title="No Docker",message="Docker unavailable - please launch/install Docker desktop before proceeding...")
-                client = docker.from_env()
-
-        try:
-            data = client.images.get(DOCKER_IMAGE)
-            if "latest" not in str(data):
-                resp = messagebox.askquestion("Newer docker image available", "A newer version of the msconvert docker image is available, would you like to update?")
-                if resp == "yes":
-                    client.images.pull(DOCKER_IMAGE)
-        except:
-            resp = messagebox.askquestion("Docker image unavailable", "No docker image for msconvert is available, would you like to download it now? (WARNING: May take several minutes)")
-            if resp == "yes":
-                client.images.pull(DOCKER_IMAGE)
-            else:
-                raise
-
-
-        working_directory = path
+        client = Check_Docker_Image()
         file_type = get_file_type(path)
 
-        vol = {working_directory: {'bind': fr"{sl}{DOCKER_IMAGE}{sl}data", 'mode': 'rw'}}
+        vol = {path: {'bind': fr"/{DOCKER_IMAGE}/data", 'mode': 'rw'}}
 
         if write_mode=="Centroid":
-            comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.{file_type} --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
+            comm = fr"wine msconvert /{DOCKER_IMAGE}/data/*.{file_type} --zlib=off --mzML --64 --outdir /{DOCKER_IMAGE}/data --filter '"'peakPicking true 1-'"' --simAsSpectra --srmAsSpectra"
         elif write_mode=="Profile":
-            comm = fr"wine msconvert {sl}{DOCKER_IMAGE}{sl}data{sl}*.{file_type} --zlib=off --mzML --64 --outdir {sl}{DOCKER_IMAGE}{sl}data --simAsSpectra --srmAsSpectra"
+            comm = fr"wine msconvert /{DOCKER_IMAGE}/data/*.{file_type} --zlib=off --mzML --64 --outdir /{DOCKER_IMAGE}/data --simAsSpectra --srmAsSpectra"
         else:
             raise("Invalid data write mode!")
             
 
         env_vars = {"WINEDEBUG": "-all"}
-        
         
         ##Call/run the docker container
         client.containers.run(
@@ -315,9 +326,10 @@ def RAW_to_mzML(path:str,sl:str="/",write_mode:str="Centroid", blocking:bool=Fal
             environment=env_vars,
             volumes = vol,
             command=comm,
-            working_dir=working_directory,
+            working_dir=path,
             auto_remove= True,
-            detach=not blocking
+            # detach=not blocking
+            detach=False
             )
         
         
@@ -554,7 +566,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     for filt in scan_filts:
         image_files[filt].close()
 
-def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,tgt_progress=None,sl:str="/", scan_mode:str = "x-scan"):
+def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,tgt_progress=None, scan_mode:str = "x-scan"):
     """Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). 
     
     :param model_files: Directory to the folder containing mzML files
@@ -562,7 +574,6 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
     :param y_step: step between strip lines, µm
     :param path: path to the directory where imzML files should be stored after annotation
     :param tgt_progress: Tkinter progress bar object to update as the process continues
-    :param sl: legacy, use '/'
     :param scan_mode: Whether the data was acquired in 'x-scan' or 'y-scan' mode."""
     
     global OUTPUT_NAME, time_targets
@@ -617,7 +628,16 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
                     target_file = file
 
         ##Calls the actual annotation function
-        annotate_imzML(target_file,model_files+sl+model_file_list[0],final_time_point,filt,x_speed=x_speed,y_step=y_step,ms_level = ms_levels[filt_idx],polarity = polarities[filt_idx],scan_mode = scan_mode)
+        annotate_imzML(
+                    annotate_file=target_file,
+                    SRC_mzML=os.path.join(model_files,model_file_list[0]),
+                    scan_time=final_time_point,
+                    filter_string=filt,
+                    x_speed=x_speed,
+                    y_step=y_step,
+                    ms_level = ms_levels[filt_idx],
+                    polarity = polarities[filt_idx],
+                    scan_mode = scan_mode)
 
         ##Update progress bar in the GUI
         progress = int(iter*100/len(scan_filts))
