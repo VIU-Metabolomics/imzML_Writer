@@ -5,9 +5,8 @@ TODO:
 
 -Added blocking option to Raw_to_mzML for Mac & PC - prevents further execution so you don't need a waiting loop for compatibility in CLI
 -Added optional '--combineIonMobility' flag to advanced options, passed to msconvert during mzML writing
-
-
 -Added simple test suite for Agilent/Thermo/Waters to ensure basic functionality is working
+-Fixed a bug where files would not be copied to external drives
 
 -Added image viewing option 'smooth', which uses scipy.nkimage's zoom option to interpolate between pixels and smooth out the square edges
 -Fixed coordinate selection for spectrum viewing to match, now actually searches imzML object for matching coordinates rather than inferring by length (which broke for imzML without all data written)

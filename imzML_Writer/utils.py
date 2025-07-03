@@ -369,10 +369,12 @@ def clean_raw_files(path:str,file_type:str):
         os.mkdir(RAW_folder)
 
     for file in os.listdir(path):
-        if ".mzML".lower() in file.lower():
-            shutil.move(os.path.join(path,file),os.path.join(mzML_folder,file))
-        elif file_type in file and file != "Initial RAW files":
-            shutil.move(os.path.join(path,file),os.path.join(RAW_folder,file))
+        if not file.startswith("."):
+            logger.info(f"Starting file transfer: {file}")
+            if ".mzML".lower() in file.lower():
+                shutil.move(os.path.join(path,file),os.path.join(mzML_folder,file))
+            elif file_type in file and file != "Initial RAW files":
+                shutil.move(os.path.join(path,file),os.path.join(RAW_folder,file))
 
 def get_final_scan_time(run:pymzml.run.Reader):
     """Returns the final scan time from the specified mzML
@@ -672,15 +674,22 @@ def move_files(probe_txt:str,path:str):
     :param probe_txt: The search string to find in the current directory.
     :param path: The target directory to move files to"""
     files = os.listdir()
+    new_directory = os.path.join(path, probe_txt)
     try:
-        new_directory = f"{path}/{probe_txt}"
-        os.mkdir(new_directory)
+        print(new_directory)
+        os.makedirs(new_directory, exist_ok=True)
     except:
         pass
     
     for file in files:
         if probe_txt in file:
-            shutil.move(file,f"{path}/{probe_txt}/{file}")
+                try:
+                    shutil.copy2(file, os.path.join(new_directory,file))
+                except Exception as e:
+                    logger.info("Copy object claimed failure")
+                finally:
+                    os.remove(file)
+
 
 def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1,polarity:str="positive",ms_level:int=1, scan_mode:str = 'x-scan'):
     """Takes pyimzml output imzML files and annotates them using GUI inputs and the corresponding mzML source file, then cleans up errors in the imzML structure

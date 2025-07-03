@@ -86,25 +86,6 @@ The utilities for imzML Writer are also available under ``imzML_Writer.utils``, 
     #Convert RAW to mzML
     iw_utils.RAW_to_mzML(raw_data_path)
 
-    ##Waiting loop to check if msconvert has finished it's work:
-    all_files = os.listdir(raw_data_path)
-    num_raw_files = 0
-    for file in all_files:
-        if file.split(".")[-1] == filetype:
-            num_raw_files+=1
-
-    num_mzML = 0
-    while num_mzML < num_raw_files:
-        num_mzML = 0
-        all_files = os.listdir(raw_data_path)
-        for file in all_files:
-            if file.split(".")[-1] == "mzML":
-                num_mzML += 1
-        time.sleep(1)
-
-    time.sleep(5)
-
-
     ##Once MSconvert is done, clean up the file structure, sorting data into folders:
     #Initial Raw Files - Starting files
     #Output mzML Files - mzML files
