@@ -391,6 +391,17 @@ def get_final_scan_time(run:pymzml.run.Reader):
     
     return scan_time
 
+def _fix_unicode(dir:str, files:list[str]):
+    """Patch for Waters files to find replace an invalid utf-8 character (0xB5) with 0xC2 0xB5"""
+    for file in files:
+        print(f"fixing file {file}")
+        file_path = Path(os.path.join(dir, file))
+        raw = file_path.read_bytes()
+        fixed = raw.replace(b"\xB5", b"\xC2\xB5")
+        file_path.write_bytes(fixed)
+        print(f"Finished file {file}")
+
+
 def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20,zero_indexed:bool=False,no_duplicating:bool=False,scan_mode:str = "x-scan"):
     """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
     aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
@@ -421,7 +432,14 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     for file in files:
         if ".mzML".lower() in file.lower():
             file_iter+=1
-            tmp = pymzml.run.Reader(os.path.join(PATH,file))
+            try:
+                tmp = pymzml.run.Reader(os.path.join(PATH,file))
+            except UnicodeDecodeError:
+                print("Attempting to fix unicode error")
+                logger.info("Attempting to fix unicode error")
+                _fix_unicode(PATH, files)
+                tmp = pymzml.run.Reader(os.path.join(PATH, file))
+
             spec_counts.append(tmp.get_spectrum_count())
             ##Ignore partially collected datafiles that were cut-short (threshold of <50% the scans of the mean datafile)
             if np.mean(spec_counts)*0.5 > tmp.get_spectrum_count():
@@ -544,6 +562,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
                 align_time = time_targets[filt][x_row]
                 time_diffs = abs(tmp_times - align_time)
                 match_idx = np.where(time_diffs == min(time_diffs))[0][0]
+                time_offset = time_diffs[match_idx]
                 num_total += 1
                 if zero_indexed:
                     x_coord = x_row

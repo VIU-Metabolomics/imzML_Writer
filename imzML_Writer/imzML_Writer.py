@@ -356,7 +356,11 @@ def gui(tgt_dir:str=None):
         lock_mass_search_tol_label.grid(row=4,column=1)
 
 
-            
+    def bring_to_front():
+        window.lift()
+        window.attributes("-topmost",True)
+        window.after(100, lambda: window.attributes('-topmost',False))
+        window.focus_force()       
 
 
     ##Build tkinter window
@@ -382,10 +386,9 @@ def gui(tgt_dir:str=None):
                 img=tk.PhotoImage(file=resource_path(path))
                 canvas.create_image(313/2, 205/2,image=img)
                 canvas.grid(column=0,row=0,columnspan=2)
-            with resources.path('imzml_writer.Images','imzML_Writer.ico') as path:
-                window.iconbitmap(resource_path(path))
-        except:
-            pass
+                window.iconphoto(True, img)
+        except Exception as e:
+            print(e)
     
     ##Initialize defaults for advanced options
     search_tol = tk.StringVar(window)
@@ -484,6 +487,7 @@ def gui(tgt_dir:str=None):
     write_options_dropdown.grid(row=4,column=4)
 
     if _on_startup:
+        bring_to_front()
         _on_startup = False
         if tgt_dir != None:
             CD_entry.delete(0,tk.END)
