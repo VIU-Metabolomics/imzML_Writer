@@ -95,7 +95,7 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
 
         #Check if TIC image was requested, view entire spectrum if so. Otherwise generate datagrid of requested m/z and tolerance combo
         if view_tic_option.get():
-            ion_image = getionimage_wrapper(imzML_object,tgt_mz=200,window=9999)
+            ion_image = scout_utils.tic_image(tgt_file)
         else:
             ion_image = getionimage_wrapper(imzML_object,tgt_mz=target_mz,window=mz_window)
         
@@ -110,7 +110,7 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
             norm_grid = getionimage_wrapper(imzML_object,tgt_mz=norm_mz,window=norm_window)
             ion_image = np.divide(ion_image,norm_grid,out=np.zeros_like(ion_image),where=norm_grid!=0)
         elif norm_method == "TIC":
-            norm_grid = getionimage_wrapper(imzML_object,tgt_mz=200,window=9999)
+            norm_grid = scout_utils.tic_image(tgt_file)
             ion_image = np.divide(ion_image,norm_grid,out=np.zeros_like(ion_image),where=norm_grid!=0)
         
         #Initiate new raw data variable so we can freely manipulate the ion image as needed

@@ -36,6 +36,7 @@ BEIGE = "#dbc076"
 GREEN = "#22d10f"
 FONT = ("HELVETICA", 18, 'bold')
 
+
 def get_drives():
     """On windows machines, retrieves the accessible drives (e.g C:\\, D:\\, etc.) in to for automated seeking
     of msconvert.
@@ -300,10 +301,10 @@ def Check_Docker_Image():
 
     try:
         data = client.images.get(DOCKER_IMAGE)
-        if "latest" not in str(data):
-            resp = messagebox.askquestion("Newer docker image available", "A newer version of the msconvert docker image is available, would you like to update?")
-            if resp == "yes":
-                client.images.pull(DOCKER_IMAGE)
+        # if "latest" not in str(data):
+        #     resp = messagebox.askquestion("Newer docker image available", "A newer version of the msconvert docker image is available, would you like to update?")
+        #     if resp == "yes":
+        #         client.images.pull(DOCKER_IMAGE)
     except:
         resp = messagebox.askquestion("Docker image unavailable", "No docker image for msconvert is available, would you like to download it now? (WARNING: May take several minutes)")
         if resp == "yes":
@@ -557,11 +558,15 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
 
             pvs_ppm_off = 0
             used_idx = []
+
+            last_idx = 0
             
             for x_row in range(max_x_pixels[filt]):
                 align_time = time_targets[filt][x_row]
                 time_diffs = abs(tmp_times - align_time)
                 match_idx = np.where(time_diffs == min(time_diffs))[0][0]
+                scan_delta_to_pvs = tmp_times[match_idx] - tmp_times[last_idx]
+                last_idx = match_idx
                 time_offset = time_diffs[match_idx]
                 num_total += 1
                 if zero_indexed:
@@ -571,7 +576,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
                     x_coord = x_row + 1
                     y_coord = y_row + 1
                 
-                if scan_mode == "x-scan":
+                if scan_mode == "x-scan": 
                     coords = (x_coord, y_coord, 1)
                 elif scan_mode == 'y-scan':
                     coords = (y_coord, x_coord, 1)
@@ -584,14 +589,14 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
                     match_spectra = spec_list[match_idx]
                     [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
                     if len(recalibrated_mz) != 0:
-                        image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,coords)
+                        image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,coords,userParams=[{"name": "DeltaScanTime","value":f"{scan_delta_to_pvs:.4f}"}])
                 else:
                     num_duplicates += 1
                     if not no_duplicating:
                         match_spectra = spec_list[match_idx]
                         [recalibrated_mz, pvs_ppm_off] = recalibrate(mz=match_spectra.mz, int=match_spectra.i,lock_mz=LOCK_MASS,search_tol=TOLERANCE,ppm_off=pvs_ppm_off)
                         if len(recalibrated_mz) != 0:
-                            image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,coords,userParams=[{"name":"DuplicatedSpectrum","value":"True"}])
+                            image_files[filt].addSpectrum(recalibrated_mz,match_spectra.i,coords,userParams=[{"name":"DuplicatedSpectrum","value":"True"},{"name": "DeltaScanTime","value":f"{scan_delta_to_pvs:.4f}"}])
 
                     # print(f"Duplicated pixel detected - {num_duplicates} / {num_total} ({num_duplicates * 100 / num_total:.2f}%)")
 

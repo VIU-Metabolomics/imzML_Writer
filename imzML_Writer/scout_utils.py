@@ -6,8 +6,11 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.widgets import PolygonSelector
 from matplotlib.path import Path
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from imzml_writer import utils
+from lxml import etree
+import pandas as pd
+import numpy as np
 
 
 roi_mask = None
@@ -18,6 +21,37 @@ raw_ion_image = None
 TEAL = "#2da7ad"
 BEIGE = "#dbc076"
 FONT = ("HELVETICA", 18, 'bold')
+
+
+def tic_image(path:Path):
+    spec_elements = []
+    tgts = {
+        "IMS:1000050": ["x", int, 0],
+        'IMS:1000051': ["y", int, 0],
+        'MS:1000285': ['tic', float, 0],
+    }
+    for _, spec in etree.iterparse(path,tag='{http://psi.hupo.org/ms/mzml}spectrum'):
+        local_spec = {}
+        
+        for param in spec.findall(".//{http://psi.hupo.org/ms/mzml}cvParam"):
+            param_val = param.attrib['accession']
+            if param_val in tgts.keys():
+                converted_val = tgts[param_val][1](param.attrib['value'])
+                local_spec[tgts[param_val][0]] = converted_val
+                if converted_val > tgts[param_val][2]:
+                    tgts[param_val][2] = converted_val
+        
+        spec_elements.append(local_spec)
+
+    tic_image = np.zeros((tgts['IMS:1000051'][2], tgts['IMS:1000050'][2]))
+
+    for spec in spec_elements:
+        tic_image[spec['y']-1,spec['x']-1] = spec['tic']
+
+
+    return tic_image
+
+
 
 
 def unsharp_mask(image, kernel_size=(5, 5), sigmaX=1.0, sigmaY=1.0, amount=1.0, threshold=0):

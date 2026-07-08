@@ -28,3 +28,4 @@ LOGFILE_imzML_Writer.log
 /sandbox
 *__pycache__
 /tests/test_files
+./imzml_writer/__pycache__
