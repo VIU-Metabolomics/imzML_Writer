@@ -615,7 +615,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     for filt in scan_filts:
         image_files[filt].close()
 
-def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,tgt_progress=None, scan_mode:str = "x-scan"):
+def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,tgt_progress=None, scan_mode:str = "x-scan", write_zarr:bool=False, zarr_options:dict|None=None):
     """Manages annotation of imzML files with metadata from source mzML files and user-specified fields (GUI). 
     
     :param model_files: Directory to the folder containing mzML files
@@ -623,7 +623,9 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
     :param y_step: step between strip lines, µm
     :param path: path to the directory where imzML files should be stored after annotation
     :param tgt_progress: Tkinter progress bar object to update as the process continues
-    :param scan_mode: Whether the data was acquired in 'x-scan' or 'y-scan' mode."""
+    :param scan_mode: Whether the data was acquired in 'x-scan' or 'y-scan' mode.
+    :param write_zarr: Also write one combined Thyra Zarr store after annotation.
+    :param zarr_options: Optional keyword arguments forwarded to ``thyra.convert_msi``."""
     
     global OUTPUT_NAME, time_targets
 
@@ -695,7 +697,15 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
             tgt_progress.config(mode="determinate",value=progress)
 
     ##After conversion is complete, clean up files by putting the annotated imzML files in a new directory within the datafile folder           
-    move_files(OUTPUT_NAME,path)
+    output_directory = move_files(OUTPUT_NAME,path)
+    if write_zarr:
+        from imzml_writer.zarr_writer import write_combined_zarr
+
+        write_combined_zarr(
+            output_directory,
+            os.path.join(output_directory, f"{OUTPUT_NAME}.zarr"),
+            thyra_options=zarr_options,
+        )
 
 def move_files(probe_txt:str,path:str):
     """Moves files matching a search string (probe_txt) in the current working directory into the specified directory in a new folder called 'probe_txt'
@@ -718,6 +728,8 @@ def move_files(probe_txt:str,path:str):
                     logger.info("Copy object claimed failure")
                 finally:
                     os.remove(file)
+
+    return new_directory
 
 
 def annotate_imzML(annotate_file:str,SRC_mzML:str,scan_time:float=0.001,filter_string:str="none given",x_speed:float=1,y_step:float=1,polarity:str="positive",ms_level:int=1, scan_mode:str = 'x-scan'):

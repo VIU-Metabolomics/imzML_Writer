@@ -1,9 +1,11 @@
 import tkinter as tk
-from tkinter import ttk, filedialog,messagebox
+from tkinter import ttk, filedialog, messagebox, simpledialog
+import faulthandler
 import os
 import threading
 import sys
 import time
+from pathlib import Path
 from importlib import resources
 
 import imzml_writer.imzML_Scout as scout
@@ -26,6 +28,10 @@ def gui(tgt_dir:str=None):
     """Main control loop for imzML_Writer GUI. No arguments required, but if a directory is passed imzML writer will launch with that directory opened.
     
     :param tgt_dir: (optional) - initial directory for imzML Writer to open in (str)"""
+
+    if not faulthandler.is_enabled():
+        faulthandler.enable(all_threads=True)
+    active_workers = set()
 
     ##UI Functions
     def get_path():
@@ -69,6 +75,242 @@ def gui(tgt_dir:str=None):
                 else:                
                     file_list.insert(ticker,file)
                     ticker+=1
+        update_zarr_action(dir)
+
+    def imzml_pairs(directory):
+        """Return finalized imzML files that have their matching binary file."""
+        folder = Path(directory)
+        if not folder.is_dir():
+            return []
+        return sorted(
+            path
+            for path in folder.iterdir()
+            if path.suffix.lower() == ".imzml"
+            and path.with_suffix(".ibd").is_file()
+        )
+
+    def update_zarr_action(directory):
+        """Replace the imzML conversion action once finalized files exist."""
+        if imzml_pairs(directory):
+            mzML_process.grid_remove()
+            combined_zarr_button.grid()
+        else:
+            combined_zarr_button.grid_remove()
+            mzML_process.grid()
+
+    def create_combined_zarr():
+        """Convert the active imzML set and optionally register an optical TIFF."""
+        source_directory = Path(CD_entry.get()).resolve()
+        inputs = imzml_pairs(source_directory)
+        if not inputs:
+            messagebox.showwarning(
+                title="No finalized imzML files",
+                message="Select a folder containing matching .imzML and .ibd files.",
+            )
+            return
+
+        suggested_stem = source_directory.name
+        if suggested_stem.lower().endswith("-zarr"):
+            suggested_stem = suggested_stem[:-5]
+        suggested_stem = suggested_stem.rstrip(" ._-") or "combined"
+        output = filedialog.asksaveasfilename(
+            parent=window,
+            initialdir=str(source_directory),
+            # Tk appends defaultextension itself on some platforms. Including
+            # it here produces names such as sample.zarr.zarr on macOS.
+            initialfile=suggested_stem,
+            defaultextension=".zarr",
+            filetypes=[("SpatialData Zarr", "*.zarr"), ("All files", "*")],
+            title="Save combined Zarr as",
+        )
+        if not output:
+            return
+        output_path = Path(output)
+        if output_path.name.lower().endswith(".zarr.zarr"):
+            output_path = output_path.with_name(output_path.name[:-5])
+        elif output_path.suffix.lower() != ".zarr":
+            output_path = output_path.with_name(f"{output_path.name}.zarr")
+        if output_path.exists():
+            messagebox.showwarning(
+                title="Zarr already exists",
+                message="Choose a new output name; existing Zarr stores are not overwritten.",
+            )
+            return
+
+        optical_path = filedialog.askopenfilename(
+            parent=window,
+            initialdir=str(source_directory),
+            title="Optional: select optical TIFF (Cancel to skip)",
+            filetypes=[("TIFF images", ("*.tif", "*.tiff")), ("All files", "*")],
+        )
+        optical_pixel_size = None
+        if optical_path:
+            try:
+                import tifffile
+                from imzml_writer.zarr_writer import _tiff_pixel_size_um
+
+                with tifffile.TiffFile(optical_path) as tiff:
+                    optical_pixel_size = _tiff_pixel_size_um(tiff)
+            except (ImportError, OSError, ValueError):
+                # The worker reports the complete optional-dependency message.
+                pass
+            if optical_pixel_size is None:
+                optical_pixel_size = simpledialog.askfloat(
+                    "Optical pixel size",
+                    "No physical calibration was found in the TIFF.\n"
+                    "Enter the optical pixel size in µm (square pixels):",
+                    parent=window,
+                    minvalue=0.000001,
+                )
+                if optical_pixel_size is None:
+                    if not messagebox.askyesno(
+                        "Skip optical registration?",
+                        "Continue creating the combined Zarr without the optical image?",
+                        parent=window,
+                    ):
+                        return
+                    optical_path = ""
+
+        operation = {"error": None, "result": None}
+        combined_zarr_button.config(state="disabled", text="Creating Zarr…")
+
+        def convert():
+            try:
+                from imzml_writer.zarr_writer import write_combined_zarr
+
+                operation["result"] = write_combined_zarr(inputs, output_path)
+            except Exception as exc:
+                operation["error"] = exc
+
+        conversion_thread = threading.Thread(target=convert, daemon=True)
+        active_workers.add(conversion_thread)
+        conversion_thread.start()
+
+        def finish_conversion():
+            if conversion_thread.is_alive():
+                window.after(500, finish_conversion)
+                return
+            active_workers.discard(conversion_thread)
+            if operation["error"] is not None:
+                combined_zarr_button.config(
+                    state="normal", text="Create combined Zarr"
+                )
+                messagebox.showerror(
+                    title="Combined Zarr conversion failed",
+                    message=str(operation["error"]),
+                    parent=window,
+                )
+                return
+
+            if not optical_path:
+                combined_zarr_button.config(
+                    state="normal", text="Create combined Zarr"
+                )
+                messagebox.showinfo(
+                    title="Combined Zarr complete",
+                    message=f"Combined Zarr created.\n\n{output_path}",
+                    parent=window,
+                )
+                return
+
+            combined_zarr_button.config(text="Registering optical…")
+            registration_operation = {"error": None, "result": None}
+            preview_requests = []
+
+            def dispatch_preview(preview):
+                """Pause the worker while Tk runs the modal preview safely."""
+                request = {
+                    "preview": preview,
+                    "decision": False,
+                    "error": None,
+                    "done": threading.Event(),
+                }
+                preview_requests.append(request)
+                request["done"].wait()
+                if request["error"] is not None:
+                    raise request["error"]
+                return request["decision"]
+
+            def register_optical():
+                try:
+                    from imzml_writer.zarr_writer import (
+                        add_optical_image,
+                        coregister_optical_image,
+                    )
+
+                    optical_name = add_optical_image(
+                        output_path,
+                        optical_path,
+                        pixel_size_um=optical_pixel_size,
+                    )
+                    registration_operation["result"] = coregister_optical_image(
+                        output_path,
+                        optical_name,
+                        save=None,
+                        preview_dispatch=dispatch_preview,
+                    )
+                except Exception as exc:
+                    registration_operation["error"] = exc
+
+            registration_thread = threading.Thread(
+                target=register_optical, daemon=True
+            )
+            active_workers.add(registration_thread)
+            registration_thread.start()
+
+            def finish_registration():
+                if preview_requests:
+                    request = preview_requests.pop(0)
+                    try:
+                        request["decision"] = request["preview"]()
+                    except Exception as exc:
+                        request["error"] = exc
+                    finally:
+                        # Matplotlib's Tk backend creates internal PhotoImages.
+                        # Drop and collect them here, while still on Tk's thread.
+                        request["preview"] = None
+                        import gc
+
+                        gc.collect()
+                        request["done"].set()
+                if registration_thread.is_alive():
+                    window.after(100, finish_registration)
+                    return
+                active_workers.discard(registration_thread)
+
+                combined_zarr_button.config(
+                    state="normal", text="Create combined Zarr"
+                )
+                if registration_operation["error"] is not None:
+                    messagebox.showerror(
+                        title="Optical registration failed",
+                        message=(
+                            f"The combined Zarr was created at:\n{output_path}\n\n"
+                            "Optical registration failed:\n"
+                            f"{registration_operation['error']}"
+                        ),
+                        parent=window,
+                    )
+                    return
+
+                registration = registration_operation["result"]
+                if registration.saved:
+                    detail = (
+                        "Combined Zarr created and optical registration saved."
+                    )
+                else:
+                    detail = (
+                        "Combined Zarr created; optical registration was not saved."
+                    )
+                messagebox.showinfo(
+                    title="Combined Zarr complete",
+                    message=f"{detail}\n\n{output_path}",
+                    parent=window,
+                )
+
+            window.after(100, finish_registration)
+
+        window.after(500, finish_conversion)
 
     def get_file_types(dir) -> str:
         """dir: pathname for active directory
@@ -372,21 +614,45 @@ def gui(tgt_dir:str=None):
 
 
 
+    logo_image = None
+
+    def close_window():
+        """Keep Tk alive while workers may still dispatch UI work."""
+        if any(worker.is_alive() for worker in active_workers):
+            messagebox.showwarning(
+                title="Processing in progress",
+                message="Please wait for the Zarr operation to finish before closing.",
+                parent=window,
+            )
+            return
+
+        # Release Tk images on the GUI thread. Otherwise Python may finalize a
+        # PhotoImage after Tk's main loop has already stopped.
+        if logo_image is not None and logo_image.name:
+            try:
+                window.tk.call("image", "delete", logo_image.name)
+            except tk.TclError:
+                pass
+            logo_image.name = ""
+        window.destroy()
+
+    window.protocol("WM_DELETE_WINDOW", close_window)
+
     ##Logo
     try:
         canvas = tk.Canvas(width = 313,height=205,bg=TEAL,highlightthickness=0)
-        img = tk.PhotoImage(file=resource_path("Images/Logo-01.png"))
+        logo_image = tk.PhotoImage(file=resource_path("Images/Logo-01.png"))
         window.iconbitmap(resource_path("Images/imzML_Writer.ico"))
-        canvas.create_image(313/2, 205/2,image=img)
+        canvas.create_image(313/2, 205/2,image=logo_image)
         canvas.grid(column=0,row=0,columnspan=2)
     except:
         try:
             canvas = tk.Canvas(width = 313,height=205,bg=TEAL,highlightthickness=0)
             with resources.path('imzml_writer.Images','Logo-01.png') as path:
-                img=tk.PhotoImage(file=resource_path(path))
-                canvas.create_image(313/2, 205/2,image=img)
+                logo_image=tk.PhotoImage(file=resource_path(path))
+                canvas.create_image(313/2, 205/2,image=logo_image)
                 canvas.grid(column=0,row=0,columnspan=2)
-                window.iconphoto(True, img)
+                window.iconphoto(True, logo_image)
         except Exception as e:
             print(e)
     
@@ -454,8 +720,6 @@ def gui(tgt_dir:str=None):
     Annotate_progress=ttk.Progressbar(length=525,style="success.Striped.Horizontal.TProgressbar")
     Annotate_progress.grid(row=7,column=1,columnspan=5)
 
-
-
     #Listbox for files in target folder
     file_list = tk.Listbox(window,bg=BEIGE,fg="black",height=10,highlightcolor=TEAL,width=35,justify='left')
     file_list.grid(row=0,column=4,rowspan=2,columnspan=3)
@@ -469,6 +733,15 @@ def gui(tgt_dir:str=None):
 
     imzML_metadata = tk.Button(text="Write imzML metadata",bg=TEAL,highlightbackground=TEAL,command=write_metadata)
     imzML_metadata.grid(row=3,column=4)
+
+    combined_zarr_button = tk.Button(
+        text="Create combined Zarr",
+        bg=TEAL,
+        highlightbackground=TEAL,
+        command=create_combined_zarr,
+    )
+    combined_zarr_button.grid(row=2,column=5)
+    combined_zarr_button.grid_remove()
 
     #Advanced option
     adv_options = tk.Button(text="Advanced Options...",bg=TEAL,highlightbackground=TEAL,command=launch_advanced)

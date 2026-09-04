@@ -80,6 +80,13 @@ most-abundant file type in your directory. The process will then be begin and ca
 :Write imzML: progress bar for the conversion of ``.mzML`` files to ``.imzML`` format.  
 
 :Metadata: Data from the source ``.mzML`` file and user-input parameters are used to populate metadata in the ``.imzML`` file(s).
+
+Once the active folder contains completed ``.imzML``/``.ibd`` pairs, a
+``Create combined Zarr`` button appears. Choose an output name, then optionally
+select an optical TIFF. Cancelling the TIFF picker creates an MSI-only Zarr;
+selecting a TIFF adds the image and opens a translation-only coregistration
+preview. If the TIFF has no physical pixel calibration, the GUI asks for its
+pixel size in micrometers.
  
 1. View the image with imzML Scout
 +++++++++++++++++++++++++++++++++++
@@ -166,6 +173,5 @@ export, click the ``Bulk export`` or ``Bulk CSV export`` button and navigate to 
 The ``include TIC?`` checkbox specifies whether the TIC image / TIC array should be included in the bulk export.
 
 Single targeted m/z can be also be exported by choosing either Export Image or csv Export. 
-
 
 
