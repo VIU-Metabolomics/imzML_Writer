@@ -4,7 +4,9 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from RangeSlider.RangeSlider import RangeSliderV
 import os
+import subprocess
 import sys
+import tempfile
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backend_tools import ToolBase, ToolToggleBase 
@@ -16,7 +18,6 @@ import json
 from imzml_writer import scout_utils
 from imzml_writer.analyte_list_cleanup import *
 from imzml_writer import __version__
-
 
 
 def main(tgt_file:str = "",initial_mz:float=104.1070):
@@ -366,6 +367,30 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
                         pad_inches=0)
         
         show_patches()
+
+
+    def copy_image_to_clipboard():
+        """Copy the active ion image with an m/z and tolerance overlay."""
+        target_mz = float(mz_entry.get())
+        tolerance = float(tolerance_entry.get())
+        hide_patches()
+        overlay = plot1.text(
+            0.5, 0.98, f"m/z {target_mz:g} @ {tolerance:g} ppm",
+            transform=plot1.transAxes, ha="center", va="top", color="white",
+            fontsize=12, fontweight="bold", bbox={"facecolor": "black", "alpha": 0.65, "edgecolor": "none"},
+        )
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".png") as image_file:
+                fig.savefig(image_file.name,format="png",dpi=float(qual_var.get()),bbox_inches="tight",pad_inches=0)
+                script = (
+                    f'set the clipboard to (read (POSIX file "{image_file.name}") '
+                    'as «class PNGf»)'
+                )
+                subprocess.run(["osascript", "-e", script],check=True)
+        finally:
+            overlay.remove()
+            show_patches()
+            canvas_ionimage.draw_idle()
             
 
 
@@ -851,6 +876,9 @@ def main(tgt_file:str = "",initial_mz:float=104.1070):
     ##Export buttons
     export_button=tk.Button(window_scout,text="Export Image",bg=TEAL,highlightbackground=TEAL,command=lambda:export_image(fig))
     export_button.grid(row=7,column=2)
+
+    copy_button=tk.Button(window_scout,text="Copy Image to Clipboard",bg=TEAL,highlightbackground=TEAL,command=copy_image_to_clipboard)
+    copy_button.grid(row=9,column=2)
 
     b_export = tk.Button(window_scout,text="Bulk Export",bg=TEAL,highlightbackground=TEAL,command=bulk_export)
     b_export.grid(row=7,column=0)
