@@ -403,6 +403,14 @@ def _fix_unicode(dir:str, files:list[str]):
         print(f"Finished file {file}")
 
 
+def _filter_output_stem(output_name, scan_filter):
+    """Sanitize filter text without treating decimal points as extensions."""
+    if scan_filter is None:
+        return f"{output_name}_None"
+    readable = re.sub(r'[^\w +@()\[\]=-]', '_', scan_filter)[:150]
+    return f"{output_name}_{readable}"
+
+
 def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:float=0,TOLERANCE:float=20,zero_indexed:bool=False,no_duplicating:bool=False,scan_mode:str = "x-scan"):
     """Handles conversion of mzML files to the imzML format using the pyimzml library. Converts data line-by-line (one mzML at a time),
     aligning data based on scan time and splitting into separate imzML files for each scan in the source mzML.
@@ -502,7 +510,7 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
     #Compute max number of pixels in each scan filter to construct pixel grids
     max_x_pixels = {}
     y_pixels = len(spectrum_counts)
-    contender_idx=[]
+    contender_idx={}
     if isinstance(scan_filts,str):
         scan_filts = [scan_filts]
 
@@ -513,32 +521,33 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
             idx += 1
             if spec_file[filt] > max_x:
                 max_x = spec_file[filt]
-                contender_idx.append(idx)
+                contender_idx[filt] = idx
         max_x_pixels[filt] = max_x
 
     #Retrieve max times for time-alignment on longest spectra, build ideal time array
-    max_times = []
-    for idx in contender_idx:
+    max_times = {}
+    for filt, idx in contender_idx.items():
         tmp = pymzml.run.Reader(os.path.join(PATH,mzml_files[idx]))
         scan_time = get_final_scan_time(tmp)
-        max_times.append(scan_time)
+        max_times[filt] = scan_time
+        tmp.close()
 
     time_targets={}
     iter = -1
     for key in max_x_pixels:
         iter += 1
-        time_array = np.linspace(0,max_times[iter],max_x_pixels[key])
+        time_array = np.linspace(0,max_times[key],max_x_pixels[key])
         time_targets[key] = time_array
 
     #Initiate imzmL objects
     image_files = {}
     output_files ={}
     for filt_idx, filt in enumerate(scan_filts):
-        if filt == None:
-            image_files[filt]=imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_None",mode="processed",polarity=polarities[filt_idx])
-        else:
-            image_files[filt] = imzmlw.ImzMLWriter(output_filename=fr"{OUTPUT_NAME}_{filt.split(".")[0]}",mode="processed",polarity=polarities[filt_idx])
-        output_files[filt]=(fr"{OUTPUT_NAME}_{filt}")
+        # Explicit extension prevents pyimzml from treating decimal filter values
+        # as a filename extension and truncating the rest of the filter.
+        output_files[filt] = _filter_output_stem(OUTPUT_NAME, filt) + ".imzML"
+        image_files[filt] = imzmlw.ImzMLWriter(
+            output_filename=output_files[filt], mode="processed", polarity=polarities[filt_idx])
 
     num_duplicates = 0
     num_total = 0
@@ -602,11 +611,11 @@ def mzML_to_imzML_convert(progress_target=None,PATH:str=os.getcwd(),LOCK_MASS:fl
 
 
         ##Update progress bar in the GUI as each mzML finishes
-        progress = int(y_row*100/(y_pixels-1)) 
+        progress = int((y_row + 1)*100/y_pixels)
 
         if progress > 0 and progress_target != None:   
             progress_target.stop() 
-            progress_target.config(mode="determinate",value=int(y_row*100/(y_pixels-1)))
+            progress_target.config(mode="determinate",value=progress)
 
     ##Close imzML objects for downstream annotation
     update_files = os.listdir()
@@ -636,8 +645,8 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
     scan_filts=[]
     polarities = []
     ms_levels = []
-    model_file_list = os.listdir(model_files)
-    model_file_list.sort()
+    model_file_list = [f for f in os.listdir(model_files) if f.lower().endswith('.mzml')]
+    human_sort(model_file_list)
 
     ##Ignore hidden files
     while model_file_list[0].startswith("."):
@@ -670,13 +679,9 @@ def imzML_metadata_process(model_files:str,x_speed:float,y_step:float,path:str,t
     for filt_idx, filt in enumerate(scan_filts):
         #Find the target file based on a filter string match
         iter+=1
-        for file in update_files:
-            if ".imzML" in file:
-                partial_filter_string = file.split(OUTPUT_NAME+"_")[-1].split(".imzML")[0]
-                if partial_filter_string == "None":
-                    target_file = file
-                elif partial_filter_string in filt:
-                    target_file = file
+        target_file = _filter_output_stem(OUTPUT_NAME, filt) + ".imzML"
+        if target_file not in update_files:
+            raise FileNotFoundError(f"Missing output for scan filter {filt!r}: {target_file}")
 
         ##Calls the actual annotation function
         annotate_imzML(

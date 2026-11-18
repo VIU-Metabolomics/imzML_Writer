@@ -1972,10 +1972,6 @@ def write_combined_zarr(
     if conflicting:
         names = ", ".join(sorted(conflicting))
         raise ValueError(f"thyra_options cannot override: {names}")
-    # Thyra's CLI enables automatic mass-axis resampling, but its Python API
-    # only does so when a non-None config is supplied. Without this, centroid
-    # imzML can produce a raw union axis with nearly one column per peak across
-    # the file, making even spatially tiny datasets slow to open and browse.
     options.setdefault("resampling_config", {})
 
     convert_msi, read_zarr, SpatialData = _load_zarr_dependencies()
@@ -2006,9 +2002,6 @@ def write_combined_zarr(
             temporary_store = temporary_root / f"source-{index}.zarr"
 
             with warnings.catch_warnings():
-                # Older imzML Writer outputs used non-canonical CV display
-                # names. pyimzML corrects them automatically; suppress only
-                # that known warning while retaining every other warning.
                 warnings.filterwarnings(
                     "ignore",
                     message=r"Accession MS:100(?:0799|0031) found with incorrect name.*",

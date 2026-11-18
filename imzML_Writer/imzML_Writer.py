@@ -564,7 +564,7 @@ def gui(tgt_dir:str=None):
             else:
                 combine_ion_mobility.set(False)
 
-        advanced_window = tk.Tk()
+        advanced_window = tk.Toplevel(window)
         advanced_window.title("Advanced Options...")
         advanced_window.config(padx=5,pady=5,bg=TEAL)
 
@@ -596,6 +596,7 @@ def gui(tgt_dir:str=None):
 
         lock_mass_search_tol_entry.grid(row=4,column=2)
         lock_mass_search_tol_label.grid(row=4,column=1)
+
 
 
     def bring_to_front():
